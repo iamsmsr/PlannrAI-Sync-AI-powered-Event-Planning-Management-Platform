@@ -1,0 +1,167 @@
+/* Results Section Styles */
+.results-section {
+    display: none;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.search-info {
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.back-btn {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.back-btn:hover {
+    background: #333;
+}
+
+.venues-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.venue-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.venue-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.venue-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.venue-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.venue-card:hover .venue-image img {
+    transform: scale(1.05);
+}
+
+.venue-info {
+    padding: 20px;
+}
+
+.venue-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 8px 0;
+}
+
+.venue-address {
+    color: #666;
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+}
+
+.venue-location {
+    color: #888;
+    margin: 0 0 12px 0;
+    font-size: 0.9rem;
+}
+
+.venue-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating {
+    color: #ff6b6b;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.reviews {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.view-dates-btn {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 15px;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+.view-dates-btn:hover {
+    background: #333;
+}
+
+/* No results message */
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.no-results h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.no-results p {
+    font-size: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .venues-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .results-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .venue-card {
+        margin: 0 10px;
+    }
+}

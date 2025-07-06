@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peerspace - Event Management</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/results.css">
+    <link rel="stylesheet" href="styles/calendar.css">
+    <link rel="stylesheet" href="styles/user.css">
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo">PEERSPACE</div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Browse Spaces ▼</a>
+                <a href="#" class="nav-link">List Your Space</a>
+                <a href="#" class="nav-link dashboard-link" onclick="showDashboard()" style="display: none;">Dashboard</a>
+                <a href="#" class="nav-link" onclick="showAuthModal('signin')">Log In</a>
+                <button class="signup-btn" onclick="showAuthModal('signup')">Sign Up</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-section">
+                <label class="search-label">What are you planning?</label>
+                <div class="activity-buttons">
+                    <button class="activity-btn" data-activity="wedding">Wedding</button>
+                    <button class="activity-btn" data-activity="party">Party</button>
+                    <button class="activity-btn" data-activity="meeting">Meeting</button>
+                </div>
+            </div>
+            <div class="search-section">
+                <label class="search-label">Where?</label>
+                <input type="text" class="location-input" value="Dhaka" placeholder="Enter a city">
+            </div>
+            <button class="search-button">Search →</button>
+        </div>
+
+        <!-- Hero Title -->
+        <div class="hero-title">
+            <h1>Find a space.</h1>
+        </div>
+    </div>
+
+    <!-- Awards Section -->
+    <section class="awards-section">
+        <div class="awards-container">
+            <div class="awards-images">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Venue 1">
+                <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Venue 2">
+                <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt="Venue 3">
+            </div>
+            <div class="awards-text">
+                <p>Announcing the 2025</p>
+                <h2>OPEN DOOR AWARDS</h2>
+                <p>Discover the best in space rentals</p>
+                <a href="#" class="awards-link">→</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <div class="results-header">
+            <div class="search-info">Found 0 venues</div>
+            <button class="back-btn" onclick="backToSearch()">← Back to Search</button>
+        </div>
+        <div class="venues-container">
+            <!-- Venue cards will be inserted here -->
+        </div>
+    </section>
+
+    <!-- Calendar Modal -->
+    <div class="calendar-modal" id="calendarModal">
+        <div class="modal-overlay" onclick="closeCalendar()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="venue-title">Select Dates</h2>
+                <button class="close-btn" onclick="closeCalendar()">×</button>
+            </div>
+            <div class="month-selector">
+                <!-- Month buttons will be generated here -->
+            </div>
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="day-label">Sun</div>
+                    <div class="day-label">Mon</div>
+                    <div class="day-label">Tue</div>
+                    <div class="day-label">Wed</div>
+                    <div class="day-label">Thu</div>
+                    <div class="day-label">Fri</div>
+                    <div class="day-label">Sat</div>
+                </div>
+                <div class="calendar-grid">
+                    <!-- Calendar days will be generated here -->
+                </div>
+            </div>
+            <div class="calendar-legend">
+                <div class="legend-item">
+                    <div class="legend-color available"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color booked"></div>
+                    <span>Booked</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color temp-hold"></div>
+                    <span>Temporarily Hold</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color selected"></div>
+                    <span>Selected</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeCalendar()">Cancel</button>
+                <button class="book-dates-btn" onclick="bookDates()">Book Dates</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard-section">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-welcome">Welcome!</h1>
+                <p class="dashboard-subtitle">Manage your bookings and account settings</p>
+                <p>Email: <span class="dashboard-email">user@example.com</span></p>
+                <button class="dashboard-logout-btn" onclick="logout()">Logout</button>
+            </div>
+            
+            <div class="dashboard-nav">
+                <button class="dashboard-nav-btn active" onclick="switchDashboardTab('overview')">Overview</button>
+                <button class="dashboard-nav-btn" onclick="switchDashboardTab('bookings')">My Bookings</button>
+                <button class="dashboard-nav-btn" onclick="switchDashboardTab('profile')">Profile</button>
+                <button class="dashboard-nav-btn" onclick="goToSearchFromDashboard()">Search Venues</button>
+            </div>
+            
+            <div class="dashboard-content">
+                <!-- Overview Section -->
+                <div class="dashboard-overview" id="overviewSection">
+                    <div class="dashboard-empty">
+                        <h3>Dashboard Overview</h3>
+                        <p>Welcome to your event management dashboard. Use the navigation above to manage your bookings and profile.</p>
+                        <!-- Test booking creation for debugging -->
+                        <button class="test-booking-btn" onclick="createTestBooking()" style="margin-top: 20px; padding: 10px 20px; background: #059669; color: white; border: none; border-radius: 5px; cursor: pointer;">Create Test Booking (Dev Only)</button>
+                    </div>
+                </div>
+                
+                <!-- My Bookings Section -->
+                <div class="dashboard-bookings" id="bookingsSection" style="display: none;">
+                    <div class="bookings-container">
+                        <!-- Booking cards will be inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Profile Section -->
+                <div class="dashboard-profile" id="profileSection" style="display: none;">
+                    <div class="dashboard-empty">
+                        <h3>Profile Settings</h3>
+                        <p>Profile management features will be available here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Authentication Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <h2 class="auth-modal-title" id="authModalTitle">Welcome</h2>
+                <button class="auth-close-btn" onclick="closeAuthModal()">×</button>
+            </div>
+            
+            <!-- Sign In Form -->
+            <div id="signinFormContainer" class="auth-form-container">
+                <div class="error-message" id="signinError"></div>
+                <form id="signinForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label" for="signinEmail">Email</label>
+                        <input type="email" id="signinEmail" name="email" class="form-input" 
+                               placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signinPassword">Password</label>
+                        <input type="password" id="signinPassword" name="password" class="form-input" 
+                               placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Sign In</button>
+                </form>
+                <div class="auth-switch">
+                    <p class="auth-switch-text">Don't have an account?</p>
+                    <button class="auth-switch-btn" onclick="switchAuthMode('signup')">Sign up here</button>
+                </div>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div id="signupFormContainer" class="auth-form-container" style="display: none;">
+                <div class="error-message" id="signupError"></div>
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label" for="signupName">Full Name</label>
+                        <input type="text" id="signupName" name="name" class="form-input" 
+                               placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" name="email" class="form-input" 
+                               placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupPhone">Phone (Optional)</label>
+                        <input type="tel" id="signupPhone" name="phone" class="form-input" 
+                               placeholder="Enter your phone number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" name="password" class="form-input" 
+                               placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" name="confirmPassword" class="form-input" 
+                               placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Sign Up</button>
+                </form>
+                <div class="auth-switch">
+                    <p class="auth-switch-text">Already have an account?</p>
+                    <button class="auth-switch-btn" onclick="switchAuthMode('signin')">Sign in here</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/app.js"></script>
+    <script src="scripts/search.js"></script>
+    <script src="scripts/calendar.js"></script>
+    <script src="scripts/user.js"></script>
+</body>
+</html>
