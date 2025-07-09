@@ -202,9 +202,17 @@ async function handleSignin(event) {
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('userData', JSON.stringify(currentUser));
             
-            // Close modal and show dashboard directly - no popup
+            // Close modal
             closeAuthModal();
-            showDashboard();
+            
+            // Check if user is admin and redirect accordingly
+            if (currentUser.isAdmin || (currentUser.roles && currentUser.roles.includes('ADMIN'))) {
+                // Redirect to admin dashboard
+                window.location.href = 'admin.html';
+            } else {
+                // Show user dashboard
+                showDashboard();
+            }
         } else {
             // Show error message
             showErrorMessage('signin', result.message || 'Invalid email or password.');
@@ -402,6 +410,9 @@ function logout() {
     currentUser = null;
     authToken = null;
     
+    // Stop auto-refresh
+    stopBookingAutoRefresh();
+    
     // Show homepage and update navigation to logged-out state
     showHomePage();
     updateNavigation(false);
@@ -420,71 +431,183 @@ function goToSearchFromDashboard() {
 
 // Dashboard tab switching functionality
 function switchDashboardTab(tabName) {
-    // Remove active class from all tabs
-    document.querySelectorAll('.dashboard-nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
     // Hide all sections
     document.getElementById('overviewSection').style.display = 'none';
     document.getElementById('bookingsSection').style.display = 'none';
     document.getElementById('profileSection').style.display = 'none';
     
-    // Show selected section and activate tab
-    switch(tabName) {
+    // Remove active class from all nav buttons
+    document.querySelectorAll('.dashboard-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected section and activate nav button
+    switch (tabName) {
         case 'overview':
             document.getElementById('overviewSection').style.display = 'block';
             document.querySelector('[onclick="switchDashboardTab(\'overview\')"]').classList.add('active');
+            stopBookingAutoRefresh();
             break;
         case 'bookings':
             document.getElementById('bookingsSection').style.display = 'block';
             document.querySelector('[onclick="switchDashboardTab(\'bookings\')"]').classList.add('active');
             loadUserBookings();
+            startBookingAutoRefresh();
             break;
         case 'profile':
             document.getElementById('profileSection').style.display = 'block';
             document.querySelector('[onclick="switchDashboardTab(\'profile\')"]').classList.add('active');
+            stopBookingAutoRefresh();
             break;
     }
 }
 
-// Load and display user bookings
-function loadUserBookings() {
+// Auto-refresh functionality for bookings
+let bookingRefreshInterval = null;
+
+// Start auto-refresh for bookings (every 30 seconds)
+function startBookingAutoRefresh() {
+    // Clear any existing interval
+    if (bookingRefreshInterval) {
+        clearInterval(bookingRefreshInterval);
+    }
+    
+    // Start new interval
+    bookingRefreshInterval = setInterval(() => {
+        // Only refresh if we're on the bookings tab
+        const bookingsSection = document.getElementById('bookingsSection');
+        if (bookingsSection && bookingsSection.style.display !== 'none') {
+            console.log('Auto-refreshing bookings...');
+            loadUserBookings();
+        }
+    }, 30000); // 30 seconds
+}
+
+// Stop auto-refresh
+function stopBookingAutoRefresh() {
+    if (bookingRefreshInterval) {
+        clearInterval(bookingRefreshInterval);
+        bookingRefreshInterval = null;
+    }
+}
+
+// Load and display user bookings (both temporary and confirmed)
+async function loadUserBookings() {
     console.log('=== loadUserBookings called ===');
     const bookingsContainer = document.querySelector('.bookings-container');
-    const userBookings = JSON.parse(localStorage.getItem('userBookings')) || [];
     const userData = JSON.parse(localStorage.getItem('userData'));
     
-    console.log('Bookings container:', bookingsContainer);
-    console.log('User bookings from localStorage:', userBookings);
-    console.log('User data from localStorage:', userData);
-    
-    if (userBookings.length === 0) {
+    if (!userData || !userData.id) {
         bookingsContainer.innerHTML = `
             <div class="no-bookings">
-                <h3>No Bookings Yet</h3>
-                <p>Your booking history will appear here when you make your first reservation.</p>
-                <button class="search-venues-btn" onclick="goToSearchFromDashboard()">Search Venues</button>
+                <h3>Please Sign In</h3>
+                <p>Sign in to view your booking history.</p>
+                <button class="search-venues-btn" onclick="showAuthModal('signin')">Sign In</button>
             </div>
         `;
         return;
     }
-    
-    // Display user info and bookings
+
+    // Show loading state
     bookingsContainer.innerHTML = `
-        <div class="user-info">
-            <h3>My Bookings</h3>
-            <p><strong>User ID:</strong> ${userData ? userData.id : 'N/A'}</p>
-            <p><strong>Name:</strong> ${userData ? userData.name : 'Guest'}</p>
-            <p><strong>Email:</strong> ${userData ? userData.email : 'Not logged in'}</p>
-        </div>
-        <div class="bookings-list">
-            ${userBookings.map(booking => createBookingCard(booking)).join('')}
+        <div class="loading-state">
+            <h3>Loading your bookings...</h3>
+            <div class="loading-spinner"></div>
         </div>
     `;
-    
-    // Start countdown timers for temp bookings
-    startCountdownTimers();
+
+    try {
+        // Get temporary bookings from localStorage
+        const tempBookings = JSON.parse(localStorage.getItem('userBookings')) || [];
+        console.log('Temporary bookings from localStorage:', tempBookings);
+
+        // Fetch confirmed bookings from backend
+        let confirmedBookings = [];
+        try {
+            const response = await fetch(`http://localhost:8080/api/venues/bookings/user/${userData.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+
+            if (response.ok) {
+                confirmedBookings = await response.json();
+                console.log('Confirmed bookings from backend:', confirmedBookings);
+            } else {
+                console.warn('Failed to fetch backend bookings, showing temp bookings only');
+            }
+        } catch (error) {
+            console.warn('Backend request failed, showing temp bookings only:', error);
+        }
+
+        // Check if we have any bookings at all
+        if (tempBookings.length === 0 && confirmedBookings.length === 0) {
+            bookingsContainer.innerHTML = `
+                <div class="no-bookings">
+                    <h3>No Bookings Yet</h3>
+                    <p>Your booking history will appear here when you make your first reservation.</p>
+                    <button class="search-venues-btn" onclick="goToSearchFromDashboard()">Search Venues</button>
+                </div>
+            `;
+            return;
+        }
+
+        // Create booking cards HTML
+        let bookingCardsHTML = '';
+        
+        // Add temporary bookings first (need to be confirmed)
+        if (tempBookings.length > 0) {
+            bookingCardsHTML += `
+                <div class="temp-bookings-section">
+                    <h4 class="section-title">⏰ Pending Confirmation</h4>
+                    ${tempBookings.map(booking => createBookingCard(booking)).join('')}
+                </div>
+            `;
+        }
+
+        // Add confirmed bookings (from backend)
+        if (confirmedBookings.length > 0) {
+            bookingCardsHTML += `
+                <div class="confirmed-bookings-section">
+                    <h4 class="section-title">📋 Confirmed Bookings</h4>
+                    ${confirmedBookings.map(booking => createBookingStatusCard(booking)).join('')}
+                </div>
+            `;
+        }
+
+        // Display user info and all bookings
+        bookingsContainer.innerHTML = `
+            <div class="user-info">
+                <h3>My Bookings</h3>
+                <p><strong>User ID:</strong> ${userData.id}</p>
+                <p><strong>Name:</strong> ${userData.name}</p>
+                <p><strong>Email:</strong> ${userData.email}</p>
+                <div class="refresh-btn-container">
+                    <button class="refresh-btn" onclick="loadUserBookings()">🔄 Refresh</button>
+                </div>
+            </div>
+            <div class="bookings-list">
+                ${bookingCardsHTML}
+            </div>
+        `;
+
+        // Start countdown timers for temp bookings
+        if (tempBookings.length > 0) {
+            startCountdownTimers();
+        }
+
+    } catch (error) {
+        console.error('Error loading user bookings:', error);
+        bookingsContainer.innerHTML = `
+            <div class="error-state">
+                <h3>Error Loading Bookings</h3>
+                <p>Failed to load your bookings. Please try again.</p>
+                <button class="retry-btn" onclick="loadUserBookings()">Try Again</button>
+            </div>
+        `;
+    }
 }
 
 // Create booking card HTML
@@ -536,12 +659,106 @@ function createBookingCard(booking) {
                 </p>
                 ${timerHTML}
                 <div class="booking-actions">
-                    ${isTemp ? `<button class="confirm-booking-btn" onclick="confirmBooking('${booking.id}')" disabled>Confirm Booking</button>` : ''}
+                    ${isTemp ? `<button class="confirm-booking-btn" onclick="confirmBooking('${booking.id}')">Confirm Booking</button>` : ''}
                     <button class="cancel-booking-btn" onclick="cancelBooking('${booking.id}')">Cancel Booking</button>
                 </div>
             </div>
         </div>
     `;
+}
+
+// Create booking status card HTML for backend data
+function createBookingStatusCard(booking) {
+    const statusInfo = getBookingStatusInfo(booking.status, booking.notes);
+    const formattedDates = booking.selectedDates ? booking.selectedDates.join(', ') : 'No dates';
+    const bookingDate = booking.bookingDate ? new Date(booking.bookingDate).toLocaleDateString() : 'Unknown';
+    
+    return `
+        <div class="booking-card booking-status-${booking.status.toLowerCase()}">
+            <div class="booking-header">
+                <h4 class="booking-venue">${booking.venueName || 'Unknown Venue'}</h4>
+                <span class="booking-id">ID: ${booking.id}</span>
+            </div>
+            
+            <div class="booking-details">
+                <div class="booking-info">
+                    <p><strong>Selected Dates:</strong> ${formattedDates}</p>
+                    <p><strong>Booking Date:</strong> ${bookingDate}</p>
+                    <p><strong>Venue ID:</strong> ${booking.venueId}</p>
+                </div>
+                
+                <div class="booking-status">
+                    <div class="status-indicator ${statusInfo.class}">
+                        <span class="status-icon">${statusInfo.icon}</span>
+                        <span class="status-text">${statusInfo.text}</span>
+                    </div>
+                    
+                    ${statusInfo.message ? `
+                        <div class="status-message ${statusInfo.messageClass}">
+                            ${statusInfo.message}
+                        </div>
+                    ` : ''}
+                    
+                    ${booking.approvedBy ? `
+                        <div class="admin-info">
+                            <p><strong>Processed by:</strong> ${booking.approvedBy}</p>
+                            ${booking.approvedAt ? `<p><strong>Date:</strong> ${new Date(booking.approvedAt).toLocaleString()}</p>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <div class="booking-actions">
+                ${booking.status === 'PENDING' ? `
+                    <button class="action-btn secondary" onclick="loadUserBookings()">🔄 Check Status</button>
+                ` : ''}
+                ${booking.status === 'ACTIVE' ? `
+                    <button class="action-btn success" disabled>✓ Confirmed</button>
+                ` : ''}
+                ${booking.status === 'REJECTED' ? `
+                    <button class="action-btn danger" disabled>✗ Rejected</button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// Get status information for display
+function getBookingStatusInfo(status, notes) {
+    switch (status) {
+        case 'PENDING':
+            return {
+                class: 'status-pending',
+                icon: '⏳',
+                text: 'Pending Review',
+                message: 'Your booking is under admin review. Please wait for approval.',
+                messageClass: 'message-info'
+            };
+        case 'ACTIVE':
+            return {
+                class: 'status-approved',
+                icon: '✅',
+                text: 'Approved & Active',
+                message: 'Your booking has been approved and is confirmed!',
+                messageClass: 'message-success'
+            };
+        case 'REJECTED':
+            return {
+                class: 'status-rejected',
+                icon: '❌',
+                text: 'Rejected',
+                message: notes ? `Reason: ${notes}` : 'Your booking was rejected by the admin.',
+                messageClass: 'message-error'
+            };
+        default:
+            return {
+                class: 'status-unknown',
+                icon: '❓',
+                text: 'Unknown Status',
+                message: 'Status unknown. Please contact support.',
+                messageClass: 'message-warning'
+            };
+    }
 }
 
 // Start countdown timers for temporary bookings
@@ -607,9 +824,89 @@ function removeExpiredBooking(expiry) {
     loadUserBookings();
 }
 
-// Confirm booking (placeholder for now)
-function confirmBooking(bookingId) {
-    showToast('Booking confirmation feature will be implemented later', 'info');
+// Confirm booking - send to backend and update status
+async function confirmBooking(bookingId) {
+    try {
+        // Get the booking from localStorage
+        const userBookings = JSON.parse(localStorage.getItem('userBookings')) || [];
+        const booking = userBookings.find(b => b.id === bookingId);
+        
+        if (!booking) {
+            showToast('Booking not found', 'error');
+            return;
+        }
+        
+        // Check if user is authenticated
+        if (!currentUser || !authToken) {
+            showToast('Please sign in to confirm booking', 'error');
+            return;
+        }
+        
+        // Disable the confirm button to prevent double-clicking
+        const confirmBtn = document.querySelector(`button[onclick="confirmBooking('${bookingId}')"]`);
+        if (confirmBtn) {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Confirming...';
+        }
+        
+        // Prepare booking data for backend
+        const bookingData = {
+            userId: currentUser.id,
+            venueId: booking.venueId,
+            venueName: booking.venueName,
+            selectedDates: booking.selectedDates,
+            bookingDate: new Date().toISOString()
+        };
+        
+        console.log('Sending booking data to backend:', bookingData);
+        
+        // Send to backend
+        const response = await fetch('http://localhost:8080/api/venues/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(bookingData)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Booking confirmed successfully:', result);
+            
+            // Remove the temporary booking from localStorage
+            const updatedBookings = userBookings.filter(b => b.id !== bookingId);
+            localStorage.setItem('userBookings', JSON.stringify(updatedBookings));
+            
+            // Show success message
+            showToast('Booking confirmed successfully! It is now pending admin approval.', 'success');
+            
+            // Refresh the bookings display
+            loadUserBookings();
+            
+        } else {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Booking confirmation failed:', errorData);
+            showToast(errorData.message || 'Failed to confirm booking. Please try again.', 'error');
+            
+            // Re-enable the button
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirm Booking';
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error confirming booking:', error);
+        showToast('Network error. Please check your connection and try again.', 'error');
+        
+        // Re-enable the button
+        const confirmBtn = document.querySelector(`button[onclick="confirmBooking('${bookingId}')"]`);
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Confirm Booking';
+        }
+    }
 }
 
 // Show toast notification
@@ -617,17 +914,35 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
+    
+    let backgroundColor;
+    switch(type) {
+        case 'success':
+            backgroundColor = '#059669';
+            break;
+        case 'error':
+            backgroundColor = '#dc2626';
+            break;
+        case 'warning':
+            backgroundColor = '#d97706';
+            break;
+        default:
+            backgroundColor = '#3b82f6';
+    }
+    
     toast.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: ${type === 'success' ? '#059669' : type === 'warning' ? '#d97706' : '#3b82f6'};
+        background: ${backgroundColor};
         color: white;
         padding: 12px 16px;
         border-radius: 6px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         z-index: 10000;
         font-size: 14px;
+        max-width: 300px;
+        word-wrap: break-word;
     `;
     
     document.body.appendChild(toast);
@@ -636,7 +951,7 @@ function showToast(message, type = 'info') {
         if (toast.parentNode) {
             toast.parentNode.removeChild(toast);
         }
-    }, 3000);
+    }, 4000); // Increased to 4 seconds for error messages
 }
 
 // Test function to create a sample booking for debugging

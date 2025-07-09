@@ -74,11 +74,15 @@ public class AuthController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwt);
-            response.put("user", Map.of(
-                "id", user.getId(),
-                "name", user.getName(),
-                "email", user.getEmail()
-            ));
+            
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("id", user.getId());
+            userMap.put("name", user.getName());
+            userMap.put("email", user.getEmail());
+            userMap.put("roles", user.getRoles());
+            userMap.put("isAdmin", user.getRoles().contains("ADMIN"));
+            
+            response.put("user", userMap);
 
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Event Management</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/admin.css">
+</head>
+<body>
+    <!-- Admin Navigation -->
+    <nav class="admin-navbar">
+        <div class="admin-nav-container">
+            <div class="admin-logo">PEERSPACE ADMIN</div>
+            <div class="admin-nav-links">
+                <span class="admin-user-info">
+                    <span class="admin-user-name">Admin User</span>
+                    <span class="admin-user-email">admin@example.com</span>
+                </span>
+                <button class="admin-logout-btn" onclick="adminLogout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-menu">
+                <div class="admin-menu-item active" onclick="showAdminSection('dashboard')">
+                    <span>📊 Dashboard</span>
+                </div>
+                <div class="admin-menu-item" onclick="showAdminSection('users')">
+                    <span>👥 User Management</span>
+                </div>
+                <div class="admin-menu-item" onclick="showAdminSection('venues')">
+                    <span>🏢 Venue Management</span>
+                </div>
+                <div class="admin-menu-item" onclick="showAdminSection('bookings')">
+                    <span>📅 Booking Management</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Dashboard Section -->
+            <section id="adminDashboard" class="admin-section active">
+                <div class="admin-header">
+                    <h1>Dashboard Overview</h1>
+                    <p>Welcome to the admin dashboard</p>
+                </div>
+                
+                <div class="admin-stats">
+                    <div class="admin-stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3>Total Users</h3>
+                            <p class="stat-number">0</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-info">
+                            <h3>Total Venues</h3>
+                            <p class="stat-number">0</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3>Total Bookings</h3>
+                            <p class="stat-number">0</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card pending-bookings-stat">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <h3>Pending Bookings</h3>
+                            <p class="stat-number pending-count-badge">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Bookings Section -->
+                <div class="pending-bookings-container">
+                    <!-- Pending bookings will be loaded here -->
+                </div>
+
+                <div class="admin-welcome">
+                    <h2>Admin Panel</h2>
+                    <p>Use the sidebar to navigate between different management sections.</p>
+                    <div class="admin-test-connection">
+                        <button class="test-btn" onclick="testAdminConnection()">Test Admin Connection</button>
+                        <div class="connection-status" id="connectionStatus"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Management Section -->
+            <section id="adminUsers" class="admin-section">
+                <div class="admin-header">
+                    <h1>User Management</h1>
+                    <p>Manage system users</p>
+                </div>
+                <div class="admin-placeholder">
+                    <h3>User Management</h3>
+                    <p>User management functionality will be implemented here.</p>
+                </div>
+            </section>
+
+            <!-- Venue Management Section -->
+            <section id="adminVenues" class="admin-section">
+                <div class="admin-header">
+                    <h1>Venue Management</h1>
+                    <p>Manage venue listings</p>
+                </div>
+                <div class="admin-placeholder">
+                    <h3>Venue Management</h3>
+                    <p>Venue management functionality will be implemented here.</p>
+                </div>
+            </section>
+
+            <!-- Booking Management Section -->
+            <section id="adminBookings" class="admin-section">
+                <div class="admin-header">
+                    <h1>Booking Management</h1>
+                    <p>Manage all bookings</p>
+                </div>
+                <div class="admin-placeholder">
+                    <h3>Booking Management</h3>
+                    <p>Booking management functionality will be implemented here.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="scripts/admin.js"></script>
+</body>
+</html>

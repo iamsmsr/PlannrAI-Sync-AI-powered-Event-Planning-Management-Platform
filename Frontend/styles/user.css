@@ -499,6 +499,258 @@
     font-family: 'Courier New', monospace;
 }
 
+/* Bookings header styles */
+.bookings-header {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.bookings-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.bookings-header p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+/* Booking Status Cards Styles */
+.loading-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #dc2626;
+}
+
+.retry-btn, .refresh-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.retry-btn:hover, .refresh-btn:hover {
+    background: #2563eb;
+}
+
+.refresh-btn-container {
+    margin-top: 15px;
+}
+
+/* Booking Status Card Styles */
+.booking-status-pending {
+    border-left: 4px solid #f59e0b;
+    background: #fffbeb;
+}
+
+.booking-status-active {
+    border-left: 4px solid #10b981;
+    background: #f0fdf4;
+}
+
+.booking-status-rejected {
+    border-left: 4px solid #ef4444;
+    background: #fef2f2;
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.booking-venue {
+    margin: 0;
+    color: #111827;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.booking-id {
+    font-size: 12px;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.booking-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.booking-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #374151;
+}
+
+.booking-status {
+    text-align: right;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-approved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-rejected {
+    background: #fecaca;
+    color: #991b1b;
+}
+
+.status-unknown {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.status-message {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.message-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.message-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.message-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.message-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.admin-info {
+    font-size: 12px;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 10px;
+}
+
+.admin-info p {
+    margin: 4px 0;
+}
+
+.booking-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn.secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.action-btn.secondary:hover {
+    background: #e5e7eb;
+}
+
+.action-btn.success {
+    background: #10b981;
+    color: white;
+}
+
+.action-btn.danger {
+    background: #ef4444;
+    color: white;
+}
+
+.action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Booking sections styles */
+.temp-bookings-section {
+    margin-bottom: 30px;
+}
+
+.confirmed-bookings-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 15px 0;
+    padding: 10px 15px;
+    background: #f9fafb;
+    border-left: 4px solid #3b82f6;
+    border-radius: 4px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .auth-modal-content {

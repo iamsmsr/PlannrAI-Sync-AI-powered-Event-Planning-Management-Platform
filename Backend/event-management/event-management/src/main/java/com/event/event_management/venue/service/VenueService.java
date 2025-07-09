@@ -1,10 +1,17 @@
 package com.event.event_management.venue.service;
 
 import com.event.event_management.venue.model.Venue;
+import com.event.event_management.venue.model.Booking;
 import com.event.event_management.venue.repository.VenueRepository;
+import com.event.event_management.venue.repository.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class VenueService {
@@ -12,13 +19,11 @@ public class VenueService {
     @Autowired
     private VenueRepository venueRepository;
     
+    @Autowired
+    private BookingRepository bookingRepository;
+    
     public List<Venue> searchVenuesByLocation(String location) {
-        
         List<Venue> venues = venueRepository.findByLocationIgnoreCase(location);
-      
-        
-
-        
         return venues;
     }
     
@@ -27,5 +32,147 @@ public class VenueService {
         List<Venue> allVenues = venueRepository.findAll();
         System.out.println("Total venues found: " + allVenues.size());
         return allVenues;
+    }
+    
+    // Booking related methods
+    public Booking createBooking(String userId, String venueId, String venueName, 
+                                List<String> selectedDates, String bookingDate) {
+        System.out.println("Creating new booking for user: " + userId);
+        
+        Booking booking = new Booking(userId, venueId, venueName, selectedDates, bookingDate);
+        Booking savedBooking = bookingRepository.save(booking);
+        
+        System.out.println("Booking created with ID: " + savedBooking.getId());
+        return savedBooking;
+    }
+    
+    public List<Booking> getUserBookings(String userId) {
+        return bookingRepository.findByUserId(userId);
+    }
+    
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
+    
+    public List<Booking> getBookingsByStatus(String status) {
+        return bookingRepository.findByStatus(status);
+    }
+
+    public Booking approveBooking(String bookingId, String adminUserId) {
+        System.out.println("Approving booking: " + bookingId + " by admin: " + adminUserId);
+        
+        // Find the booking
+        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+        if (!bookingOpt.isPresent()) {
+            throw new RuntimeException("Booking not found with ID: " + bookingId);
+        }
+        
+        Booking booking = bookingOpt.get();
+        
+        // Check if booking is in PENDING status
+        if (!"PENDING".equals(booking.getStatus())) {
+            throw new RuntimeException("Booking is not in PENDING status. Current status: " + booking.getStatus());
+        }
+        
+        // Update booking status
+        booking.setStatus("ACTIVE");
+        booking.setApprovedBy(adminUserId);
+        booking.setApprovedAt(LocalDateTime.now().toString());
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        
+        // Save updated booking
+        Booking savedBooking = bookingRepository.save(booking);
+        
+        // Update venue's currentBookings
+        updateVenueCurrentBookings(booking.getVenueId(), booking.getSelectedDates());
+        
+        System.out.println("Booking approved successfully: " + savedBooking.getId());
+        return savedBooking;
+    }
+
+    public Booking rejectBooking(String bookingId, String adminUserId, String reason) {
+        System.out.println("Rejecting booking: " + bookingId + " by admin: " + adminUserId);
+        
+        // Find the booking
+        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
+        if (!bookingOpt.isPresent()) {
+            throw new RuntimeException("Booking not found with ID: " + bookingId);
+        }
+        
+        Booking booking = bookingOpt.get();
+        
+        // Check if booking is in PENDING status
+        if (!"PENDING".equals(booking.getStatus())) {
+            throw new RuntimeException("Booking is not in PENDING status. Current status: " + booking.getStatus());
+        }
+        
+        // Update booking status
+        booking.setStatus("REJECTED");
+        booking.setApprovedBy(adminUserId);
+        booking.setApprovedAt(LocalDateTime.now().toString());
+        booking.setNotes(reason);
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        
+        // Save updated booking (no venue update needed for rejected bookings)
+        Booking savedBooking = bookingRepository.save(booking);
+        
+        System.out.println("Booking rejected successfully: " + savedBooking.getId());
+        return savedBooking;
+    }
+
+    private void updateVenueCurrentBookings(String venueId, List<String> selectedDates) {
+        System.out.println("Updating venue currentBookings for venue: " + venueId);
+        
+        // Find the venue
+        Optional<Venue> venueOpt = venueRepository.findById(venueId);
+        if (!venueOpt.isPresent()) {
+            System.err.println("Venue not found with ID: " + venueId);
+            return;
+        }
+        
+        Venue venue = venueOpt.get();
+        Map<String, List<Integer>> currentBookings = venue.getCurrentBookings();
+        
+        // Initialize currentBookings if null
+        if (currentBookings == null) {
+            currentBookings = new HashMap<>();
+            venue.setCurrentBookings(currentBookings);
+        }
+        
+        // Process each selected date
+        for (String dateStr : selectedDates) {
+            try {
+                // Parse date string (format: "2025-07-10")
+                String[] dateParts = dateStr.split("-");
+                int year = Integer.parseInt(dateParts[0]);
+                int month = Integer.parseInt(dateParts[1]);
+                int day = Integer.parseInt(dateParts[2]);
+                
+                // Create month/year key (format: "7/25")
+                String monthYearKey = month + "/" + (year % 100);
+                
+                // Get or create the list for this month/year
+                List<Integer> bookedDays = currentBookings.getOrDefault(monthYearKey, new ArrayList<>());
+                
+                // Add the day if not already present
+                if (!bookedDays.contains(day)) {
+                    bookedDays.add(day);
+                    // Sort the list to keep days in order
+                    bookedDays.sort(Integer::compareTo);
+                }
+                
+                // Update the map
+                currentBookings.put(monthYearKey, bookedDays);
+                
+                System.out.println("Added day " + day + " to month " + monthYearKey);
+                
+            } catch (Exception e) {
+                System.err.println("Error parsing date: " + dateStr + " - " + e.getMessage());
+            }
+        }
+        
+        // Save updated venue
+        venueRepository.save(venue);
+        System.out.println("Venue currentBookings updated successfully");
     }
 }
