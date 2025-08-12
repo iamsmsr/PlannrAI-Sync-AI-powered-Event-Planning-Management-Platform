@@ -191,7 +191,13 @@ async function handleSignin(event) {
             body: JSON.stringify(loginData)
         });
         
-        const result = await response.json();
+        let result;
+        try {
+            result = await response.json();
+        } catch (jsonError) {
+            console.error('Failed to parse response JSON:', jsonError);
+            result = { message: 'Invalid server response' };
+        }
         
         if (response.ok) {
             // Signin successful
@@ -214,8 +220,70 @@ async function handleSignin(event) {
                 showDashboard();
             }
         } else {
-            // Show error message
-            showErrorMessage('signin', result.message || 'Invalid email or password.');
+            // Show error message with better handling
+            let errorMessage = 'Invalid email or password.';
+            
+            if (result && result.message) {
+                errorMessage = result.message;
+            } else if (result && result.error) {
+                errorMessage = result.error;
+            } else if (response.status === 400) {
+                errorMessage = 'Invalid email or password.';
+            } else if (response.status === 401) {
+                errorMessage = 'Invalid credentials. Please check your email and password.';
+            } else if (response.status >= 500) {
+                errorMessage = 'Server error. Please try again later.';
+            }
+            
+            console.error('Signin failed:', response.status, result);
+            
+            // Use setTimeout to ensure DOM is ready and error message shows
+            setTimeout(() => {
+                console.log(`🚨 Attempting to show error message: "${errorMessage}"`);
+                
+                // First, try the regular showErrorMessage function
+                try {
+                    showErrorMessage('signin', errorMessage);
+                } catch (error) {
+                    console.error('🚨 Error in showErrorMessage:', error);
+                }
+                
+                // Backup method: directly manipulate the error div
+                try {
+                    const errorDiv = document.getElementById('signinError');
+                    console.log('🚨 Direct error div access:', !!errorDiv);
+                    if (errorDiv) {
+                        errorDiv.innerHTML = `<strong>Error:</strong> ${errorMessage}`;
+                        errorDiv.style.cssText = 'display: block !important; background: #fee; border: 1px solid #f00; color: #c00; padding: 10px; margin: 10px 0; border-radius: 4px;';
+                        console.log('🚨 Direct method applied');
+                    }
+                } catch (error) {
+                    console.error('🚨 Error in direct method:', error);
+                }
+                
+                // Ultimate fallback: create a new error element
+                try {
+                    const formContainer = document.getElementById('signinFormContainer');
+                    if (formContainer && !document.querySelector('.dynamic-error')) {
+                        const newErrorDiv = document.createElement('div');
+                        newErrorDiv.className = 'dynamic-error';
+                        newErrorDiv.innerHTML = `<strong>⚠️ Error:</strong> ${errorMessage}`;
+                        newErrorDiv.style.cssText = 'display: block !important; background: #ffebee !important; border: 2px solid #f44336 !important; color: #d32f2f !important; padding: 15px !important; margin: 10px 0 !important; border-radius: 8px !important; font-weight: bold !important; font-size: 14px !important;';
+                        formContainer.insertBefore(newErrorDiv, formContainer.firstChild);
+                        console.log('🚨 Ultimate fallback error created');
+                    }
+                } catch (error) {
+                    console.error('🚨 Error in ultimate fallback:', error);
+                    // Last resort: alert
+                    alert(`Login Error: ${errorMessage}`);
+                }
+                
+                // Double-check that the modal is visible
+                const authModal = document.getElementById('authModal');
+                const signinContainer = document.getElementById('signinFormContainer');
+                console.log(`🚨 Auth modal display:`, authModal ? authModal.style.display : 'not found');
+                console.log(`🚨 Signin container display:`, signinContainer ? signinContainer.style.display : 'not found');
+            }, 100);
         }
     } catch (error) {
         console.error('Signin error:', error);
@@ -302,11 +370,74 @@ function setLoadingState(form, isLoading) {
 
 // Show error message
 function showErrorMessage(form, message) {
-    const errorDiv = document.getElementById(`${form}Error`);
-    if (errorDiv) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
+    console.log(`🚨 Showing error for ${form}:`, message);
+    let errorDiv = document.getElementById(`${form}Error`);
+    console.log(`🚨 Error div found:`, !!errorDiv);
+    console.log(`🚨 Error div element:`, errorDiv);
+    
+    // If error div doesn't exist, create it
+    if (!errorDiv) {
+        console.log(`🚨 Creating new error div for ${form}`);
+        errorDiv = document.createElement('div');
+        errorDiv.id = `${form}Error`;
+        errorDiv.className = 'error-message';
+        
+        // Find the form container and insert the error div at the top
+        const formContainer = document.getElementById(`${form}FormContainer`);
+        if (formContainer) {
+            formContainer.insertBefore(errorDiv, formContainer.firstChild);
+        } else {
+            console.error(`🚨 Form container not found for ${form}`);
+            // Fallback: show error in alert
+            alert(`Error: ${message}`);
+            return;
+        }
     }
+    
+    // Clear any existing content first
+    errorDiv.innerHTML = '';
+    
+    // Set the error message
+    errorDiv.textContent = message;
+    
+    // Force visibility with important styles - use a more direct approach
+    errorDiv.style.cssText = `
+        display: block !important;
+        background-color: #fef2f2 !important;
+        border: 1px solid #fecaca !important;
+        color: #dc2626 !important;
+        padding: 12px !important;
+        border-radius: 6px !important;
+        margin-bottom: 16px !important;
+        font-size: 14px !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+        z-index: 9999 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    `;
+    
+    console.log(`🚨 Error message set and displayed`);
+    
+    // Check computed styles
+    const computedStyle = window.getComputedStyle(errorDiv);
+    console.log(`🚨 Computed display:`, computedStyle.display);
+    console.log(`🚨 Computed visibility:`, computedStyle.visibility);
+    console.log(`🚨 Error div content:`, errorDiv.textContent);
+    console.log(`🚨 Error div offsetHeight:`, errorDiv.offsetHeight);
+    console.log(`🚨 Error div offsetWidth:`, errorDiv.offsetWidth);
+    
+    // Also try to scroll the error into view
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        if (errorDiv && errorDiv.style.display === 'block') {
+            console.log(`🚨 Auto-hiding error message for ${form}`);
+            errorDiv.style.display = 'none';
+        }
+    }, 5000);
 }
 
 // Show success message without popup

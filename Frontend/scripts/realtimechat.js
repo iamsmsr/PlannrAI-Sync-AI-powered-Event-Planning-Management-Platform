@@ -696,16 +696,23 @@ async function createChatWithUser(user) {
 
 // Setup navigation buttons
 function setupNavigationButtons() {
-    // Check if user is admin to show/hide admin button
-    checkUserRoleAndSetupButtons();
+    console.log('🔧 Setting up navigation buttons...');
     
-    // Dashboard button
+    // Set up a basic dashboard button immediately as fallback
     const dashboardBtn = document.getElementById('backToDashboardBtn');
     if (dashboardBtn) {
-        dashboardBtn.onclick = () => {
+        console.log('🔧 Found dashboard button, setting up basic fallback...');
+        dashboardBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔧 Basic dashboard button clicked!');
             window.location.href = 'index.html';
-        };
+        });
+    } else {
+        console.error('❌ Dashboard button not found in DOM!');
     }
+    
+    // Check if user is admin to show/hide admin button
+    checkUserRoleAndSetupButtons();
     
     // Admin button
     const adminBtn = document.getElementById('backToAdminBtn');
@@ -722,10 +729,22 @@ async function checkUserRoleAndSetupButtons() {
         const token = localStorage.getItem('authToken');
         if (!token) return;
         
+        // Check localStorage cache first
+        const cachedUserInfo = localStorage.getItem('currentUserInfo');
+        if (cachedUserInfo) {
+            try {
+                const currentUser = JSON.parse(cachedUserInfo);
+                setupDashboardButtonForUser(currentUser);
+                return;
+            } catch (e) {
+                console.log('Failed to parse cached user info, fetching fresh...');
+            }
+        }
+        
         // Decode JWT to check user role
         const payload = JSON.parse(atob(token.split('.')[1]));
         
-        // You can also make an API call to get user details with roles
+        // Fetch user details with roles
         try {
             const response = await fetch(`${API_BASE}/api/auth/users/search?query=${encodeURIComponent(payload.sub)}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -736,28 +755,103 @@ async function checkUserRoleAndSetupButtons() {
                 const currentUser = users.find(u => u.email === payload.sub);
                 
                 if (currentUser) {
+                    // Cache user info in localStorage
+                    localStorage.setItem('currentUserInfo', JSON.stringify(currentUser));
+                    
                     // Update user name in header if not already set
                     const userNameSpan = document.getElementById('currentUserName');
                     if (userNameSpan && userNameSpan.textContent === 'Loading...') {
                         updateUserNameInHeader(currentUser.name, currentUser.email);
                     }
                     
-                    // Check for admin role
-                    if (currentUser.roles && currentUser.roles.includes('ADMIN')) {
-                        // Show admin button for admin users
-                        const adminBtn = document.getElementById('backToAdminBtn');
-                        if (adminBtn) {
-                            adminBtn.style.display = 'flex';
-                        }
-                        console.log('👑 Admin user detected - showing admin button');
-                    }
+                    setupDashboardButtonForUser(currentUser);
                 }
             }
         } catch (error) {
             console.log('Could not determine user role:', error);
+            setupFallbackDashboardButton();
         }
     } catch (error) {
         console.log('Error checking user role:', error);
+        setupFallbackDashboardButton();
+    }
+}
+
+// Setup dashboard button based on user info
+function setupDashboardButtonForUser(currentUser) {
+    const dashboardBtn = document.getElementById('backToDashboardBtn');
+    console.log('🔧 Setting up dashboard button for user:', currentUser);
+    console.log('🔧 Dashboard button element found:', !!dashboardBtn);
+    
+    if (!dashboardBtn) {
+        console.error('❌ Dashboard button element not found!');
+        return;
+    }
+    
+    // Check for admin role using isAdmin property or ADMIN role
+    const isAdmin = currentUser.isAdmin === true || 
+                   (currentUser.roles && currentUser.roles.includes('ADMIN'));
+    
+    console.log('🔧 User admin status:', isAdmin);
+    
+    // Remove any existing event listeners by cloning the element
+    const newBtn = dashboardBtn.cloneNode(true);
+    dashboardBtn.parentNode.replaceChild(newBtn, dashboardBtn);
+    
+    if (isAdmin) {
+        // Admin user - redirect to admin dashboard
+        newBtn.innerHTML = '👑 Admin Dashboard';
+        newBtn.style.background = '#dc3545';
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔧 Admin dashboard button clicked! Redirecting to admin.html');
+            
+            // Clear any state that might interfere
+            localStorage.removeItem('appState');
+            
+            // Force redirect to admin page
+            window.location.href = 'admin.html';
+        });
+        
+        // Hide the separate admin button since dashboard button goes to admin
+        const adminBtn = document.getElementById('backToAdminBtn');
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
+        
+        console.log('👑 Admin user detected - dashboard button redirects to admin');
+    } else {
+        // Regular user - redirect to normal dashboard
+        newBtn.innerHTML = '🏠 Dashboard';
+        newBtn.style.background = '#28a745';
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔧 User dashboard button clicked!');
+            window.location.href = 'index.html';
+        });
+        
+        console.log('👤 Regular user - dashboard button redirects to user dashboard');
+    }
+}
+
+// Setup fallback dashboard button
+function setupFallbackDashboardButton() {
+    const dashboardBtn = document.getElementById('backToDashboardBtn');
+    console.log('🔧 Setting up fallback dashboard button');
+    console.log('🔧 Dashboard button element found:', !!dashboardBtn);
+    
+    if (dashboardBtn) {
+        // Remove any existing event listeners by cloning the element
+        const newBtn = dashboardBtn.cloneNode(true);
+        dashboardBtn.parentNode.replaceChild(newBtn, dashboardBtn);
+        
+        newBtn.innerHTML = '🏠 Dashboard';
+        newBtn.style.background = '#28a745';
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔧 Fallback dashboard button clicked!');
+            window.location.href = 'index.html';
+        });
     }
 }
 

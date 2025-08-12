@@ -43,6 +43,9 @@ function initializeApp() {
     // Initially hide results section
     document.querySelector('.results-section').style.display = 'none';
     
+    // Check if user is admin and redirect if needed
+    checkAndRedirectAdmin();
+    
     // Initialize state management
     initializeStateManagement();
     
@@ -95,6 +98,59 @@ function saveAppState() {
     
     console.log('Saving state:', state); // Debug log
     localStorage.setItem('appState', JSON.stringify(state));
+}
+
+// Check if user is admin and redirect
+async function checkAndRedirectAdmin() {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
+        
+        // Check cached user info first
+        const cachedUserInfo = localStorage.getItem('currentUserInfo');
+        if (cachedUserInfo) {
+            try {
+                const currentUser = JSON.parse(cachedUserInfo);
+                const isAdmin = currentUser.isAdmin === true || 
+                               (currentUser.roles && currentUser.roles.includes('ADMIN'));
+                
+                if (isAdmin) {
+                    console.log('🔧 Admin user detected on index.html, redirecting to admin.html');
+                    window.location.href = 'admin.html';
+                    return;
+                }
+            } catch (e) {
+                console.log('Failed to parse cached user info');
+            }
+        }
+        
+        // If no cached info, fetch user details
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const response = await fetch(`http://localhost:8080/api/auth/users/search?query=${encodeURIComponent(payload.sub)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const users = await response.json();
+            const currentUser = users.find(u => u.email === payload.sub);
+            
+            if (currentUser) {
+                // Cache user info
+                localStorage.setItem('currentUserInfo', JSON.stringify(currentUser));
+                
+                const isAdmin = currentUser.isAdmin === true || 
+                               (currentUser.roles && currentUser.roles.includes('ADMIN'));
+                
+                if (isAdmin) {
+                    console.log('🔧 Admin user detected on index.html, redirecting to admin.html');
+                    window.location.href = 'admin.html';
+                    return;
+                }
+            }
+        }
+    } catch (error) {
+        console.log('Error checking admin status:', error);
+    }
 }
 
 // Get search state
