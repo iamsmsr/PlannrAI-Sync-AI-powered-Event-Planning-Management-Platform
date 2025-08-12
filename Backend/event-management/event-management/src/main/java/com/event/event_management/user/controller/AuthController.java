@@ -12,7 +12,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -89,6 +91,57 @@ public class AuthController {
             Map<String, String> error = new HashMap<>();
             error.put("message", "Invalid email or password");
             return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable String userId, Authentication authentication) {
+        try {
+            User user = userService.findById(userId);
+            
+            if (user == null) {
+                Map<String, String> error = new HashMap<>();
+                error.put("message", "User not found");
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Return only safe user info (no password)
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("id", user.getId());
+            userInfo.put("name", user.getName());
+            userInfo.put("email", user.getEmail());
+            
+            return ResponseEntity.ok(userInfo);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Error fetching user info");
+            return ResponseEntity.internalServerError().body(error);
+        }
+    }
+
+    // Search users for chat functionality
+    @GetMapping("/users/search")
+    public ResponseEntity<?> searchUsers(@RequestParam String query, Authentication authentication) {
+        try {
+            String currentEmail = authentication.getName();
+            
+            List<User> users = userService.searchUsersByNameOrEmail(query, currentEmail);
+            
+            List<Map<String, Object>> userList = users.stream()
+                .map(user -> {
+                    Map<String, Object> userInfo = new HashMap<>();
+                    userInfo.put("id", user.getId());
+                    userInfo.put("name", user.getName());
+                    userInfo.put("email", user.getEmail());
+                    return userInfo;
+                })
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(userList);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Error searching users");
+            return ResponseEntity.internalServerError().body(error);
         }
     }
 

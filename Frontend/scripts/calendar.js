@@ -26,18 +26,32 @@ function viewDates(venueId, venueName) {
     currentMonth = now.getMonth();
     currentYear = now.getFullYear();
     
-    // Update modal title
-    document.querySelector('.venue-title').textContent = `Available Dates for ${venueName}`;
-    
-    // Generate month selector
-    generateMonthSelector();
-    
-    // Generate calendar for current month
-    generateCalendar(currentMonth, currentYear);
-    
-    // Show modal
-    document.getElementById('calendarModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    // Wait a bit for DOM to be ready, then update modal
+    setTimeout(() => {
+        // Update modal title with safety check
+        const venueTitle = document.querySelector('.venue-title');
+        if (venueTitle) {
+            venueTitle.textContent = `Available Dates for ${venueName}`;
+        } else {
+            console.error('Could not find .venue-title element');
+            return;
+        }
+        
+        // Generate month selector
+        generateMonthSelector();
+        
+        // Generate calendar for current month
+        generateCalendar(currentMonth, currentYear);
+        
+        // Show modal
+        const modal = document.getElementById('calendarModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        } else {
+            console.error('Could not find calendar modal');
+        }
+    }, 100);
 }
 
 // Close calendar modal
@@ -51,6 +65,11 @@ function closeCalendar() {
 // Generate month selector buttons
 function generateMonthSelector() {
     const monthSelector = document.querySelector('.month-selector');
+    if (!monthSelector) {
+        console.error('Could not find .month-selector element');
+        return;
+    }
+    
     monthSelector.innerHTML = '';
     
     const monthNames = [
@@ -96,6 +115,11 @@ function selectMonth(month, year) {
 // Generate calendar grid for a specific month
 function generateCalendar(month, year) {
     const calendarGrid = document.querySelector('.calendar-grid');
+    if (!calendarGrid) {
+        console.error('Could not find .calendar-grid element');
+        return;
+    }
+    
     calendarGrid.innerHTML = '';
     
     // Get first day of month and number of days

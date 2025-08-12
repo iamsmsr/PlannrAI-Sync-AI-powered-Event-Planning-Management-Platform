@@ -59,6 +59,7 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		
 		<!-- JWT Dependencies -->
 		<dependency>
@@ -78,6 +79,7 @@
 			<version>0.12.3</version>
 			<scope>runtime</scope>
 		</dependency>
+
 
 
 

@@ -49,6 +49,14 @@ function displaySearchResults(venues, location, activity) {
         });
     }
     
+    // Don't save state immediately when displaying results to avoid conflicts
+    // Save current state with a delay to avoid interfering with calendar
+    setTimeout(() => {
+        if (typeof saveAppState === 'function') {
+            saveAppState();
+        }
+    }, 500);
+    
     // Preserve login state if user is logged in
     const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('userData');

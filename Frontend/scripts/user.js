@@ -337,6 +337,11 @@ function showHomePage() {
         document.querySelector('.dashboard-section').style.display = 'none';
     }
     
+    // Save current state
+    if (typeof saveAppState === 'function') {
+        saveAppState();
+    }
+    
     // Don't automatically update navigation - let caller handle it
     // updateNavigation(false); // Removed this line
 }
@@ -357,6 +362,13 @@ function showDashboard() {
     
     // Update navigation
     updateNavigation(true);
+    
+    // Save current state
+    setTimeout(() => {
+        if (typeof saveAppState === 'function') {
+            saveAppState();
+        }
+    }, 100);
 }
 
 // Update dashboard content
@@ -405,6 +417,7 @@ function logout() {
     // Clear stored data
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
+    localStorage.removeItem('appState'); // Clear saved state
     
     // Reset global variables
     currentUser = null;
@@ -431,10 +444,13 @@ function goToSearchFromDashboard() {
 
 // Dashboard tab switching functionality
 function switchDashboardTab(tabName) {
+    console.log('=== switchDashboardTab called with:', tabName, '===');
+    
     // Hide all sections
     document.getElementById('overviewSection').style.display = 'none';
     document.getElementById('bookingsSection').style.display = 'none';
     document.getElementById('profileSection').style.display = 'none';
+    document.getElementById('chatSection').style.display = 'none';
     
     // Remove active class from all nav buttons
     document.querySelectorAll('.dashboard-nav-btn').forEach(btn => {
@@ -453,14 +469,54 @@ function switchDashboardTab(tabName) {
             document.querySelector('[onclick="switchDashboardTab(\'bookings\')"]').classList.add('active');
             loadUserBookings();
             startBookingAutoRefresh();
+            
+            // Force save state immediately for bookings
+            setTimeout(() => {
+                if (typeof saveAppState === 'function') {
+                    saveAppState();
+                    console.log('Forced state save for bookings tab');
+                }
+            }, 100);
             break;
         case 'profile':
             document.getElementById('profileSection').style.display = 'block';
             document.querySelector('[onclick="switchDashboardTab(\'profile\')"]').classList.add('active');
             stopBookingAutoRefresh();
             break;
+        case 'chat':
+            console.log('Switching to chat tab - showing chat section');
+            document.getElementById('chatSection').style.display = 'block';
+            document.getElementById('dashboardChatBtn').classList.add('active');
+            stopBookingAutoRefresh();
+            
+            console.log('Chat section display set to block');
+            
+            // Initialize chat functionality if available
+            if (typeof loadChatList === 'function') {
+                console.log('Loading chat list...');
+                loadChatList();
+            } else {
+                console.log('loadChatList function not available');
+            }
+            
+            // Force save state immediately for chat
+            setTimeout(() => {
+                if (typeof saveAppState === 'function') {
+                    saveAppState();
+                    console.log('Forced state save for chat tab');
+                }
+            }, 100);
+            break;
+    }
+    
+    // Save current state
+    if (typeof saveAppState === 'function') {
+        saveAppState();
     }
 }
+
+// Make switchDashboardTab globally accessible
+window.switchDashboardTab = switchDashboardTab;
 
 // Auto-refresh functionality for bookings
 let bookingRefreshInterval = null;
@@ -585,7 +641,7 @@ async function loadUserBookings() {
                 <p><strong>Name:</strong> ${userData.name}</p>
                 <p><strong>Email:</strong> ${userData.email}</p>
                 <div class="refresh-btn-container">
-                    <button class="refresh-btn" onclick="loadUserBookings()">🔄 Refresh</button>
+                    <button class="refresh-btn" onclick="refreshBookingsAndSaveState()">🔄 Refresh</button>
                 </div>
             </div>
             <div class="bookings-list">
@@ -986,4 +1042,15 @@ function createTestBooking() {
     
     // Switch to bookings tab
     switchDashboardTab('bookings');
+}
+
+// Refresh bookings and save current state
+function refreshBookingsAndSaveState() {
+    loadUserBookings();
+    // Save state to ensure we stay in bookings after any reload
+    if (typeof saveAppState === 'function') {
+        setTimeout(() => {
+            saveAppState();
+        }, 100);
+    }
 }

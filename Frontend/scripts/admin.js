@@ -108,10 +108,20 @@ function showAdminSection(sectionName) {
     const targetSection = document.getElementById('admin' + sectionName.charAt(0).toUpperCase() + sectionName.slice(1));
     if (targetSection) {
         targetSection.classList.add('active');
+        
+        // Save app state when switching admin sections
+        setTimeout(() => {
+            if (typeof saveAppState === 'function') {
+                saveAppState();
+                console.log('Saved state for admin section:', sectionName);
+            }
+        }, 100);
     }
     
     // Add active class to clicked menu item
-    event.target.closest('.admin-menu-item').classList.add('active');
+    if (event && event.target) {
+        event.target.closest('.admin-menu-item').classList.add('active');
+    }
     
     // Load section-specific data
     loadSectionData(sectionName);

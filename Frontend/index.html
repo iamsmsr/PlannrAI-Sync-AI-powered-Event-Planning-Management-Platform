@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="styles/results.css">
     <link rel="stylesheet" href="styles/calendar.css">
     <link rel="stylesheet" href="styles/user.css">
+    <link rel="stylesheet" href="styles/chat.css">
 </head>
-<body>
+<body class="loading">
     <!-- Hero Section -->
     <div class="hero">
         <!-- Navigation -->
@@ -141,6 +142,7 @@
                 <button class="dashboard-nav-btn" onclick="switchDashboardTab('bookings')">My Bookings</button>
                 <button class="dashboard-nav-btn" onclick="switchDashboardTab('profile')">Profile</button>
                 <button class="dashboard-nav-btn" onclick="goToSearchFromDashboard()">Search Venues</button>
+                <button class="dashboard-nav-btn" id="dashboardChatBtn" onclick="window.location.href='chat.html'">Chat</button>
             </div>
             
             <div class="dashboard-content">
@@ -165,6 +167,22 @@
                     </div>
                 </div>
                 
+                <!-- Chat Section -->
+                <div class="dashboard-chat" id="chatSection" style="display: none;">
+                    <div class="chat-container">
+                        <div class="chat-sidebar">
+                            <div class="chat-sidebar-header">
+                            </div>
+                            <div id="chatListContainer"></div>
+                        </div>
+                        <div class="chat-main">
+                            <h3>Messages</h3>
+                            <div id="chatMessagesContainer" class="chat-messages"></div>
+                            <div class="chat-input-container">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Profile Section -->
                 <div class="dashboard-profile" id="profileSection" style="display: none;">
                     <div class="dashboard-empty">
@@ -245,9 +263,10 @@
         </div>
     </div>
 
+    <script src="scripts/user.js"></script>
     <script src="scripts/app.js"></script>
     <script src="scripts/search.js"></script>
     <script src="scripts/calendar.js"></script>
-    <script src="scripts/user.js"></script>
+    <script src="scripts/chat.js"></script>
 </body>
 </html>
