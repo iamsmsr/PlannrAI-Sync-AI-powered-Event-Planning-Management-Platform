@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const viewDatesId = urlParams.get('viewDates');
     const venueNameParam = urlParams.get('venueName');
+    
     if (viewDatesId && typeof viewDates === 'function') {
         // Fetch all venues and assign to the actual global variable
         fetch('http://localhost:8080/api/venues/all')

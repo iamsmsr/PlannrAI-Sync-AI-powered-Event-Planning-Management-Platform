@@ -10,6 +10,35 @@ let currentYear = new Date().getFullYear();
 function viewDates(venueId, venueName) {
     console.log('Opening calendar for venue:', venueName, 'ID:', venueId);
     
+    // Check if user is logged in first
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        // User not logged in - save venue info for after login
+        console.log('🔄 User not logged in, saving venue for after login...');
+        
+        const viewIntent = {
+            venueId: venueId,
+            venueName: venueName,
+            timestamp: Date.now(),
+            action: 'viewDates' // Just view calendar, no pre-selected dates
+        };
+        
+        localStorage.setItem('pendingViewIntent', JSON.stringify(viewIntent));
+        console.log('🔄 View intent saved:', viewIntent);
+        
+        // Show login modal
+        showAuthModal('signin');
+        return;
+    }
+    
+    // User is logged in - proceed with showing calendar
+    showCalendarForVenue(venueId, venueName);
+}
+
+// Separate function to handle the actual calendar display
+function showCalendarForVenue(venueId, venueName) {
+    console.log('Showing calendar for venue:', venueName);
+    
     // Find the venue from the current search results
     currentVenue = currentSearchResults.find(venue => venue.id === venueId);
     
@@ -18,7 +47,7 @@ function viewDates(venueId, venueName) {
         return;
     }
     
-    // Reset selected dates
+    // Reset selected dates for fresh start
     selectedDates = [];
     
     // Set current month/year to current date
@@ -247,9 +276,48 @@ function bookDates() {
     const userData = localStorage.getItem('userData');
     
     if (!token || !userData) {
-        // User not logged in - show login modal
+        // User not logged in - just show login modal (no complex intent saving)
+        console.log('🔄 User not logged in, please sign in first');
         closeCalendar();
         showAuthModal('signin');
+        return;
+    }
+    
+    // User is logged in - proceed with booking
+    proceedWithBooking();
+}
+
+// Separate function to handle the actual booking process
+function proceedWithBooking() {
+    const token = localStorage.getItem('authToken');
+    const userData = localStorage.getItem('userData');
+    
+    if (!token || !userData) {
+        console.error('Cannot proceed with booking - user not authenticated');
+        return;
+    }
+    
+    console.log('🔄 Proceeding with booking...');
+    console.log('🔄 Current venue:', currentVenue);
+    console.log('🔄 Local selectedDates:', selectedDates);
+    console.log('🔄 Window selectedDates:', window.selectedDates);
+    
+    // Use whichever selectedDates array has data
+    const datesToUse = (selectedDates && selectedDates.length > 0) ? selectedDates : 
+                       (window.selectedDates && window.selectedDates.length > 0) ? window.selectedDates : [];
+    
+    console.log('🔄 Dates to use for booking:', datesToUse);
+    
+    // Validate we have the required data
+    if (!currentVenue || !currentVenue.id) {
+        console.error('🔄 Cannot proceed - missing venue data');
+        return;
+    }
+    
+    if (!datesToUse || datesToUse.length === 0) {
+        console.error('🔄 Cannot proceed - no selected dates found');
+        console.error('🔄 Local selectedDates:', selectedDates);
+        console.error('🔄 Window selectedDates:', window.selectedDates);
         return;
     }
     
@@ -263,7 +331,7 @@ function bookDates() {
         userId: user.id,
         venueId: currentVenue.id,
         venueName: currentVenue.venueName,
-        selectedDates: [...selectedDates],
+        selectedDates: [...datesToUse], // Use the dates we found
         status: 'temp',
         bookingDate: new Date().toISOString(),
         tempExpiry: tempExpiry.toISOString()
@@ -274,20 +342,24 @@ function bookDates() {
     userBookings.push(newBooking);
     localStorage.setItem('userBookings', JSON.stringify(userBookings));
     
-    console.log('Creating temp booking for venue:', currentVenue.id);
-    console.log('Selected dates:', selectedDates);
-    console.log('Booking saved:', newBooking);
+    console.log('🔄 Creating temp booking for venue:', currentVenue.id);
+    console.log('🔄 Selected dates used:', datesToUse);
+    console.log('🔄 Booking saved:', newBooking);
     
     // Close calendar and show dashboard
     closeCalendar();
     showDashboard();
     
     // Switch to My Bookings tab
-    switchDashboardTab('bookings');
+    setTimeout(() => {
+        if (typeof switchDashboardTab === 'function') {
+            switchDashboardTab('bookings');
+        }
+    }, 100);
     
     // Show success message
     const confirmMessage = document.createElement('div');
-    confirmMessage.innerHTML = `<strong>Dates Reserved!</strong><br>You have 10 minutes to confirm your booking for ${currentVenue.venueName}`;
+    confirmMessage.innerHTML = `<strong>🎉 Booking Successful!</strong><br>Your dates for ${currentVenue.venueName} have been reserved. Please confirm within 10 minutes.`;
     confirmMessage.style.cssText = `
         position: fixed;
         top: 20px;
@@ -304,12 +376,56 @@ function bookDates() {
     `;
     document.body.appendChild(confirmMessage);
     
-    // Remove the message after 4 seconds
+    // Auto-remove confirmation message after 5 seconds
     setTimeout(() => {
         if (confirmMessage.parentNode) {
             confirmMessage.parentNode.removeChild(confirmMessage);
         }
-    }, 4000);
+    }, 5000);
+}
+
+// Function to restore selected dates after login
+function restoreSelectedDates(datesToRestore) {
+    console.log('🔄 Restoring selected dates:', datesToRestore);
+    
+    // Clear current selection first
+    document.querySelectorAll('.calendar-day.selected').forEach(day => {
+        day.classList.remove('selected');
+    });
+    
+    // Reset the selectedDates array but don't clear it yet
+    const tempSelectedDates = [];
+    
+    // Restore each date
+    datesToRestore.forEach(dateStr => {
+        const dayElement = document.querySelector(`[data-date="${dateStr}"]`);
+        if (dayElement && dayElement.classList.contains('available')) {
+            dayElement.classList.add('selected');
+            tempSelectedDates.push(dateStr);
+            console.log('🔄 Restored date:', dateStr);
+        } else {
+            console.log('🔄 Could not restore date (element not found or not available):', dateStr, dayElement);
+        }
+    });
+    
+    // Update the global selectedDates array
+    selectedDates.length = 0; // Clear array
+    selectedDates.push(...tempSelectedDates); // Add restored dates
+    
+    // Also update window.selectedDates if it exists
+    if (typeof window !== 'undefined') {
+        if (!window.selectedDates) {
+            window.selectedDates = [];
+        }
+        window.selectedDates.length = 0;
+        window.selectedDates.push(...tempSelectedDates);
+    }
+    
+    console.log('🔄 Final selected dates:', selectedDates);
+    console.log('🔄 Window selected dates:', window.selectedDates);
+    
+    // Return true if dates were successfully restored
+    return tempSelectedDates.length > 0;
 }
 
 // Initialize calendar functionality when DOM is loaded
@@ -332,3 +448,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Make functions globally available for booking restoration
+window.proceedWithBooking = proceedWithBooking;
+window.restoreSelectedDates = restoreSelectedDates;
+window.showCalendarForVenue = showCalendarForVenue;

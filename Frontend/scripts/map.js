@@ -31,7 +31,7 @@ fetch('http://localhost:8080/api/venues/all')
                         <div style="font-size:0.9rem;color:#666;margin-bottom:6px;">
                             <span style='color:#f59e42;font-size:1.1em;'>★</span> ${venue.ratings ? venue.ratings : 'N/A'}
                         </div>
-                        <button style='background:#059669;color:#fff;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:0.95rem;margin-top:4px;' onclick='window.location.href="index.html?viewDates=${venue.id}&venueName=${encodeURIComponent(venue.venueName)}"'>View Dates</button>
+                        <button style='background:#059669;color:#fff;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:0.95rem;margin-top:4px;' onclick='window.location.href="index.html?viewDates=${venue.id}&venueName=${encodeURIComponent(venue.venueName)}&autoBook=true"'>View Dates</button>
                     </div>
                 `;
                 L.marker([lat, lng]).addTo(map)
@@ -42,6 +42,20 @@ fetch('http://localhost:8080/api/venues/all')
     .catch(err => {
         console.error('Failed to load venues:', err);
     });
+
+// Check for URL parameters to handle direct venue booking from external links
+const urlParams = new URLSearchParams(window.location.search);
+const venueId = urlParams.get('venueId');
+const venueName = urlParams.get('venueName');
+const autoBook = urlParams.get('autoBook');
+
+if (venueId && venueName && autoBook) {
+    console.log('🔄 Map: Auto-booking requested for venue:', venueName);
+    // Redirect to index.html with booking intent
+    setTimeout(() => {
+        window.location.href = `index.html?viewDates=${venueId}&venueName=${encodeURIComponent(venueName)}&autoBook=true`;
+    }, 1000); // Small delay to let map load first
+}
 
 // Optional: Show user's current location
 map.locate({setView: false, maxZoom: 16});

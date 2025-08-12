@@ -211,6 +211,9 @@ async function handleSignin(event) {
             // Close modal
             closeAuthModal();
             
+            // Check for pending booking intent before redirecting
+            checkAndRestoreBookingIntent();
+            
             // Check if user is admin and redirect accordingly
             if (currentUser.isAdmin || (currentUser.roles && currentUser.roles.includes('ADMIN'))) {
                 // Redirect to admin dashboard
@@ -1187,4 +1190,110 @@ function refreshBookingsAndSaveState() {
             saveAppState();
         }, 100);
     }
+}
+
+// Check and restore view intent after successful login (simplified)
+function checkAndRestoreBookingIntent() {
+    const pendingViewIntent = localStorage.getItem('pendingViewIntent');
+    
+    if (pendingViewIntent) {
+        try {
+            const viewIntent = JSON.parse(pendingViewIntent);
+            console.log('🔄 Found pending view intent:', viewIntent);
+            
+            // Check if the intent is still valid (not too old)
+            const intentAge = Date.now() - viewIntent.timestamp;
+            const maxAge = 30 * 60 * 1000; // 30 minutes
+            
+            if (intentAge > maxAge) {
+                console.log('🔄 View intent too old, clearing...');
+                localStorage.removeItem('pendingViewIntent');
+                return;
+            }
+            
+            // Remove the pending intent
+            localStorage.removeItem('pendingViewIntent');
+            
+            // Restore the view intent
+            setTimeout(() => {
+                restoreViewIntent(viewIntent);
+            }, 500); // Small delay to ensure UI is ready
+            
+        } catch (error) {
+            console.error('🔄 Error restoring view intent:', error);
+            localStorage.removeItem('pendingViewIntent');
+        }
+    }
+}
+
+// Restore view intent - simply show the calendar for the venue
+function restoreViewIntent(viewIntent) {
+    console.log('🔄 Restoring view intent for venue:', viewIntent.venueName);
+    
+    // Show welcome back message
+    showViewRestoredNotification(viewIntent.venueName);
+    
+    // Simply call viewDates again - now that user is logged in, it will work
+    setTimeout(() => {
+        if (typeof showCalendarForVenue === 'function') {
+            showCalendarForVenue(viewIntent.venueId, viewIntent.venueName);
+        } else if (typeof viewDates === 'function') {
+            viewDates(viewIntent.venueId, viewIntent.venueName);
+        }
+    }, 1000); // Give time for notification to show
+}
+
+// Show notification that view was restored
+function showViewRestoredNotification(venueName) {
+    // Create a notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, #10b981, #059669);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-weight: 500;
+        max-width: 350px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">📅</span>
+            <div>
+                <div style="font-weight: bold;">Welcome Back!</div>
+                <div style="font-size: 14px; opacity: 0.9;">Opening calendar for ${venueName}</div>
+            </div>
+        </div>
+    `;
+    
+    // Add animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(notification);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+            if (style.parentNode) {
+                style.parentNode.removeChild(style);
+            }
+        }, 300);
+    }, 3000);
 }
