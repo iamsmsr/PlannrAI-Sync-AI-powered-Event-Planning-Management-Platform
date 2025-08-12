@@ -86,7 +86,7 @@ function createVenueCard(venue) {
         </div>
         <div class="venue-info">
             <h3 class="venue-name">${venue.venueName}</h3>
-            <p class="venue-address">${venue.address}</p>
+            <p class="venue-address">${venue.address ? venue.address.split('|')[0] : ''}</p>
             <p class="venue-location">${venue.location}</p>
             <div class="venue-rating">
                 <span class="rating">⭐ ${venue.ratings}</span>

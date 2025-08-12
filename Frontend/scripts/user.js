@@ -392,23 +392,26 @@ function updateNavigation(isLoggedIn) {
     const signupBtn = document.querySelector('.signup-btn');
     const logoutBtn = document.querySelector('.logout-btn');
     const dashboardLink = document.querySelector('.dashboard-link');
+    const realtimeChatLink = document.querySelector('.realtime-chat-link');
     
     if (isLoggedIn) {
         // Hide login/signup buttons
         if (loginBtn) loginBtn.style.display = 'none';
         if (signupBtn) signupBtn.style.display = 'none';
         
-        // Show logout button and dashboard link
+        // Show logout button, dashboard link, and real-time chat link
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
         if (dashboardLink) dashboardLink.style.display = 'inline-block';
+        if (realtimeChatLink) realtimeChatLink.style.display = 'inline-block';
     } else {
         // Show login/signup buttons
         if (loginBtn) loginBtn.style.display = 'inline-block';
         if (signupBtn) signupBtn.style.display = 'inline-block';
         
-        // Hide logout button and dashboard link
+        // Hide logout button, dashboard link, and real-time chat link
         if (logoutBtn) logoutBtn.style.display = 'none';
         if (dashboardLink) dashboardLink.style.display = 'none';
+        if (realtimeChatLink) realtimeChatLink.style.display = 'none';
     }
 }
 

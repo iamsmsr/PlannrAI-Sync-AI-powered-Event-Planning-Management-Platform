@@ -20,6 +20,10 @@
                 <a href="#" class="nav-link">Browse Spaces ▼</a>
                 <a href="#" class="nav-link">List Your Space</a>
                 <a href="#" class="nav-link dashboard-link" onclick="showDashboard()" style="display: none;">Dashboard</a>
+                <a href="realtimechat.html" class="nav-link realtime-chat-link" style="display: none; background: linear-gradient(45deg, #007bff, #0056b3); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: relative; margin-right: 10px;">
+                    🚀 Chat
+                    <span style="position: absolute; top: -2px; right: -2px; background: #ff6b6b; color: white; border-radius: 50%; width: 10px; height: 10px; font-size: 6px; display: flex; align-items: center; justify-content: center;">●</span>
+                </a>
                 <a href="#" class="nav-link" onclick="showAuthModal('signin')">Log In</a>
                 <button class="signup-btn" onclick="showAuthModal('signup')">Sign Up</button>
                 <button class="logout-btn" onclick="logout()">Logout</button>
@@ -41,6 +45,7 @@
                 <input type="text" class="location-input" value="Dhaka" placeholder="Enter a city">
             </div>
             <button class="search-button">Search →</button>
+            <a href="map.html" class="search-button" style="margin-left: 10px; text-decoration: none; display: inline-block; background: #059669; color: #fff; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer;">Venues Near Me</a>
         </div>
 
         <!-- Hero Title -->
@@ -143,6 +148,10 @@
                 <button class="dashboard-nav-btn" onclick="switchDashboardTab('profile')">Profile</button>
                 <button class="dashboard-nav-btn" onclick="goToSearchFromDashboard()">Search Venues</button>
                 <button class="dashboard-nav-btn" id="dashboardChatBtn" onclick="window.location.href='chat.html'">Chat</button>
+                <button class="dashboard-nav-btn" id="dashboardRealtimeChatBtn" onclick="window.location.href='realtimechat.html'" style="background: linear-gradient(45deg, #007bff, #0056b3); color: white; position: relative;">
+                    🚀 Real-Time Chat
+                    <span style="position: absolute; top: -5px; right: -5px; background: #ff6b6b; color: white; border-radius: 50%; width: 12px; height: 12px; font-size: 8px; display: flex; align-items: center; justify-content: center;">●</span>
+                </button>
             </div>
             
             <div class="dashboard-content">

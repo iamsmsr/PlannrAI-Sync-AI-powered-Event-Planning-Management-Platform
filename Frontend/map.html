@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Venue Map - Peerspace</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 90vh; width: 100%; }
+        body { margin: 0; font-family: Arial, sans-serif; }
+        .map-header { padding: 1rem; background: #059669; color: #fff; text-align: center; font-size: 1.5rem; }
+        .back-btn { position: absolute; top: 20px; left: 20px; z-index: 1000; background: #fff; border: none; border-radius: 5px; padding: 8px 16px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="map-header">Peerspace Venue Map</div>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="scripts/map.js"></script>
+    <!-- Tawk.to Script (optional, as in your template) -->
+    <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+            s1.async=true;
+            s1.src='https://embed.tawk.to/686c2761db3b4f190a1f11c2/1ivj7jlqh';
+            s1.charset='UTF-8';
+            s1.setAttribute('crossorigin','*');
+            s0.parentNode.insertBefore(s1,s0);
+        })();
+    </script>
+</body>
+</html>

@@ -49,6 +49,11 @@ public class ChatService {
         return messageRepository.save(message);
     }
 
+    // Save message (for already created message objects)
+    public Message saveMessage(Message message) {
+        return messageRepository.save(message);
+    }
+
     // SECURE: Send message with authorization
     public Message sendMessage(String chatId, String senderId, String content, String authenticatedUserId) {
         // First check if user is authorized to send message to this chat
