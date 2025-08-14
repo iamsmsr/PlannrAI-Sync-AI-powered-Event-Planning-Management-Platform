@@ -861,10 +861,24 @@ function createBookingCard(booking) {
 }
 
 // Create booking status card HTML for backend data
+function isUpcomingBooking(selectedDates) {
+    if (!selectedDates || selectedDates.length === 0) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Check if any of the selected dates are in the future
+    return selectedDates.some(date => {
+        const eventDate = new Date(date);
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate >= today;
+    });
+}
+
 function createBookingStatusCard(booking) {
     const statusInfo = getBookingStatusInfo(booking.status, booking.notes);
     const formattedDates = booking.selectedDates ? booking.selectedDates.join(', ') : 'No dates';
     const bookingDate = booking.bookingDate ? new Date(booking.bookingDate).toLocaleDateString() : 'Unknown';
+    const isUpcoming = isUpcomingBooking(booking.selectedDates);
     
     return `
         <div class="booking-card booking-status-${booking.status.toLowerCase()}">
@@ -885,6 +899,12 @@ function createBookingStatusCard(booking) {
                         <span class="status-icon">${statusInfo.icon}</span>
                         <span class="status-text">${statusInfo.text}</span>
                     </div>
+                    
+                    ${booking.status === 'ACTIVE' && isUpcoming ? `
+                        <button class="collaborate-btn" onclick="window.location.href='collab.html?bookingId=${booking.id}'">
+                            🤝 Collaborate
+                        </button>
+                    ` : ''}
                     
                     ${statusInfo.message ? `
                         <div class="status-message ${statusInfo.messageClass}">

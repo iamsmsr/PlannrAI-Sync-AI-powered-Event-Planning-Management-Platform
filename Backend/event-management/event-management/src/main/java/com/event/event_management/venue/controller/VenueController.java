@@ -4,11 +4,13 @@ import com.event.event_management.venue.model.Venue;
 import com.event.event_management.venue.model.Booking;
 import com.event.event_management.venue.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/venues")
@@ -34,7 +36,21 @@ public class VenueController {
         System.out.println("Returning " + venues.size() + " venues");
         return ResponseEntity.ok(venues);
     }
-    
+    @GetMapping("/bookings/{id}")
+    public ResponseEntity<?> getBookingById(@PathVariable String id) {
+        try {
+            Optional<Booking> bookingOpt = venueService.getBookingById(id);
+            return bookingOpt
+                    .map(booking -> ResponseEntity.ok().body(booking))
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body((Booking) Map.of("message", "Booking not found")));
+        } catch (Exception e) {
+            System.err.println("Error fetching booking by ID: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to fetch booking: " + e.getMessage()));
+        }
+    }
+
     // Booking endpoints
     @PostMapping("/bookings")
     public ResponseEntity<?> createBooking(@RequestBody BookingRequest request) {

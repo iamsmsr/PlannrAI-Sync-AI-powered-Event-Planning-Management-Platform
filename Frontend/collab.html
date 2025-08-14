@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Collaboration</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/user.css">
+    <style>
+        .collab-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+        }
+        .collab-section { margin-bottom: 32px; }
+        .collab-section h2 { margin-bottom: 12px; }
+        .collab-list { margin: 0 0 12px 0; padding: 0; list-style: none; }
+        .collab-list li { margin-bottom: 6px; }
+        .collab-invite-form, .collab-add-form { display: flex; gap: 8px; margin-bottom: 12px; }
+        .collab-invite-form input, .collab-add-form input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
+        .collab-invite-form button, .collab-add-form button { padding: 8px 16px; border-radius: 6px; border: none; background: #007bff; color: #fff; cursor: pointer; }
+        .collab-invite-form button:hover, .collab-add-form button:hover { background: #0056b3; }
+        .collab-role-label { font-weight: 500; margin-right: 8px; }
+        .collab-collaborators-list { margin-top: 8px; }
+        .collab-collaborators-list li { display: flex; align-items: center; gap: 8px; }
+        .collab-remove-btn { background: #ff6b6b; color: #fff; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 12px; }
+        .collab-remove-btn:hover { background: #c0392b; }
+        .collab-info { color: #666; font-size: 15px; margin-bottom: 18px; }
+        .collab-error { color: #c0392b; margin-bottom: 10px; }
+        .collab-success { color: #059669; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="collab-container" id="collabContainer" style="display:none;">
+        <h1>Event Collaboration</h1>
+        <div class="collab-info" id="collabInfo">Loading booking info...</div>
+        <div class="collab-error" id="collabError" style="display:none;"></div>
+        <div class="collab-success" id="collabSuccess" style="display:none;"></div>
+
+        <div class="collab-section">
+            <h2>Vendors</h2>
+            <form class="collab-add-form" id="vendorForm">
+                <input type="text" id="vendorInput" placeholder="Add vendor name or company" required />
+                <button type="submit">Add Vendor</button>
+            </form>
+            <ul class="collab-list" id="vendorList"></ul>
+        </div>
+        <div class="collab-section">
+            <h2>Cooks</h2>
+            <form class="collab-add-form" id="cookForm">
+                <input type="text" id="cookInput" placeholder="Add cook name or company" required />
+                <button type="submit">Add Cook</button>
+            </form>
+            <ul class="collab-list" id="cookList"></ul>
+        </div>
+        <div class="collab-section">
+            <h2>Decorators</h2>
+            <form class="collab-add-form" id="decoratorForm">
+                <input type="text" id="decoratorInput" placeholder="Add decorator name or company" required />
+                <button type="submit">Add Decorator</button>
+            </form>
+            <ul class="collab-list" id="decoratorList"></ul>
+        </div>
+        <div class="collab-section">
+            <h2>Collaborators</h2>
+            <form class="collab-invite-form" id="inviteForm">
+                <input type="email" id="inviteEmail" placeholder="Invite by email" required />
+                <button type="submit">Invite</button>
+            </form>
+            <ul class="collab-collaborators-list" id="collaboratorsList"></ul>
+        </div>
+    </div>
+    <script>
+    // --- Access Control & Data ---
+    const API_BASE = 'http://localhost:8080';
+    const bookingId = new URLSearchParams(window.location.search).get('bookingId');
+    const authToken = localStorage.getItem('authToken');
+
+    let currentUser = null;
+    let bookingData = null;
+    let isOwnerOrCollaborator = false;
+
+    async function fetchBooking() {
+        if (!bookingId || !authToken) return null;
+        // Replace with your backend endpoint
+        const res = await fetch(`http://localhost:8080/api/venues/bookings/${bookingId}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) return null;
+        return await res.json();
+    }
+
+    function showError(msg) {
+        const err = document.getElementById('collabError');
+        err.textContent = msg;
+        err.style.display = 'block';
+    }
+    function showSuccess(msg) {
+        const s = document.getElementById('collabSuccess');
+        s.textContent = msg;
+        s.style.display = 'block';
+        setTimeout(() => { s.style.display = 'none'; }, 3000);
+    }
+    function clearError() { document.getElementById('collabError').style.display = 'none'; }
+
+    async function checkAccessAndInit() {
+        
+        if (!currentUser) {
+            showError('You must be logged in.');
+            return;
+        }
+        bookingData = await fetchBooking();
+        if (!bookingData) {
+            showError('Booking not found.');
+            return;
+        }
+        // Owner or collaborator check (user.js logic)
+        isOwnerOrCollaborator = (bookingData.userId === currentUser.id) ||
+            (bookingData.collaborators && bookingData.collaborators.includes(currentUser.email));
+        if (!isOwnerOrCollaborator) {
+            showError('You do not have access to collaborate on this event.');
+            return;
+        }
+        document.getElementById('collabContainer').style.display = 'block';
+        document.getElementById('collabInfo').textContent = `Event: ${bookingData.venueName || 'Venue'} | Dates: ${(bookingData.selectedDates||[]).join(', ')}`;
+        renderAll();
+    }
+
+    // --- Renderers ---
+    function renderAll() {
+        renderList('vendorList', bookingData.vendors || [], 'vendor');
+        renderList('cookList', bookingData.cooks || [], 'cook');
+        renderList('decoratorList', bookingData.decorators || [], 'decorator');
+        renderList('collaboratorsList', bookingData.collaborators || [], 'collaborator');
+    }
+    function renderList(listId, items, type) {
+        const ul = document.getElementById(listId);
+        ul.innerHTML = '';
+        items.forEach((item, idx) => {
+            const li = document.createElement('li');
+            li.textContent = (type === 'collaborator') ? item : item;
+            if (type !== 'collaborator' || item !== bookingData.ownerEmail) {
+                const btn = document.createElement('button');
+                btn.className = 'collab-remove-btn';
+                btn.textContent = 'Remove';
+                btn.onclick = () => removeItem(type, idx);
+                li.appendChild(btn);
+            }
+            ul.appendChild(li);
+        });
+    }
+
+    // --- Add/Remove Handlers ---
+    async function addItem(type, value) {
+        clearError();
+        // Replace with your backend endpoint
+        const res = await fetch(`${API_BASE}/api/bookings/${bookingId}/add-${type}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+            body: JSON.stringify({ value })
+        });
+        if (!res.ok) { showError('Failed to add.'); return; }
+        bookingData = await res.json();
+        renderAll();
+        showSuccess('Added successfully!');
+    }
+    async function removeItem(type, idx) {
+        clearError();
+        // Replace with your backend endpoint
+        const res = await fetch(`${API_BASE}/api/bookings/${bookingId}/remove-${type}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+            body: JSON.stringify({ idx })
+        });
+        if (!res.ok) { showError('Failed to remove.'); return; }
+        bookingData = await res.json();
+        renderAll();
+        showSuccess('Removed successfully!');
+    }
+
+    // --- Form Listeners ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set currentUser from localStorage
+        const userData = localStorage.getItem('userData');
+        if (userData) {
+            currentUser = JSON.parse(userData);
+        }
+        checkAccessAndInit();
+        document.getElementById('vendorForm').onsubmit = e => {
+            e.preventDefault();
+            addItem('vendor', document.getElementById('vendorInput').value.trim());
+            document.getElementById('vendorInput').value = '';
+        };
+        document.getElementById('cookForm').onsubmit = e => {
+            e.preventDefault();
+            addItem('cook', document.getElementById('cookInput').value.trim());
+            document.getElementById('cookInput').value = '';
+        };
+        document.getElementById('decoratorForm').onsubmit = e => {
+            e.preventDefault();
+            addItem('decorator', document.getElementById('decoratorInput').value.trim());
+            document.getElementById('decoratorInput').value = '';
+        };
+        document.getElementById('inviteForm').onsubmit = e => {
+            e.preventDefault();
+            addItem('collaborator', document.getElementById('inviteEmail').value.trim());
+            document.getElementById('inviteEmail').value = '';
+        };
+    });
+    </script>
+</body>
+</html>

@@ -21,7 +21,10 @@ public class VenueService {
     
     @Autowired
     private BookingRepository bookingRepository;
-    
+
+    public Optional<Booking> getBookingById(String id) {
+        return bookingRepository.findById(id);
+    }
     public List<Venue> searchVenuesByLocation(String location) {
         List<Venue> venues = venueRepository.findByLocationIgnoreCase(location);
         return venues;
