@@ -107,6 +107,25 @@
         bookingData = await res.json();
         renderAll();
         showSuccess('Removed successfully!');
+
+        // Restore input and add button for the removed type
+        let inputId, formId;
+        if (type === 'vendor') { inputId = 'vendorInput'; formId = 'vendorForm'; }
+        else if (type === 'cook') { inputId = 'cookInput'; formId = 'cookForm'; }
+        else if (type === 'decorator') { inputId = 'decoratorInput'; formId = 'decoratorForm'; }
+        if (inputId && formId) {
+            const input = document.getElementById(inputId);
+            const form = document.getElementById(formId);
+            if (input) input.style.display = '';
+            if (form) {
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) btn.style.display = '';
+            }
+            // Remove any details divs next to the input
+            if (input && input.nextSibling && input.nextSibling.className === 'collab-business-details') {
+                input.nextSibling.remove();
+            }
+        }
     }
 
     // --- Form Listeners ---
@@ -152,8 +171,11 @@ function setupRoleAutocomplete(inputId, role) {
             const results = await fetchBusinessesByRole(role, query, true); // get objects
             showDropdown(input, results, async (selectedBiz) => {
                 if (dropdown) dropdown.remove();
-                // Hide input and show details
+                // Hide input and add button
                 input.style.display = 'none';
+                const addBtn = input.parentNode.querySelector('button[type="submit"]');
+                if (addBtn) addBtn.style.display = 'none';
+                // Show details
                 const detailsDiv = document.createElement('div');
                 detailsDiv.className = 'collab-business-details';
                 detailsDiv.innerHTML = `<strong>${selectedBiz.companyName || selectedBiz.name}</strong><br>

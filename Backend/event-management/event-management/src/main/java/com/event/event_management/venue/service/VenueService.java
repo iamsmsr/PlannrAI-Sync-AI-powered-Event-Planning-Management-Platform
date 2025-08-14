@@ -36,8 +36,16 @@ public class VenueService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new RuntimeException("Booking not found"));
 
+        // Log current cooks before change
+        System.out.println("Current cooks before adding: " + booking.getCooks());
+
+        // Add the cook (this will clear any existing cooks)
         booking.addCook(cookId);
         booking.setUpdatedAt(LocalDateTime.now().toString());
+
+        // Log after change
+        System.out.println("Cooks after adding: " + booking.getCooks());
+
         return bookingRepository.save(booking);
     }
 
@@ -51,8 +59,16 @@ public class VenueService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new RuntimeException("Booking not found"));
 
+        // Log current vendors before change
+        System.out.println("Current vendors before adding: " + booking.getVendors());
+
+        // Add the vendor (this will clear any existing vendors)
         booking.addVendor(vendorId);
         booking.setUpdatedAt(LocalDateTime.now().toString());
+
+        // Log after change
+        System.out.println("Vendors after adding: " + booking.getVendors());
+
         return bookingRepository.save(booking);
     }
 
@@ -66,7 +82,84 @@ public class VenueService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new RuntimeException("Booking not found"));
 
+        // Log current decorators before change
+        System.out.println("Current decorators before adding: " + booking.getDecorators());
+
+        // Add the decorator (this will clear any existing decorators)
         booking.addDecorator(decoratorId);
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+
+        // Log after change
+        System.out.println("Decorators after adding: " + booking.getDecorators());
+
+        return bookingRepository.save(booking);
+    }
+
+    /**
+     * Remove a cook from a booking
+     * @param bookingId The booking ID
+     * @param cookId The cook's business ID
+     * @return The updated booking
+     */
+    public Booking removeCookFromBooking(String bookingId, String cookId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        // Debug logging
+        System.out.println("Current cooks in booking: " + booking.getCooks());
+        System.out.println("Attempting to remove cook with ID: " + cookId);
+
+        // In the single selection model, we just clear the list regardless of the ID
+        // This makes it more robust as we don't need to worry about ID matching
+        booking.getCooks().clear();
+        System.out.println("All cooks removed from booking");
+
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        return bookingRepository.save(booking);
+    }
+
+    /**
+     * Remove a vendor from a booking
+     * @param bookingId The booking ID
+     * @param vendorId The vendor's business ID
+     * @return The updated booking
+     */
+    public Booking removeVendorFromBooking(String bookingId, String vendorId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        // Debug logging
+        System.out.println("Current vendors in booking: " + booking.getVendors());
+        System.out.println("Attempting to remove vendor with ID: " + vendorId);
+
+        // In the single selection model, we just clear the list regardless of the ID
+        // This makes it more robust as we don't need to worry about ID matching
+        booking.getVendors().clear();
+        System.out.println("All vendors removed from booking");
+
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        return bookingRepository.save(booking);
+    }
+
+    /**
+     * Remove a decorator from a booking
+     * @param bookingId The booking ID
+     * @param decoratorId The decorator's business ID
+     * @return The updated booking
+     */
+    public Booking removeDecoratorFromBooking(String bookingId, String decoratorId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        // Debug logging
+        System.out.println("Current decorators in booking: " + booking.getDecorators());
+        System.out.println("Attempting to remove decorator with ID: " + decoratorId);
+
+        // In the single selection model, we just clear the list regardless of the ID
+        // This makes it more robust as we don't need to worry about ID matching
+        booking.getDecorators().clear();
+        System.out.println("All decorators removed from booking");
+
         booking.setUpdatedAt(LocalDateTime.now().toString());
         return bookingRepository.save(booking);
     }

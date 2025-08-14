@@ -182,26 +182,72 @@ public class Booking {
         if (this.cooks == null) {
             this.cooks = new ArrayList<>();
         }
-        if (!this.cooks.contains(cookId)) {
-            this.cooks.add(cookId);
-        }
+        // Clear any existing cooks first to ensure only one selection
+        this.cooks.clear();
+        // Add the new cook
+        this.cooks.add(cookId);
     }
 
     public void addVendor(String vendorId) {
         if (this.vendors == null) {
             this.vendors = new ArrayList<>();
         }
-        if (!this.vendors.contains(vendorId)) {
-            this.vendors.add(vendorId);
-        }
+        // Clear any existing vendors first to ensure only one selection
+        this.vendors.clear();
+        // Add the new vendor
+        this.vendors.add(vendorId);
     }
 
     public void addDecorator(String decoratorId) {
         if (this.decorators == null) {
             this.decorators = new ArrayList<>();
         }
-        if (!this.decorators.contains(decoratorId)) {
-            this.decorators.add(decoratorId);
+        // Clear any existing decorators first to ensure only one selection
+        this.decorators.clear();
+        // Add the new decorator
+        this.decorators.add(decoratorId);
+    }
+
+    // Helper methods to remove individual providers
+    public boolean removeCook(String cookId) {
+        if (this.cooks == null || this.cooks.isEmpty()) {
+            return false;
         }
+        // Iterate manually to ensure we're removing the correct item
+        for (int i = 0; i < this.cooks.size(); i++) {
+            if (this.cooks.get(i).equals(cookId)) {
+                this.cooks.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeVendor(String vendorId) {
+        if (this.vendors == null || this.vendors.isEmpty()) {
+            return false;
+        }
+        // Iterate manually to ensure we're removing the correct item
+        for (int i = 0; i < this.vendors.size(); i++) {
+            if (this.vendors.get(i).equals(vendorId)) {
+                this.vendors.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean removeDecorator(String decoratorId) {
+        if (this.decorators == null || this.decorators.isEmpty()) {
+            return false;
+        }
+        // Iterate manually to ensure we're removing the correct item
+        for (int i = 0; i < this.decorators.size(); i++) {
+            if (this.decorators.get(i).equals(decoratorId)) {
+                this.decorators.remove(i);
+                return true;
+            }
+        }
+        return false;
     }
 }

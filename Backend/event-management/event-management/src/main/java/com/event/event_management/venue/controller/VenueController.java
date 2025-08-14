@@ -129,53 +129,128 @@ public class VenueController {
     }
 
     /**
-     * Add a cook to a booking
+     * Add a cook to a booking (only one cook can be selected)
      */
+    @CrossOrigin(origins = "*")
     @PostMapping("/bookings/{bookingId}/add-cook")
     public ResponseEntity<?> addCookToBooking(
             @PathVariable String bookingId,
             @RequestBody ServiceProviderRequest request) {
         try {
+            System.out.println("Received request to add cook to booking: " + bookingId + ", value: " + request.getValue());
             Booking updatedBooking = venueService.addCookToBooking(bookingId, request.getValue());
             return ResponseEntity.ok(updatedBooking);
         } catch (Exception e) {
             System.err.println("Error adding cook to booking: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to add cook: " + e.getMessage()));
         }
     }
 
     /**
-     * Add a vendor to a booking
+     * Add a vendor to a booking (only one vendor can be selected)
      */
+    @CrossOrigin(origins = "*")
     @PostMapping("/bookings/{bookingId}/add-vendor")
     public ResponseEntity<?> addVendorToBooking(
             @PathVariable String bookingId,
             @RequestBody ServiceProviderRequest request) {
         try {
+            System.out.println("Received request to add vendor to booking: " + bookingId + ", value: " + request.getValue());
             Booking updatedBooking = venueService.addVendorToBooking(bookingId, request.getValue());
             return ResponseEntity.ok(updatedBooking);
         } catch (Exception e) {
             System.err.println("Error adding vendor to booking: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to add vendor: " + e.getMessage()));
         }
     }
 
     /**
-     * Add a decorator to a booking
+     * Add a decorator to a booking (only one decorator can be selected)
      */
+    @CrossOrigin(origins = "*")
     @PostMapping("/bookings/{bookingId}/add-decorator")
     public ResponseEntity<?> addDecoratorToBooking(
             @PathVariable String bookingId,
             @RequestBody ServiceProviderRequest request) {
         try {
+            System.out.println("Received request to add decorator to booking: " + bookingId + ", value: " + request.getValue());
             Booking updatedBooking = venueService.addDecoratorToBooking(bookingId, request.getValue());
             return ResponseEntity.ok(updatedBooking);
         } catch (Exception e) {
             System.err.println("Error adding decorator to booking: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to add decorator: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Remove a cook from a booking (removes the single selected cook)
+     */
+    @CrossOrigin(origins = "*")
+    @PostMapping("/bookings/{bookingId}/remove-cook")
+    public ResponseEntity<?> removeCookFromBooking(
+            @PathVariable String bookingId,
+            @RequestBody(required = false) ServiceProviderRequest request) {
+        try {
+            System.out.println("Received request to remove cook from booking: " + bookingId);
+            // Since we're only allowing one cook, we can just clear the list
+            // The value from the request isn't actually needed anymore
+            Booking updatedBooking = venueService.removeCookFromBooking(bookingId, "");
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error removing cook from booking: " + e.getMessage());
+            e.printStackTrace(); // Print full stack trace for debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to remove cook: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Remove a vendor from a booking (removes the single selected vendor)
+     */
+    @CrossOrigin(origins = "*")
+    @PostMapping("/bookings/{bookingId}/remove-vendor")
+    public ResponseEntity<?> removeVendorFromBooking(
+            @PathVariable String bookingId,
+            @RequestBody(required = false) ServiceProviderRequest request) {
+        try {
+            System.out.println("Received request to remove vendor from booking: " + bookingId);
+            // Since we're only allowing one vendor, we can just clear the list
+            // The value from the request isn't actually needed anymore
+            Booking updatedBooking = venueService.removeVendorFromBooking(bookingId, "");
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error removing vendor from booking: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to remove vendor: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Remove a decorator from a booking (removes the single selected decorator)
+     */
+    @CrossOrigin(origins = "*")
+    @PostMapping("/bookings/{bookingId}/remove-decorator")
+    public ResponseEntity<?> removeDecoratorFromBooking(
+            @PathVariable String bookingId,
+            @RequestBody(required = false) ServiceProviderRequest request) {
+        try {
+            System.out.println("Received request to remove decorator from booking: " + bookingId);
+            // Since we're only allowing one decorator, we can just clear the list
+            // The value from the request isn't actually needed anymore
+            Booking updatedBooking = venueService.removeDecoratorFromBooking(bookingId, "");
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error removing decorator from booking: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to remove decorator: " + e.getMessage()));
         }
     }
     
