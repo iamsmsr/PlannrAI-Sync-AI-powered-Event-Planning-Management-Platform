@@ -127,6 +127,57 @@ public class VenueController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    /**
+     * Add a cook to a booking
+     */
+    @PostMapping("/bookings/{bookingId}/add-cook")
+    public ResponseEntity<?> addCookToBooking(
+            @PathVariable String bookingId,
+            @RequestBody ServiceProviderRequest request) {
+        try {
+            Booking updatedBooking = venueService.addCookToBooking(bookingId, request.getValue());
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error adding cook to booking: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to add cook: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Add a vendor to a booking
+     */
+    @PostMapping("/bookings/{bookingId}/add-vendor")
+    public ResponseEntity<?> addVendorToBooking(
+            @PathVariable String bookingId,
+            @RequestBody ServiceProviderRequest request) {
+        try {
+            Booking updatedBooking = venueService.addVendorToBooking(bookingId, request.getValue());
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error adding vendor to booking: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to add vendor: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Add a decorator to a booking
+     */
+    @PostMapping("/bookings/{bookingId}/add-decorator")
+    public ResponseEntity<?> addDecoratorToBooking(
+            @PathVariable String bookingId,
+            @RequestBody ServiceProviderRequest request) {
+        try {
+            Booking updatedBooking = venueService.addDecoratorToBooking(bookingId, request.getValue());
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error adding decorator to booking: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to add decorator: " + e.getMessage()));
+        }
+    }
     
     // BookingRequest DTO
     public static class BookingRequest {
@@ -151,5 +202,14 @@ public class VenueController {
         
         public String getBookingDate() { return bookingDate; }
         public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
+    }
+
+    // Service Provider Request DTO
+    public static class ServiceProviderRequest {
+        private String value; // Business ID of the service provider
+
+        // Getters and setters
+        public String getValue() { return value; }
+        public void setValue(String value) { this.value = value; }
     }
 }

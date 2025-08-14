@@ -25,6 +25,51 @@ public class VenueService {
     public Optional<Booking> getBookingById(String id) {
         return bookingRepository.findById(id);
     }
+
+    /**
+     * Add a cook to a booking
+     * @param bookingId The booking ID
+     * @param cookId The cook's business ID
+     * @return The updated booking
+     */
+    public Booking addCookToBooking(String bookingId, String cookId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.addCook(cookId);
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        return bookingRepository.save(booking);
+    }
+
+    /**
+     * Add a vendor to a booking
+     * @param bookingId The booking ID
+     * @param vendorId The vendor's business ID
+     * @return The updated booking
+     */
+    public Booking addVendorToBooking(String bookingId, String vendorId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.addVendor(vendorId);
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        return bookingRepository.save(booking);
+    }
+
+    /**
+     * Add a decorator to a booking
+     * @param bookingId The booking ID
+     * @param decoratorId The decorator's business ID
+     * @return The updated booking
+     */
+    public Booking addDecoratorToBooking(String bookingId, String decoratorId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.addDecorator(decoratorId);
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        return bookingRepository.save(booking);
+    }
     public List<Venue> searchVenuesByLocation(String location) {
         List<Venue> venues = venueRepository.findByLocationIgnoreCase(location);
         return venues;

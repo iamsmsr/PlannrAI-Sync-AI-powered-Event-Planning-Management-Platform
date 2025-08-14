@@ -43,6 +43,12 @@ function initializeAuthForms() {
     if (signinForm) {
         signinForm.addEventListener('submit', handleSignin);
     }
+    
+        // Corporate form submission
+        const corporateForm = document.getElementById('corporateForm');
+        if (corporateForm) {
+            corporateForm.addEventListener('submit', handleCorporateSubmit);
+        }
 }
 
 // Show authentication modal
@@ -101,6 +107,86 @@ function switchAuthMode(mode) {
         signupForm.style.display = 'none';
     }
 }
+
+// Show corporate modal
+function showCorporateModal() {
+    const modal = document.getElementById('corporateModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+        // No need to attach event listener here; it's done on DOMContentLoaded
+}
+
+// Close corporate modal
+function closeCorporateModal() {
+    const modal = document.getElementById('corporateModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Reset form and clear errors
+    const corporateForm = document.getElementById('corporateForm');
+    if (corporateForm) {
+        corporateForm.reset();
+    }
+    clearErrorMessages();
+}
+
+// Handle corporate form submission
+async function handleCorporateSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const corporateData = {
+        companyName: formData.get('companyName'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        role: formData.get('role')
+    };
+    
+ 
+    console.log('Corporate data:2', corporateData);
+
+    
+    // Show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+            console.log('Corporate data: 3', corporateData);
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+    }
+    
+    try {
+        // TODO: Replace with actual backend URL
+        const response = await fetch('http://localhost:8080/api/business/inquiry', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(corporateData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showToast('Thank you for your interest! Our team will contact you soon.', 'success');
+            closeCorporateModal();
+        } else {
+            showErrorMessage('corporate', result.message || 'Failed to submit inquiry. Please try again.');
+        }
+    } catch (error) {
+        console.error('Corporate inquiry error:', error);
+        showErrorMessage('corporate', 'Network error. Please check your connection.');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit ';
+        }
+    }
+}
+
+// Validate corporate form data
+
 
 // Handle user signup
 async function handleSignup(event) {

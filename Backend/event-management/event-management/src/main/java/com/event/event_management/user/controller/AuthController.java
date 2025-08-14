@@ -1,7 +1,9 @@
 package com.event.event_management.user.controller;
 
 import com.event.event_management.config.JwtUtils;
+import com.event.event_management.user.model.Business;
 import com.event.event_management.user.model.User;
+import com.event.event_management.user.service.BusinessService;
 import com.event.event_management.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ public class AuthController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -144,6 +147,9 @@ public class AuthController {
             return ResponseEntity.internalServerError().body(error);
         }
     }
+
+
+
 
     // Request DTOs
     public static class SignupRequest {

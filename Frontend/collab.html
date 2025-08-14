@@ -31,6 +31,15 @@
         .collab-info { color: #666; font-size: 15px; margin-bottom: 18px; }
         .collab-error { color: #c0392b; margin-bottom: 10px; }
         .collab-success { color: #059669; margin-bottom: 10px; }
+        .collab-autocomplete-dropdown {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .collab-autocomplete-dropdown li:hover {
+            background: #f0f4ff;
+        }
     </style>
 </head>
 <body>
@@ -73,143 +82,7 @@
             <ul class="collab-collaborators-list" id="collaboratorsList"></ul>
         </div>
     </div>
-    <script>
-    // --- Access Control & Data ---
-    const API_BASE = 'http://localhost:8080';
-    const bookingId = new URLSearchParams(window.location.search).get('bookingId');
-    const authToken = localStorage.getItem('authToken');
-
-    let currentUser = null;
-    let bookingData = null;
-    let isOwnerOrCollaborator = false;
-
-    async function fetchBooking() {
-        if (!bookingId || !authToken) return null;
-        // Replace with your backend endpoint
-        const res = await fetch(`http://localhost:8080/api/venues/bookings/${bookingId}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        if (!res.ok) return null;
-        return await res.json();
-    }
-
-    function showError(msg) {
-        const err = document.getElementById('collabError');
-        err.textContent = msg;
-        err.style.display = 'block';
-    }
-    function showSuccess(msg) {
-        const s = document.getElementById('collabSuccess');
-        s.textContent = msg;
-        s.style.display = 'block';
-        setTimeout(() => { s.style.display = 'none'; }, 3000);
-    }
-    function clearError() { document.getElementById('collabError').style.display = 'none'; }
-
-    async function checkAccessAndInit() {
-        
-        if (!currentUser) {
-            showError('You must be logged in.');
-            return;
-        }
-        bookingData = await fetchBooking();
-        if (!bookingData) {
-            showError('Booking not found.');
-            return;
-        }
-        // Owner or collaborator check (user.js logic)
-        isOwnerOrCollaborator = (bookingData.userId === currentUser.id) ||
-            (bookingData.collaborators && bookingData.collaborators.includes(currentUser.email));
-        if (!isOwnerOrCollaborator) {
-            showError('You do not have access to collaborate on this event.');
-            return;
-        }
-        document.getElementById('collabContainer').style.display = 'block';
-        document.getElementById('collabInfo').textContent = `Event: ${bookingData.venueName || 'Venue'} | Dates: ${(bookingData.selectedDates||[]).join(', ')}`;
-        renderAll();
-    }
-
-    // --- Renderers ---
-    function renderAll() {
-        renderList('vendorList', bookingData.vendors || [], 'vendor');
-        renderList('cookList', bookingData.cooks || [], 'cook');
-        renderList('decoratorList', bookingData.decorators || [], 'decorator');
-        renderList('collaboratorsList', bookingData.collaborators || [], 'collaborator');
-    }
-    function renderList(listId, items, type) {
-        const ul = document.getElementById(listId);
-        ul.innerHTML = '';
-        items.forEach((item, idx) => {
-            const li = document.createElement('li');
-            li.textContent = (type === 'collaborator') ? item : item;
-            if (type !== 'collaborator' || item !== bookingData.ownerEmail) {
-                const btn = document.createElement('button');
-                btn.className = 'collab-remove-btn';
-                btn.textContent = 'Remove';
-                btn.onclick = () => removeItem(type, idx);
-                li.appendChild(btn);
-            }
-            ul.appendChild(li);
-        });
-    }
-
-    // --- Add/Remove Handlers ---
-    async function addItem(type, value) {
-        clearError();
-        // Replace with your backend endpoint
-        const res = await fetch(`${API_BASE}/api/bookings/${bookingId}/add-${type}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-            body: JSON.stringify({ value })
-        });
-        if (!res.ok) { showError('Failed to add.'); return; }
-        bookingData = await res.json();
-        renderAll();
-        showSuccess('Added successfully!');
-    }
-    async function removeItem(type, idx) {
-        clearError();
-        // Replace with your backend endpoint
-        const res = await fetch(`${API_BASE}/api/bookings/${bookingId}/remove-${type}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-            body: JSON.stringify({ idx })
-        });
-        if (!res.ok) { showError('Failed to remove.'); return; }
-        bookingData = await res.json();
-        renderAll();
-        showSuccess('Removed successfully!');
-    }
-
-    // --- Form Listeners ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // Set currentUser from localStorage
-        const userData = localStorage.getItem('userData');
-        if (userData) {
-            currentUser = JSON.parse(userData);
-        }
-        checkAccessAndInit();
-        document.getElementById('vendorForm').onsubmit = e => {
-            e.preventDefault();
-            addItem('vendor', document.getElementById('vendorInput').value.trim());
-            document.getElementById('vendorInput').value = '';
-        };
-        document.getElementById('cookForm').onsubmit = e => {
-            e.preventDefault();
-            addItem('cook', document.getElementById('cookInput').value.trim());
-            document.getElementById('cookInput').value = '';
-        };
-        document.getElementById('decoratorForm').onsubmit = e => {
-            e.preventDefault();
-            addItem('decorator', document.getElementById('decoratorInput').value.trim());
-            document.getElementById('decoratorInput').value = '';
-        };
-        document.getElementById('inviteForm').onsubmit = e => {
-            e.preventDefault();
-            addItem('collaborator', document.getElementById('inviteEmail').value.trim());
-            document.getElementById('inviteEmail').value = '';
-        };
-    });
-    </script>
+    <script src="scripts/collab-search.js"></script>
+   
 </body>
 </html>

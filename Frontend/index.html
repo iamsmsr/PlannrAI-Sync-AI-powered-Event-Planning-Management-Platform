@@ -18,6 +18,7 @@
             <div class="logo">PEERSPACE</div>
             <div class="nav-links">
                 <a href="#" class="nav-link">Browse Spaces ▼</a>
+                <a href="#" class="nav-link" onclick="showCorporateModal()">Corporate Plans</a>
                 <a href="#" class="nav-link">List Your Space</a>
                 <a href="#" class="nav-link dashboard-link" onclick="showDashboard()" style="display: none;">Dashboard</a>
                 <a href="realtimechat.html" class="nav-link realtime-chat-link" style="display: none; background: linear-gradient(45deg, #007bff, #0056b3); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: relative; margin-right: 10px;">
@@ -274,6 +275,42 @@
                     <p class="auth-switch-text">Already have an account?</p>
                     <button class="auth-switch-btn" onclick="switchAuthMode('signin')">Sign in here</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Corporate Plans Modal -->
+    <div class="auth-modal" id="corporateModal" style="display: none;">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <h2 class="auth-modal-title">Corporate Plans</h2>
+                <button class="auth-close-btn" onclick="closeCorporateModal()">×</button>
+            </div>
+            <div class="auth-form-container">
+                <div class="error-message" id="corporateError"></div>
+                <form id="corporateForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label" for="corporateCompany">Company Name</label>
+                        <input type="text" id="corporateCompany" name="companyName" class="form-input" 
+                               placeholder="Enter your company name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="corporateEmail">Email</label>
+                        <input type="email" id="corporateEmail" name="email" class="form-input" 
+                               placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="corporatePhone">Phone</label>
+                        <input type="tel" id="corporatePhone" name="phone" class="form-input" 
+                               placeholder="Enter your phone number" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="corporateRole">Role</label>
+                        <input type="text" id="corporateRole" name="role" class="form-input" 
+                               placeholder="Your company's role" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Submit Inquiry</button>
+                </form>
             </div>
         </div>
     </div>

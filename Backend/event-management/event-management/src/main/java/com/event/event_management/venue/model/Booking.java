@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import java.util.ArrayList;
+
 @Document(collection = "bookings")
 public class Booking {
     
@@ -22,6 +24,11 @@ public class Booking {
     private String notes;
     private String createdAt;
     private String updatedAt;
+
+    // Additional service providers for the event
+    private List<String> cooks = new ArrayList<>();       // List of cook business IDs
+    private List<String> vendors = new ArrayList<>();     // List of vendor business IDs
+    private List<String> decorators = new ArrayList<>();  // List of decorator business IDs
     
     // Default constructor
     public Booking() {
@@ -144,5 +151,57 @@ public class Booking {
     
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<String> getCooks() {
+        return cooks;
+    }
+
+    public void setCooks(List<String> cooks) {
+        this.cooks = cooks;
+    }
+
+    public List<String> getVendors() {
+        return vendors;
+    }
+
+    public void setVendors(List<String> vendors) {
+        this.vendors = vendors;
+    }
+
+    public List<String> getDecorators() {
+        return decorators;
+    }
+
+    public void setDecorators(List<String> decorators) {
+        this.decorators = decorators;
+    }
+
+    // Helper methods to add individual providers
+    public void addCook(String cookId) {
+        if (this.cooks == null) {
+            this.cooks = new ArrayList<>();
+        }
+        if (!this.cooks.contains(cookId)) {
+            this.cooks.add(cookId);
+        }
+    }
+
+    public void addVendor(String vendorId) {
+        if (this.vendors == null) {
+            this.vendors = new ArrayList<>();
+        }
+        if (!this.vendors.contains(vendorId)) {
+            this.vendors.add(vendorId);
+        }
+    }
+
+    public void addDecorator(String decoratorId) {
+        if (this.decorators == null) {
+            this.decorators = new ArrayList<>();
+        }
+        if (!this.decorators.contains(decoratorId)) {
+            this.decorators.add(decoratorId);
+        }
     }
 }
