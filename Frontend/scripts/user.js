@@ -191,7 +191,7 @@ async function handleCorporateSubmit(event) {
 // Handle user signup
 async function handleSignup(event) {
     event.preventDefault();
-    
+    console.log("aaa")
     const formData = new FormData(event.target);
     const userData = {
         name: formData.get('name'),
@@ -205,6 +205,7 @@ async function handleSignup(event) {
     if (!validateSignupData(userData)) {
         return;
     }
+    console.log("aa")
     
     // Show loading state
     setLoadingState('signup', true);
@@ -800,9 +801,12 @@ async function loadUserBookings() {
         const tempBookings = JSON.parse(localStorage.getItem('userBookings')) || [];
         console.log('Temporary bookings from localStorage:', tempBookings);
 
-        // Fetch confirmed bookings from backend
+        // Fetch confirmed bookings from backend (owned)
         let confirmedBookings = [];
+        // Fetch bookings where user is a collaborator
+        let collaboratorBookings = [];
         try {
+            // Fetch bookings where user is owner
             const response = await fetch(`http://localhost:8080/api/venues/bookings/user/${userData.id}`, {
                 method: 'GET',
                 headers: {
@@ -810,19 +814,33 @@ async function loadUserBookings() {
                     'Authorization': `Bearer ${authToken}`
                 }
             });
-
             if (response.ok) {
                 confirmedBookings = await response.json();
                 console.log('Confirmed bookings from backend:', confirmedBookings);
             } else {
                 console.warn('Failed to fetch backend bookings, showing temp bookings only');
             }
+
+            // Fetch bookings where user is a collaborator (by email)
+            const collabRes = await fetch(`http://localhost:8080/api/venues/bookings/collaborator/${encodeURIComponent(userData.email)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            if (collabRes.ok) {
+                collaboratorBookings = await collabRes.json();
+                console.log('Collaborator bookings from backend:', collaboratorBookings);
+            } else {
+                console.warn('Failed to fetch collaborator bookings');
+            }
         } catch (error) {
             console.warn('Backend request failed, showing temp bookings only:', error);
         }
 
         // Check if we have any bookings at all
-        if (tempBookings.length === 0 && confirmedBookings.length === 0) {
+        if (tempBookings.length === 0 && confirmedBookings.length === 0 && collaboratorBookings.length === 0) {
             bookingsContainer.innerHTML = `
                 <div class="no-bookings">
                     <h3>No Bookings Yet</h3>
@@ -833,25 +851,39 @@ async function loadUserBookings() {
             return;
         }
 
-        // Create booking cards HTML
+        // Create booking cards HTML with Send Invite button for each booking
         let bookingCardsHTML = '';
-        
+        // Helper to add Send Invite button to each card
+        function addSendInviteBtn(cardHtml, booking) {
+            return cardHtml.replace(
+                /(<div class="booking-actions">[\s\S]*?<\/div>)/,
+                `$1\n<button class="invite-btn" style="margin-top:8px;background:#059669;" onclick="showInviteModalForBooking('${booking.id}')">Send Invite</button>`
+            );
+        }
         // Add temporary bookings first (need to be confirmed)
         if (tempBookings.length > 0) {
             bookingCardsHTML += `
                 <div class="temp-bookings-section">
                     <h4 class="section-title">⏰ Pending Confirmation</h4>
-                    ${tempBookings.map(booking => createBookingCard(booking)).join('')}
+                    ${tempBookings.map(booking => addSendInviteBtn(createBookingCard(booking), booking)).join('')}
                 </div>
             `;
         }
-
-        // Add confirmed bookings (from backend)
+        // Add confirmed bookings (from backend, owned)
         if (confirmedBookings.length > 0) {
             bookingCardsHTML += `
                 <div class="confirmed-bookings-section">
-                    <h4 class="section-title">📋 Confirmed Bookings</h4>
-                    ${confirmedBookings.map(booking => createBookingStatusCard(booking)).join('')}
+                    <h4 class="section-title">📋 Confirmed Bookings (Owner)</h4>
+                    ${confirmedBookings.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
+                </div>
+            `;
+        }
+        // Add collaborator bookings (from backend)
+        if (collaboratorBookings.length > 0) {
+            bookingCardsHTML += `
+                <div class="collaborator-bookings-section">
+                    <h4 class="section-title">🤝 Collaborator Bookings</h4>
+                    ${collaboratorBookings.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
                 </div>
             `;
         }
@@ -870,11 +902,161 @@ async function loadUserBookings() {
             <div class="bookings-list">
                 ${bookingCardsHTML}
             </div>
+            <div id="inviteModal" class="auth-modal" style="display:none;z-index:9999;">
+                <div class="auth-modal-content" style="max-width:400px;">
+                    <div class="auth-modal-header">
+                        <h2 class="auth-modal-title">Send Wedding Invite</h2>
+                        <button class="auth-close-btn" onclick="closeInviteModal()">×</button>
+                    </div>
+                    <div class="auth-form-container">
+                        <div class="error-message" id="inviteError" style="display:none;"></div>
+                        <form id="inviteForm" class="auth-form">
+                            <div class="form-group">
+                                <label class="form-label" for="inviteEmail">Recipient Email</label>
+                                <input type="email" id="inviteEmail" name="inviteEmail" class="form-input" placeholder="Enter email" required />
+                            </div>
+                            <button type="submit" class="auth-submit-btn">Send Invite</button>
+                        </form>
+                        <div id="inviteSuccess" style="color:#059669;margin-top:10px;display:none;"></div>
+                    </div>
+                </div>
+            </div>
         `;
 
         // Start countdown timers for temp bookings
         if (tempBookings.length > 0) {
             startCountdownTimers();
+        }
+
+        // Attach invite modal logic for each booking
+        window.showInviteModalForBooking = function(bookingId) {
+            document.getElementById('inviteModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            document.getElementById('inviteForm').setAttribute('data-booking-id', bookingId);
+            document.getElementById('inviteError').style.display = 'none';
+            document.getElementById('inviteSuccess').style.display = 'none';
+            document.getElementById('inviteForm').reset();
+        };
+        window.closeInviteModal = function() {
+            document.getElementById('inviteModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('inviteError').style.display = 'none';
+            document.getElementById('inviteSuccess').style.display = 'none';
+            document.getElementById('inviteForm').removeAttribute('data-booking-id');
+            document.getElementById('inviteForm').reset();
+        };
+        const inviteForm = document.getElementById('inviteForm');
+        if (inviteForm) {
+            inviteForm.onsubmit = async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('inviteEmail').value.trim();
+                if (!email) return;
+                document.getElementById('inviteError').style.display = 'none';
+                document.getElementById('inviteSuccess').style.display = 'none';
+                // Find the booking by id
+                const bookingId = inviteForm.getAttribute('data-booking-id');
+                let booking = null;
+                const allBookings = [...tempBookings, ...confirmedBookings, ...(collaboratorBookings || [])];
+                booking = allBookings.find(b => b.id === bookingId);
+                if (!booking) {
+                    document.getElementById('inviteError').textContent = 'No booking found to send invite.';
+                    document.getElementById('inviteError').style.display = 'block';
+                    return;
+                }
+                // Extract details
+                const eventTitle = booking.venueName || 'Event';
+                const eventDate = (booking.selectedDates && booking.selectedDates.length > 0) ? booking.selectedDates[0] : null;
+                const eventLocation = booking.venueAddress || booking.venueLocation || 'Venue';
+                // Get day, month, year, and day of week
+                let eventDay = '', eventMonthYear = '', eventDayOfWeek = '';
+                if (eventDate) {
+                    const dateObj = new Date(eventDate);
+                    eventDay = dateObj.getDate().toString();
+                    const month = dateObj.toLocaleString('default', { month: 'long' }).toUpperCase();
+                    const year = dateObj.getFullYear();
+                    eventMonthYear = `${month} ${year}`;
+                    eventDayOfWeek = dateObj.toLocaleString('en-US', { weekday: 'long' }).toUpperCase();
+                }
+                // Compose payload for templated.io
+                const payload = {
+                    "template": "58b64ef2-d0df-4687-bbed-0f4258f1a2e4",
+                    "format": "jpg",
+                    "layers": {
+                        "main_heading": {
+                            "text": "YOU'RE INVITED",
+                            "color": "rgb(255, 255, 255)"
+                        },
+                        "event_title": {
+                            "text": eventTitle,
+                            "color": "rgb(212, 175, 55)"
+                        },
+                        "event_day": {
+                            "text": eventDay,
+                            "color": "rgb(255, 255, 255)"
+                        },
+                        "event_month_year": {
+                            "text": eventMonthYear,
+                            "color": "rgb(255, 255, 255)"
+                        },
+                        "event_time": {
+                            "text": `${eventDayOfWeek || 'SATURDAY'} AT 7:00 PM`,
+                            "color": "rgb(255, 255, 255)"
+                        },
+                        "location_text": {
+                            "text": eventLocation.replace(/\n/g, '<br>'),
+                            "color": "rgb(255, 255, 255)"
+                        },
+                        "rsvp_text": {
+                            "text": `RSVP by ${eventMonthYear || ''}<br>to ${userData.email}`,
+                            "color": "rgb(160, 174, 192)"
+                        }
+                    }
+                };
+                // Call templated.io API
+                try {
+                    const cardRes = await fetch('https://api.templated.io/v1/render', {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer '
+                        }
+                    });
+                    if (!cardRes.ok) throw new Error('Failed to generate invite card');
+                    const cardData = await cardRes.json();
+                    // Send email via EmailJS
+                    try {
+                        emailjs.send(
+                                'service_',        // service ID
+                                'template_',       // template ID
+                                {
+                                to_email: email,
+                                from_name: userData.name,
+                                event_title: eventTitle,
+                                event_date: eventDate,
+                                event_location: eventLocation,
+                                invite_image_url: cardData.url
+                                },
+                                ''        // ⚠️ must be your real PUBLIC KEY
+                            )
+                            .then((response) => {
+                                console.log("✅ Email sent:", response.status, response.text);
+                            })
+                            .catch((error) => {
+                                console.error("❌ Email failed:", error);
+                            });
+                            
+                        document.getElementById('inviteSuccess').innerHTML = `Invite sent to ${email}!<br><img src="${cardData.url}" alt="Invite Card" style="max-width:100%;margin-top:10px;" />`;
+                        document.getElementById('inviteSuccess').style.display = 'block';
+                    } catch (emailErr) {
+                        document.getElementById('inviteError').textContent = 'Failed to send email: ' + emailErr.message;
+                        document.getElementById('inviteError').style.display = 'block';
+                    }
+                } catch (err) {
+                    document.getElementById('inviteError').textContent = 'Failed to send invite: ' + err.message;
+                    document.getElementById('inviteError').style.display = 'block';
+                }
+            };
         }
 
     } catch (error) {

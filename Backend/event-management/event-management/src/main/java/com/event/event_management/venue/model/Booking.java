@@ -29,6 +29,7 @@ public class Booking {
     private List<String> cooks = new ArrayList<>();       // List of cook business IDs
     private List<String> vendors = new ArrayList<>();     // List of vendor business IDs
     private List<String> decorators = new ArrayList<>();  // List of decorator business IDs
+    private List<String> collaborators = new ArrayList<>(); // List of collaborator business IDs
     
     // Default constructor
     public Booking() {
@@ -177,6 +178,14 @@ public class Booking {
         this.decorators = decorators;
     }
 
+    public List<String> getCollaborators() {
+        return collaborators;
+    }
+
+    public void setCollaborators(List<String> collaborators) {
+        this.collaborators = collaborators;
+    }
+
     // Helper methods to add individual providers
     public void addCook(String cookId) {
         if (this.cooks == null) {
@@ -245,6 +254,31 @@ public class Booking {
         for (int i = 0; i < this.decorators.size(); i++) {
             if (this.decorators.get(i).equals(decoratorId)) {
                 this.decorators.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Helper methods for collaborators
+    public void addCollaborator(String collaboratorId) {
+        if (this.collaborators == null) {
+            this.collaborators = new ArrayList<>();
+        }
+        // Clear any existing collaborators first to ensure only one selection
+        this.collaborators.clear();
+        // Add the new collaborator
+        this.collaborators.add(collaboratorId);
+    }
+
+    public boolean removeCollaborator(String collaboratorId) {
+        if (this.collaborators == null || this.collaborators.isEmpty()) {
+            return false;
+        }
+        // Iterate manually to ensure we're removing the correct item
+        for (int i = 0; i < this.collaborators.size(); i++) {
+            if (this.collaborators.get(i).equals(collaboratorId)) {
+                this.collaborators.remove(i);
                 return true;
             }
         }

@@ -12,4 +12,5 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
     List<Booking> findByVenueId(String venueId);
     List<Booking> findByStatus(String status);
     List<Booking> findByUserIdAndStatus(String userId, String status);
+    List<Booking> findByCollaboratorsContaining(String collaboratorEmail);
 }

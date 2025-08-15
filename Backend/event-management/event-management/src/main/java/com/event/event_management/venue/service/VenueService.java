@@ -163,6 +163,52 @@ public class VenueService {
         booking.setUpdatedAt(LocalDateTime.now().toString());
         return bookingRepository.save(booking);
     }
+
+    /**
+     * Add a collaborator to a booking
+     * @param bookingId The booking ID
+     * @param collaboratorId The collaborator's business ID
+     * @return The updated booking
+     */
+    public Booking addCollaboratorToBooking(String bookingId, String collaboratorId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        // Log current collaborators before change
+        System.out.println("Current collaborators before adding: " + booking.getCollaborators());
+
+        // Add the collaborator (this will clear any existing collaborators)
+        booking.addCollaborator(collaboratorId);
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+
+        // Log after change
+        System.out.println("Collaborators after adding: " + booking.getCollaborators());
+
+        return bookingRepository.save(booking);
+    }
+
+    /**
+     * Remove a collaborator from a booking
+     * @param bookingId The booking ID
+     * @param collaboratorId The collaborator's business ID
+     * @return The updated booking
+     */
+    public Booking removeCollaboratorFromBooking(String bookingId, String collaboratorId) {
+        Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        // Debug logging
+        System.out.println("Current collaborators in booking: " + booking.getCollaborators());
+        System.out.println("Attempting to remove collaborator with ID: " + collaboratorId);
+
+        // In the single selection model, we just clear the list regardless of the ID
+        // This makes it more robust as we don't need to worry about ID matching
+        booking.getCollaborators().clear();
+        System.out.println("All collaborators removed from booking");
+
+        booking.setUpdatedAt(LocalDateTime.now().toString());
+        return bookingRepository.save(booking);
+    }
     public List<Venue> searchVenuesByLocation(String location) {
         List<Venue> venues = venueRepository.findByLocationIgnoreCase(location);
         return venues;
@@ -197,6 +243,16 @@ public class VenueService {
     
     public List<Booking> getBookingsByStatus(String status) {
         return bookingRepository.findByStatus(status);
+    }
+
+    /**
+     * Get all bookings where the specified email is listed as a collaborator
+     * @param collaboratorEmail The collaborator's email
+     * @return List of bookings where the email is a collaborator
+     */
+    public List<Booking> getBookingsByCollaborator(String collaboratorEmail) {
+        System.out.println("Finding bookings for collaborator email: " + collaboratorEmail);
+        return bookingRepository.findByCollaboratorsContaining(collaboratorEmail);
     }
 
     public Booking approveBooking(String bookingId, String adminUserId) {

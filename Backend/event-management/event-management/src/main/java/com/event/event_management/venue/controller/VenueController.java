@@ -129,6 +129,23 @@ public class VenueController {
     }
 
     /**
+     * Get all bookings where a specific email is listed as a collaborator
+     */
+    @CrossOrigin(origins = "*")
+    @GetMapping("/bookings/collaborator/{email}")
+    public ResponseEntity<List<Booking>> getBookingsByCollaborator(@PathVariable String email) {
+        try {
+            System.out.println("Looking for bookings with collaborator: " + email);
+            List<Booking> bookings = venueService.getBookingsByCollaborator(email);
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            System.err.println("Error fetching bookings by collaborator: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
      * Add a cook to a booking (only one cook can be selected)
      */
     @CrossOrigin(origins = "*")
@@ -251,6 +268,48 @@ public class VenueController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to remove decorator: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Add a collaborator to a booking (only one collaborator can be selected)
+     */
+    @CrossOrigin(origins = "*")
+    @PostMapping("/bookings/{bookingId}/add-collaborator")
+    public ResponseEntity<?> addCollaboratorToBooking(
+            @PathVariable String bookingId,
+            @RequestBody ServiceProviderRequest request) {
+        try {
+            System.out.println("Received request to add collaborator to booking: " + bookingId + ", value: " + request.getValue());
+            Booking updatedBooking = venueService.addCollaboratorToBooking(bookingId, request.getValue());
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error adding collaborator to booking: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to add collaborator: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Remove a collaborator from a booking (removes the single selected collaborator)
+     */
+    @CrossOrigin(origins = "*")
+    @PostMapping("/bookings/{bookingId}/remove-collaborator")
+    public ResponseEntity<?> removeCollaboratorFromBooking(
+            @PathVariable String bookingId,
+            @RequestBody(required = false) ServiceProviderRequest request) {
+        try {
+            System.out.println("Received request to remove collaborator from booking: " + bookingId);
+            // Since we're only allowing one collaborator, we can just clear the list
+            // The value from the request isn't actually needed anymore
+            Booking updatedBooking = venueService.removeCollaboratorFromBooking(bookingId, "");
+            return ResponseEntity.ok(updatedBooking);
+        } catch (Exception e) {
+            System.err.println("Error removing collaborator from booking: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to remove collaborator: " + e.getMessage()));
         }
     }
     
