@@ -1,8 +1,8 @@
-PlannrAI Sync – AI-powered Event Planning & Management
+**PlannrAI Sync – AI-powered Event Planning & Management**
 
 PlannrAI Sync is an intelligent event management platform that combines interactive tools, AI recommendations, and real-time collaboration to make planning and executing events effortless. Whether you’re a customer searching for venues, a vendor offering services, or an admin managing the system, PlannrAI Sync streamlines the entire process from discovery to booking.
 
-Key Features
+**Key Features**
 
 🔍 Interactive Map Search – Find venues and vendors by location, type, and availability.
 
@@ -18,7 +18,7 @@ Key Features
 
 📊 Vendor Management – Vendors list services, handle bookings, and manage availability.
 
-Tech Stack
+**Tech Stack**
 
 Frontend: HTML, CSS, JavaScript, Leaflet.js
 
