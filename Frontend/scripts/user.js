@@ -1002,12 +1002,9 @@ async function loadUserBookings() {
                             "text": `${eventDayOfWeek || 'SATURDAY'} AT 7:00 PM`,
                             "color": "rgb(255, 255, 255)"
                         },
-                        "location_text": {
-                            "text": eventLocation.replace(/\n/g, '<br>'),
-                            "color": "rgb(255, 255, 255)"
-                        },
+                      
                         "rsvp_text": {
-                            "text": `RSVP by ${eventMonthYear || ''}<br>to ${userData.email}`,
+                            "text": `RSVP by ${eventMonthYear || ''}<br>to ${email}`,
                             "color": "rgb(160, 174, 192)"
                         }
                     }
@@ -1031,14 +1028,14 @@ async function loadUserBookings() {
                                 'template_',       // template ID
                                 {
                                 to_email: email,
-                                from_name: userData.name,
+                              //  from_name: userData.name,
                                 event_title: eventTitle,
                                 event_date: eventDate,
-                                event_location: eventLocation,
                                 invite_image_url: cardData.url
                                 },
-                                ''        // ⚠️ must be your real PUBLIC KEY
+                                ''        // ⚠️ must be your real PUBLIC KEY, not user_xxxx
                             )
+
                             .then((response) => {
                                 console.log("✅ Email sent:", response.status, response.text);
                             })
