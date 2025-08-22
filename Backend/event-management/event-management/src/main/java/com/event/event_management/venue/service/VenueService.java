@@ -221,6 +221,11 @@ public class VenueService {
         return allVenues;
     }
     
+    public Optional<Venue> getVenueById(String id) {
+        System.out.println("Fetching venue with ID: " + id);
+        return venueRepository.findById(id);
+    }
+    
     // Booking related methods
     public Booking createBooking(String userId, String venueId, String venueName, 
                                 List<String> selectedDates, String bookingDate) {

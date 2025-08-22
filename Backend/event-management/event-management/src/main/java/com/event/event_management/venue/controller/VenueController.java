@@ -6,6 +6,8 @@ import com.event.event_management.venue.service.VenueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/venues")
 @CrossOrigin(origins = "*")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class VenueController {
     
     @Autowired
@@ -35,6 +38,27 @@ public class VenueController {
         List<Venue> venues = venueService.getAllVenues();
         System.out.println("Returning " + venues.size() + " venues");
         return ResponseEntity.ok(venues);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")  // Ensures user is authenticated
+    public ResponseEntity<Venue> getVenueById(@PathVariable String id) {
+        try {
+            System.out.println("Received request to fetch venue: " + id);
+            Optional<Venue> venue = venueService.getVenueById(id);
+            
+            if (!venue.isPresent()) {
+                System.out.println("Venue not found: " + id);
+                return ResponseEntity.notFound().build();
+            }
+            
+            System.out.println("Successfully fetched venue: " + id);
+            return ResponseEntity.ok(venue.get());
+        } catch (Exception e) {
+            System.err.println("Error fetching venue by ID: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
     @GetMapping("/bookings/{id}")
     public ResponseEntity<?> getBookingById(@PathVariable String id) {
