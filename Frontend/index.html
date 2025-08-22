@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="styles/calendar.css">
     <link rel="stylesheet" href="styles/user.css">
     <link rel="stylesheet" href="styles/chat.css">
+    <!-- Leaflet CSS for map support -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body class="loading">
     <!-- Hero Section -->
@@ -77,9 +79,15 @@
         <div class="results-header">
             <div class="search-info">Found 0 venues</div>
             <button class="back-btn" onclick="backToSearch()">← Back to Search</button>
+            <button class="show-map-btn" id="showMapBtn" style="margin-left:10px; background:#059669; color:#fff; border:none; border-radius:5px; padding:8px 18px; cursor:pointer; font-size:1rem;">Show Map</button>
         </div>
-        <div class="venues-container">
-            <!-- Venue cards will be inserted here -->
+        <div class="venues-map-flex" style="display:flex; gap:24px; align-items:flex-start;">
+            <div class="venues-container" style="flex:1 1 0;">
+                <!-- Venue cards will be inserted here -->
+            </div>
+            <div id="sideMapContainer" style="flex:1 1 0; min-width:350px; max-width:600px; display:none;">
+                <div id="sideMap" style="height:70vh; width:100%; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,0.08);"></div>
+            </div>
         </div>
     </section>
 
@@ -314,20 +322,21 @@
             </div>
         </div>
     </div>
+     <!-- Leaflet JS for map support -->
+     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
      <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
-</script>
-<script type="text/javascript">
-   (function(){
-      emailjs.init({
-        publicKey: "IG37CTbx3UqbTiBe4",
-      });
-   })();
-</script>
-    <script src="scripts/user.js"></script>
-    <script src="scripts/app.js"></script>
-    <script src="scripts/search.js"></script>
-    <script src="scripts/calendar.js"></script>
-    <script src="scripts/chat.js"></script>
+     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+     <script type="text/javascript">
+         (function(){
+             emailjs.init({
+                publicKey: "IG37CTbx3UqbTiBe4",
+             });
+         })();
+     </script>
+     <script src="scripts/user.js"></script>
+     <script src="scripts/app.js"></script>
+     <script src="scripts/search.js"></script>
+     <script src="scripts/calendar.js"></script>
+     <script src="scripts/chat.js"></script>
 </body>
 </html>

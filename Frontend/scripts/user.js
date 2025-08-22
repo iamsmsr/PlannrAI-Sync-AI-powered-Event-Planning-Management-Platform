@@ -851,40 +851,128 @@ async function loadUserBookings() {
             return;
         }
 
-        // Create booking cards HTML with Send Invite button for each booking
-        let bookingCardsHTML = '';
         // Helper to add Send Invite button to each card
         function addSendInviteBtn(cardHtml, booking) {
             return cardHtml.replace(
                 /(<div class="booking-actions">[\s\S]*?<\/div>)/,
-                `$1\n<button class="invite-btn" style="margin-top:8px;background:#059669;" onclick="showInviteModalForBooking('${booking.id}')">Send Invite</button>`
+                `$1\n<button class="invite-btn" style="margin-top:8px;background:#059669;" onclick="showInviteModalForBooking('${booking.id}')">Send Invite<\/button>`
             );
         }
+
+        // Helper to check if all selectedDates are in the past
+        function isPastEvent(booking) {
+            if (!booking.selectedDates || booking.selectedDates.length === 0) return false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return booking.selectedDates.every(date => {
+                const eventDate = new Date(date);
+                eventDate.setHours(0, 0, 0, 0);
+                return eventDate < today;
+            });
+        }
+
+        // Separate confirmed and collaborator bookings into upcoming and past
+        const confirmedUpcoming = [], confirmedPast = [];
+        let venues = new Map(); // Cache for venue details
+
+        // Process confirmed bookings
+        for (const booking of confirmedBookings) {
+            if (!isPastEvent(booking)) {
+                // Only fetch venue and weather for upcoming bookings
+                if (!venues.has(booking.venueId)) {
+                    const venue = await fetchVenueDetails(booking.venueId);
+                    if (venue) venues.set(booking.venueId, venue);
+                }
+                const venue = venues.get(booking.venueId);
+                if (venue && venue.location) {
+                    booking.weatherInfo = [];
+                    try {
+                        const weatherPromises = booking.selectedDates.map(date => 
+                            fetchWeatherForEvent(venue.location, date)
+                                .then(weather => {
+                                    if (weather) {
+                                        return { date, ...weather };
+                                    }
+                                    return null;
+                                })
+                                .catch(err => {
+                                    console.warn(`Weather fetch failed for ${date}:`, err);
+                                    return null;
+                                })
+                        );
+                        
+                        const weatherResults = await Promise.all(weatherPromises);
+                        booking.weatherInfo = weatherResults.filter(w => w !== null);
+                    } catch (weatherError) {
+                        console.error('Error fetching weather for booking:', weatherError);
+                        booking.weatherInfo = [];
+                    }
+                }
+                confirmedUpcoming.push(booking);
+            } else {
+                confirmedPast.push(booking);
+            }
+        }
+
+        const collabUpcoming = [], collabPast = [];
+        // Process collaborator bookings
+        for (const booking of collaboratorBookings) {
+            if (!isPastEvent(booking)) {
+                // Only fetch venue and weather for upcoming bookings
+                if (!venues.has(booking.venueId)) {
+                    const venue = await fetchVenueDetails(booking.venueId);
+                    if (venue) venues.set(booking.venueId, venue);
+                }
+                const venue = venues.get(booking.venueId);
+                if (venue) {
+                    booking.weatherInfo = [];
+                    for (const date of booking.selectedDates) {
+                        const weather = await fetchWeatherForEvent(venue.location, date);
+                        if (weather) booking.weatherInfo.push({ date, ...weather });
+                    }
+                }
+                collabUpcoming.push(booking);
+            } else {
+                collabPast.push(booking);
+            }
+        }
+
+        let bookingCardsHTML = '';
         // Add temporary bookings first (need to be confirmed)
         if (tempBookings.length > 0) {
             bookingCardsHTML += `
                 <div class="temp-bookings-section">
-                    <h4 class="section-title">⏰ Pending Confirmation</h4>
+                    <h4 class="section-title">⏰ Pending Confirmation<\/h4>
                     ${tempBookings.map(booking => addSendInviteBtn(createBookingCard(booking), booking)).join('')}
-                </div>
+                <\/div>
             `;
         }
-        // Add confirmed bookings (from backend, owned)
-        if (confirmedBookings.length > 0) {
+        // Add confirmed upcoming bookings (from backend, owned)
+        if (confirmedUpcoming.length > 0) {
             bookingCardsHTML += `
                 <div class="confirmed-bookings-section">
-                    <h4 class="section-title">📋 Confirmed Bookings (Owner)</h4>
-                    ${confirmedBookings.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
-                </div>
+                    <h4 class="section-title">📋 Confirmed Bookings (Owner)<\/h4>
+                    ${confirmedUpcoming.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
+                <\/div>
             `;
         }
-        // Add collaborator bookings (from backend)
-        if (collaboratorBookings.length > 0) {
+        // Add collaborator upcoming bookings
+        if (collabUpcoming.length > 0) {
             bookingCardsHTML += `
                 <div class="collaborator-bookings-section">
-                    <h4 class="section-title">🤝 Collaborator Bookings</h4>
-                    ${collaboratorBookings.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
-                </div>
+                    <h4 class="section-title">🤝 Collaborator Bookings<\/h4>
+                    ${collabUpcoming.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
+                <\/div>
+            `;
+        }
+        // Add past events at the bottom
+        if (confirmedPast.length > 0 || collabPast.length > 0) {
+            bookingCardsHTML += `
+                <div class="past-bookings-section">
+                    <h4 class="section-title">🕓 Past Events<\/h4>
+                    ${confirmedPast.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
+                    ${collabPast.map(booking => addSendInviteBtn(createBookingStatusCard(booking), booking)).join('')}
+                <\/div>
             `;
         }
 
@@ -1139,24 +1227,141 @@ function isUpcomingBooking(selectedDates) {
     });
 }
 
+// API base URL - can be changed for different environments
+const API_BASE_URL = 'http://localhost:8080/api';
+
+// Fetch weather for a city and date
+async function fetchWeatherForEvent(city, date) {
+    if (!city || !date) {
+        console.error('City and date are required for weather fetch');
+        return null;
+    }
+
+    if (!authToken) {
+        console.error('No auth token available');
+        return null;
+    }
+
+    // Check if date is in the future
+    const eventDate = new Date(date);
+    const today = new Date();
+    
+    // If date is more than 7 days in the future, return a placeholder
+    if ((eventDate - today) > (7 * 24 * 60 * 60 * 1000)) {
+        console.log(`Date ${date} is more than 7 days away. Returning forecast unavailable message.`);
+        return {
+            city: city,
+            temperature: null,
+            main: 'Forecast unavailable',
+            message: 'Weather forecast only available for next 7 days'
+        };
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/weather/${encodeURIComponent(city)}/${encodeURIComponent(date)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.log(`No weather data available for ${city} on ${date}`);
+                return null;
+            }
+            throw new Error(`Weather fetch failed: ${response.statusText}`);
+        }
+        
+        const weatherData = await response.json();
+        console.log(`Weather data for ${city} on ${date}:`, weatherData);
+        return weatherData;
+    } catch (error) {
+        console.error(`Error fetching weather for ${city} on ${date}:`, error);
+        return null;
+    }
+}
+
+// Fetch venue details including city
+async function fetchVenueDetails(venueId) {
+    if (!venueId) {
+        console.error('Venue ID is required');
+        return null;
+    }
+
+    if (!authToken) {
+        console.error('No auth token available');
+        return null;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/venues/${venueId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.warn(`Venue not found with ID: ${venueId}`);
+                return null;
+            }
+            throw new Error(`Venue fetch failed with status: ${response.status}`);
+        }
+        
+        const venue = await response.json();
+        console.log(`Fetched venue details for ID ${venueId}:`, venue);
+        return venue;
+    } catch (error) {
+        console.error(`Error fetching venue ${venueId}:`, error);
+        return null;
+    }
+}
+
 function createBookingStatusCard(booking) {
     const statusInfo = getBookingStatusInfo(booking.status, booking.notes);
     const formattedDates = booking.selectedDates ? booking.selectedDates.join(', ') : 'No dates';
     const bookingDate = booking.bookingDate ? new Date(booking.bookingDate).toLocaleDateString() : 'Unknown';
     const isUpcoming = isUpcomingBooking(booking.selectedDates);
+
+    // Add weather information if available
+    let weatherHTML = '';
+    if (isUpcoming && booking.weatherInfo) {
+        weatherHTML = `
+            <div class="weather-info" style="margin-top: 10px; padding: 8px; background: #f3f4f6; border-radius: 6px;">
+                <h5 style="margin: 0 0 8px 0; color: #374151;">🌤️ Weather Forecast</h5>
+                ${booking.weatherInfo.map(info => {
+                    const date = new Date(info.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                    const weather = info.weather || info.condition || 'N/A'; // Handle different weather property names
+                    const temp = info.temperature ? `${info.temperature}°C` : 'N/A';
+                    
+                    return `
+                    <div style="margin-bottom: 6px;">
+                        <strong>${date}:</strong>
+                        <span>${weather === 'N/A' ? '' : '☀️'} ${weather} ${temp}</span>
+                    </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
     
     return `
         <div class="booking-card booking-status-${booking.status.toLowerCase()}">
             <div class="booking-header">
                 <h4 class="booking-venue">${booking.venueName || 'Unknown Venue'}</h4>
-                <span class="booking-id">ID: ${booking.id}</span>
             </div>
             
             <div class="booking-details">
                 <div class="booking-info">
                     <p><strong>Selected Dates:</strong> ${formattedDates}</p>
                     <p><strong>Booking Date:</strong> ${bookingDate}</p>
-                    <p><strong>Venue ID:</strong> ${booking.venueId}</p>
+                    ${weatherHTML}
                 </div>
                 
                 <div class="booking-status">
