@@ -10,18 +10,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/weather")
+@RequestMapping("/api/prediction")
 public class PredictionController {
 
-    private final PredictionService weatherService;
+    private final PredictionService predictionService;
 
     @Autowired
-    public PredictionController(PredictionService weatherService) {
-        this.weatherService = weatherService;
+    public PredictionController(PredictionService predictionService) {
+        this.predictionService = predictionService;
     }
 
-    @GetMapping("/{city}/{date}")
+    // Endpoint for weather prediction
+    @GetMapping("/weather/{city}/{date}")
     public Weather getWeatherByDate(@PathVariable String city, @PathVariable LocalDate date) {
-        return weatherService.getWeatherForDate(city, date);
+        return predictionService.getWeatherForDate(city, date);
     }
-}
+
+
+    }

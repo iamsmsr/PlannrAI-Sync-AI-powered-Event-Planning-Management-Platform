@@ -770,6 +770,23 @@ function stopBookingAutoRefresh() {
         bookingRefreshInterval = null;
     }
 }
+function extractCoordinates(combinedString) {
+  // Check if the input is a valid string and includes the separator
+  if (typeof combinedString !== 'string' || !combinedString.includes('|')) {
+    console.error("Invalid input: The string must contain '|' to be split.");
+    return null;
+  }
+
+  // Use the split() method to break the string into an array at the '|' character.
+  const parts = combinedString.split('|');
+
+  // The first element of the array is the address, and the second is the coordinates.
+  const address = parts[0].trim(); // .trim() removes any leading/trailing whitespace
+  const coordinates = parts[1].trim();
+
+  // Return an object with the separated values.
+  return   coordinates
+}
 
 // Load and display user bookings (both temporary and confirmed)
 async function loadUserBookings() {
@@ -881,7 +898,43 @@ async function loadUserBookings() {
                 // Only fetch venue and weather for upcoming bookings
                 if (!venues.has(booking.venueId)) {
                     const venue = await fetchVenueDetails(booking.venueId);
-                    if (venue) venues.set(booking.venueId, venue);
+                    if (venue) {
+                        // Get user's location
+                        const userCoords = await new Promise((resolve) => {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => resolve(`${position.coords.longitude},${position.coords.latitude}`),
+                                () => resolve(null)
+                            );
+                        });
+
+                        if (userCoords && venue.address) {
+                            // Get venue coordinates and swap lat/long order for OSRM
+                            let venueCoords = extractCoordinates(venue.address);
+                            // Split coordinates and reverse order
+                            venueCoords = venueCoords.split(',').reverse().join(',');
+                            
+                            // Get route information using OSRM
+                            try {
+                                console.log('Fetching route from', userCoords, 'to', venueCoords);
+                                const routeResponse = await fetch(`http://router.project-osrm.org/route/v1/driving/${userCoords};${venueCoords}?overview=false`);
+                                const routeData = await routeResponse.json();
+                                
+                                if (routeData.routes && routeData.routes[0]) {
+                                    venue.distanceInfo = {
+                                        distance: (routeData.routes[0].distance / 1000).toFixed(2), // Convert to km
+                                        duration: Math.round(routeData.routes[0].duration / 60) // Convert to minutes
+                                    };
+                                    // Also add the distance info and coordinates to the booking
+                                    booking.distanceInfo = venue.distanceInfo;
+                                    booking.userCoords = userCoords;
+                                    booking.venueCoords = venueCoords;
+                                }
+                            } catch (error) {
+                                console.error('Error fetching route information:', error);
+                            }
+                        }
+                        venues.set(booking.venueId, venue);
+                    }                
                 }
                 const venue = venues.get(booking.venueId);
                 if (venue && venue.location) {
@@ -1230,6 +1283,13 @@ function isUpcomingBooking(selectedDates) {
 // API base URL - can be changed for different environments
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// Function to show route on map
+function showRouteOnMap(userCoords, venueCoords) {
+    // Open map.html with coordinates as parameters
+    const url = `map.html?showRoute=true&from=${userCoords}&to=${venueCoords}`;
+    window.open(url, '_blank');
+}
+
 // Fetch weather for a city and date
 async function fetchWeatherForEvent(city, date) {
     if (!city || !date) {
@@ -1258,7 +1318,7 @@ async function fetchWeatherForEvent(city, date) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/weather/${encodeURIComponent(city)}/${encodeURIComponent(date)}`, {
+        const response = await fetch(`${API_BASE_URL}/prediction/weather/${encodeURIComponent(city)}/${encodeURIComponent(date)}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -1282,7 +1342,16 @@ async function fetchWeatherForEvent(city, date) {
         return null;
     }
 }
+async function userLocation() {
+    map.on('locationfound', function(e) {
+    // Get the coordinates from the event object
+    const { lat, lng } = e.latlng;
+    const accuracy = e.accuracy; // The accuracy of the location in meters
 
+    console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+    console.log(`Accuracy: ${accuracy} meters`);
+    return {lat, lng};
+})};
 // Fetch venue details including city
 async function fetchVenueDetails(venueId) {
     if (!venueId) {
@@ -1362,6 +1431,18 @@ function createBookingStatusCard(booking) {
                     <p><strong>Selected Dates:</strong> ${formattedDates}</p>
                     <p><strong>Booking Date:</strong> ${bookingDate}</p>
                     ${weatherHTML}
+                    ${booking.distanceInfo ? `
+                        <div class="distance-info" style="margin-top: 10px; padding: 8px; background: #f3f4f6; border-radius: 6px;">
+                            <h5 style="margin: 0 0 8px 0; color: #374151;">🚗 Travel Information</h5>
+                            <p style="margin: 4px 0;"><strong>Distance:</strong> ${booking.distanceInfo.distance} km</p>
+                            <p style="margin: 4px 0;"><strong>Estimated time:</strong> ${booking.distanceInfo.duration} minutes</p>
+                            <button onclick="showRouteOnMap('${booking.userCoords}', '${booking.venueCoords}')" 
+                                    style="background: #059669; color: white; border: none; border-radius: 4px; 
+                                           padding: 6px 12px; margin-top: 8px; cursor: pointer; width: 100%;">
+                                🗺️ Show Route
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
                 
                 <div class="booking-status">

@@ -60,6 +60,47 @@ if (venueId && venueName && autoBook) {
 // Optional: Show user's current location
 map.locate({setView: false, maxZoom: 16});
 map.on('locationfound', function(e) {
+    console.log(e.latlng)
+    const { lat, lng } = e.latlng;
     L.marker(e.latlng).addTo(map)
         .bindPopup('You are here').openPopup();
 });
+
+// Check URL parameters for route visualization
+const showRoute = urlParams.get('showRoute');
+const fromCoords = urlParams.get('from');
+const toCoords = urlParams.get('to');
+
+if (showRoute && fromCoords && toCoords) {
+    const [fromLng, fromLat] = fromCoords.split(',');
+    const [toLng, toLat] = toCoords.split(',');
+    
+    // Add markers for start and end points
+    const startMarker = L.marker([fromLat, fromLng]).addTo(map)
+        .bindPopup('Start Location').openPopup();
+    const endMarker = L.marker([toLat, toLng]).addTo(map)
+        .bindPopup('Destination').openPopup();
+
+    // Fetch route from OSRM
+    fetch(`http://router.project-osrm.org/route/v1/driving/${fromCoords};${toCoords}?overview=full&geometries=geojson`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.routes && data.routes[0]) {
+                // Add the route to the map
+                const route = L.geoJSON(data.routes[0].geometry, {
+                    style: {
+                        color: '#059669',
+                        weight: 6,
+                        opacity: 0.7
+                    }
+                }).addTo(map);
+
+                // Fit the map to show the entire route
+                const bounds = route.getBounds();
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching route:', error);
+        });
+}
