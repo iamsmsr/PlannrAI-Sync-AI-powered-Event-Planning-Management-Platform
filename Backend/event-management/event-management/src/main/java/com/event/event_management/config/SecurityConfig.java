@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").permitAll()
                 .requestMatchers("/api/chat/**").permitAll()  // Allow chat endpoints
                 .requestMatchers("/ws/**").permitAll()  // Allow WebSocket connections
+                .requestMatchers("/api/business/**").permitAll() // Allow business inquiry public access
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,3 +1,74 @@
+        // Add Login using ID button below the toast/modal
+        setTimeout(() => {
+            // Only add if not already present
+            if (!document.getElementById('loginByIdBtn')) {
+                const modal = document.getElementById('corporateModal');
+                const btn = document.createElement('button');
+                btn.id = 'loginByIdBtn';
+                btn.textContent = 'Login using ID';
+                btn.className = 'auth-submit-btn';
+                btn.style.marginTop = '20px';
+                btn.onclick = showBusinessIdLoginModal;
+                modal.querySelector('.auth-modal-content')?.appendChild(btn);
+            }
+        }, 1000);
+// Show modal for business ID login
+function showBusinessIdLoginModal() {
+    const modal = document.getElementById('corporateModal');
+    if (!modal) return;
+    // Clear modal content and show only ID input
+    const content = modal.querySelector('.auth-modal-content');
+    if (!content) return;
+    content.innerHTML = `
+        <div class="auth-modal-header">
+            <h2 class="auth-modal-title">Business Login</h2>
+            <button class="auth-close-btn" onclick="closeCorporateModal()">×</button>
+        </div>
+        <div class="auth-form-container">
+            <form id="businessIdLoginForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="businessIdInput">Business ID</label>
+                    <input type="text" id="businessIdInput" name="businessId" class="form-input" placeholder="Enter your business ID" required />
+                </div>
+                <button type="submit" class="auth-submit-btn">Login</button>
+            </form>
+            <div id="businessIdLoginError" class="error-message" style="display:none;"></div>
+        </div>
+    `;
+    document.body.style.overflow = 'hidden';
+    modal.style.display = 'flex';
+    // Attach submit handler
+    document.getElementById('businessIdLoginForm').onsubmit = handleBusinessIdLogin;
+}
+
+// Handle business ID login
+async function handleBusinessIdLogin(e) {
+    e.preventDefault();
+    const id = document.getElementById('businessIdInput').value.trim();
+    const errorDiv = document.getElementById('businessIdLoginError');
+    errorDiv.style.display = 'none';
+    if (!id) {
+        errorDiv.textContent = 'Please enter your business ID.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+    try {
+        const res = await fetch(`http://localhost:8080/api/business/${id}`);
+        if (!res.ok) {
+            errorDiv.textContent = 'Business not found or not approved yet.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        const business = await res.json();
+        // Store business info in localStorage for business.html
+        console.log("here")
+        localStorage.setItem('businessInfo', JSON.stringify(business));
+        window.location.href = 'business.html';
+    } catch (err) {
+        errorDiv.textContent = 'Network error. Please try again.';
+        errorDiv.style.display = 'block';
+    }
+}
 // User authentication and dashboard functionality
 
 // Global variables for user management
@@ -157,20 +228,36 @@ async function handleCorporateSubmit(event) {
     }
     
     try {
-        // TODO: Replace with actual backend URL
+        // Add Authorization header if authToken is available
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (authToken) {
+            headers['Authorization'] = `Bearer ${authToken}`;
+        }
         const response = await fetch('http://localhost:8080/api/business/inquiry', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify(corporateData)
         });
-        
-        const result = await response.json();
-        
+
+        let result = {};
+        // Only try to parse JSON if response has content
+        const text = await response.text();
+        if (text) {
+            try {
+                result = JSON.parse(text);
+            } catch (jsonErr) {
+                result = { message: 'Invalid server response' };
+            }
+        }
+
         if (response.ok) {
-            showToast('Thank you for your interest! Our team will contact you soon.', 'success');
-            closeCorporateModal();
+            // Show backend message in toast for 10 seconds, then close modal
+            showToast(result.message || 'Thank you for your interest!', 'success', 10000);
+            setTimeout(() => {
+                closeCorporateModal();
+            }, 10000);
         } else {
             showErrorMessage('corporate', result.message || 'Failed to submit inquiry. Please try again.');
         }

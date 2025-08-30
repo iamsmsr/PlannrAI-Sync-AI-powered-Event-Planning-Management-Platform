@@ -26,32 +26,31 @@ public class BusinessController {
      */
     @PostMapping("/inquiry")
     public ResponseEntity<?> submitInquiry(@RequestBody Business inquiryDTO) {
-        try {
-            Business inquiry = businessService.saveInquiry(
-                    inquiryDTO.getName(),
-                    inquiryDTO.getEmail(),
-                    inquiryDTO.getCompanyName(),
-                    inquiryDTO.getPhone(),
-                    inquiryDTO.getRole()
-            );
+    try {
+        Business inquiry = businessService.saveInquiry(
+            inquiryDTO.getName(),
+            inquiryDTO.getEmail(),
+            inquiryDTO.getCompanyName(),
+            inquiryDTO.getPhone(),
+            inquiryDTO.getRole()
+        );
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", " submitted successfully");
-            response.put("inquiry", Map.of(
-                    "id", inquiry.getId(),
-                    "companyName", inquiry.getCompanyName(),
-                    "email", inquiry.getEmail(),
-                    "phone", inquiry.getPhone(),
-                    "role",  inquiry.getRole()
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Here is your id: " + inquiry.getId() + ". you'll be able to use it once approved");
+        response.put("inquiry", Map.of(
+            "id", inquiry.getId(),
+            "companyName", inquiry.getCompanyName(),
+            "email", inquiry.getEmail(),
+            "phone", inquiry.getPhone(),
+            "role",  inquiry.getRole()
+        ));
 
-            ));
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("message", "Error submitting inquiry: " + e.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        }
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", "Error submitting inquiry: " + e.getMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
     }
     @GetMapping("/search")
     public ResponseEntity<?> searchBusinesses(

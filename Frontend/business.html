@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Info</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .business-info-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 32px 24px;
+        }
+        .business-info-container h2 {
+            margin-bottom: 24px;
+            color: #059669;
+        }
+        .business-info-container .info-row {
+            margin-bottom: 16px;
+        }
+        .business-info-container .info-label {
+            font-weight: bold;
+            color: #374151;
+        }
+        .business-info-container .info-value {
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body>
+    <div class="business-info-container">
+        <h2>Business Information</h2>
+        <div id="businessInfoContent">
+            <!-- Info will be loaded here -->
+        </div>
+        <button onclick="window.location.href='index.html'" style="margin-top:24px;" class="auth-submit-btn">Back to Home</button>
+    </div>
+    <script>
+        function renderBusinessInfo() {
+            const infoDiv = document.getElementById('businessInfoContent');
+            const business = JSON.parse(localStorage.getItem('businessInfo'));
+            if (!business) {
+                infoDiv.innerHTML = '<div style="color:#dc2626;">No business info found. Please login again.</div>';
+                return;
+            }
+            infoDiv.innerHTML = `
+                <div class="info-row"><span class="info-label">ID:</span> <span class="info-value">${business.id}</span></div>
+                <div class="info-row"><span class="info-label">Email:</span> <span class="info-value">${business.email || '-'}</span></div>
+                <div class="info-row"><span class="info-label">Company Name:</span> <span class="info-value">${business.companyName || '-'}</span></div>
+                <div class="info-row"><span class="info-label">Phone:</span> <span class="info-value">${business.phone || '-'}</span></div>
+                <div class="info-row"><span class="info-label">Role:</span> <span class="info-value">${business.role || '-'}</span></div>
+            `;
+        }
+        renderBusinessInfo();
+    </script>
+</body>
+</html>
