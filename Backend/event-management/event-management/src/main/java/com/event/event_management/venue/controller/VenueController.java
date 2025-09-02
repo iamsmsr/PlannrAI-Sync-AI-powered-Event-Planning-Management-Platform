@@ -170,6 +170,27 @@ public class VenueController {
     }
 
     /**
+     * Get all bookings where a company name appears in cooks, vendors, or decorators arrays
+     */
+    @CrossOrigin(origins = "*")
+    @GetMapping("/bookings/business")
+    public ResponseEntity<?> getBookingsByBusinessName(
+            @RequestHeader("X-Business-Id") String businessId,
+            @RequestHeader("X-Business-Email") String businessEmail,
+            @RequestParam String companyName) {
+        try {
+            System.out.println("Looking for bookings with business: " + companyName);
+            List<Booking> bookings = venueService.getBookingsByBusinessName(companyName);
+            return ResponseEntity.ok(bookings);
+        } catch (Exception e) {
+            System.err.println("Error fetching bookings by business name: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to fetch bookings: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Add a cook to a booking (only one cook can be selected)
      */
     @CrossOrigin(origins = "*")

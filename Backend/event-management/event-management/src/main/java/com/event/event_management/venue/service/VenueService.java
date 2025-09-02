@@ -27,6 +27,37 @@ public class VenueService {
     }
 
     /**
+     * Get all bookings where a business name appears in cooks, vendors, or decorators arrays
+     * @param businessName The name of the business to search for
+     * @return List of bookings where the business is involved
+     */
+    public List<Booking> getBookingsByBusinessName(String businessName) {
+        List<Booking> allBookings = bookingRepository.findAll();
+        List<Booking> matchingBookings = new ArrayList<>();
+
+        for (Booking booking : allBookings) {
+            // Check cooks array
+            if (booking.getCooks() != null && booking.getCooks().contains(businessName)) {
+                matchingBookings.add(booking);
+                continue;
+            }
+            
+            // Check vendors array
+            if (booking.getVendors() != null && booking.getVendors().contains(businessName)) {
+                matchingBookings.add(booking);
+                continue;
+            }
+            
+            // Check decorators array
+            if (booking.getDecorators() != null && booking.getDecorators().contains(businessName)) {
+                matchingBookings.add(booking);
+            }
+        }
+
+        return matchingBookings;
+    }
+
+    /**
      * Add a cook to a booking
      * @param bookingId The booking ID
      * @param cookId The cook's business ID

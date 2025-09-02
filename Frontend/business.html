@@ -28,6 +28,40 @@
         .business-info-container .info-value {
             color: #1f2937;
         }
+        .events-list {
+            margin-top: 16px;
+        }
+        .event-item {
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .event-item:hover {
+            border-color: #059669;
+            background-color: #f3f4f6;
+        }
+        .event-title {
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        .event-details {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background-color: #f9fafb;
+            border-radius: 6px;
+        }
+        .event-details.show {
+            display: block;
+        }
+        .event-detail-row {
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
     </style>
 </head>
 <body>
@@ -36,9 +70,16 @@
         <div id="businessInfoContent">
             <!-- Info will be loaded here -->
         </div>
+        <h3 style="margin-top: 32px; color: #059669;">Your Events</h3>
+        <div id="businessEvents" class="events-list">
+            <!-- Events will be loaded here -->
+        </div>
         <button onclick="window.location.href='index.html'" style="margin-top:24px;" class="auth-submit-btn">Back to Home</button>
+        <button onclick="window.location.href='realtimechat.html'" style="margin-top:24px;" class="auth-submit-btn">Chat with your client</button>
     </div>
     <script>
+        const API_BASE = 'http://localhost:8080';
+
         function renderBusinessInfo() {
             const infoDiv = document.getElementById('businessInfoContent');
             const business = JSON.parse(localStorage.getItem('businessInfo'));
@@ -53,7 +94,76 @@
                 <div class="info-row"><span class="info-label">Phone:</span> <span class="info-value">${business.phone || '-'}</span></div>
                 <div class="info-row"><span class="info-label">Role:</span> <span class="info-value">${business.role || '-'}</span></div>
             `;
+            fetchBusinessEvents();
         }
+
+        async function fetchBusinessEvents() {
+            const business = JSON.parse(localStorage.getItem('businessInfo'));
+            if (!business) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/venues/bookings/business?companyName=${encodeURIComponent(business.companyName)}`, {
+    headers: {
+        'X-Business-Id': business.id,
+        'X-Business-Email': business.email
+    }
+});
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+
+                const events = await response.json();
+                renderEvents(events);
+            } catch (error) {
+                const eventsDiv = document.getElementById('businessEvents');
+                eventsDiv.innerHTML = '<div style="color: #dc2626;">Failed to load events. Please try again later.</div>';
+            }
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function renderEvents(events) {
+            const eventsDiv = document.getElementById('businessEvents');
+            
+            if (!events || events.length === 0) {
+                eventsDiv.innerHTML = '<div style="color: #6b7280;">No events found.</div>';
+                return;
+            }
+
+            const eventsHtml = events.map((event, index) => `
+                <div class="event-item" onclick="toggleEventDetails(${index})">
+                    <div class="event-title">${event.venueName}</div>
+                    <div class="event-details" id="event-details-${index}">
+                        <div class="event-detail-row">
+                            <strong>Date(s):</strong> ${event.selectedDates.map(date => formatDate(date)).join(', ')}
+                        </div>
+                        <div class="event-detail-row">
+                            <strong>Status:</strong> ${event.status}
+                        </div>
+                        <div class="event-detail-row">
+                            <strong>Booking Date:</strong> ${formatDate(event.bookingDate)}
+                        </div>
+                        ${event.totalAmount ? `             
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            eventsDiv.innerHTML = eventsHtml;
+        }
+
+        function toggleEventDetails(index) {
+            const detailsDiv = document.getElementById(`event-details-${index}`);
+            detailsDiv.classList.toggle('show');
+        }
+
         renderBusinessInfo();
     </script>
 </body>

@@ -69,7 +69,22 @@
         ul.innerHTML = '';
         items.forEach((item, idx) => {
             const li = document.createElement('li');
-            li.textContent = (type === 'collaborator') ? item : item;
+            
+            // Create name span that's clickable for business users
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = (type === 'collaborator') ? item : item;
+            if (type !== 'collaborator') {
+                nameSpan.style.cursor = 'pointer';
+                nameSpan.onclick = () => showBusinessDetails(item, type, li);
+            }
+            li.appendChild(nameSpan);
+
+            // Add details container
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'business-details-container';
+            detailsDiv.style.display = 'none';
+            li.appendChild(detailsDiv);
+
             if (type !== 'collaborator' || item !== bookingData.ownerEmail) {
                 const btn = document.createElement('button');
                 btn.className = 'collab-remove-btn';
@@ -82,7 +97,7 @@
     }
 
     // --- Add/Remove Handlers ---
-    async function addItem(type, value) {
+    async function addItem(type, value, selectedBiz = null) {
         clearError();
         // Replace with your backend endpoint
         const res = await fetch(`${API_BASE}/api/venues/bookings/${bookingId}/add-${type}`, {
@@ -92,6 +107,44 @@
         });
         if (!res.ok) { showError('Failed to add.'); return; }
         bookingData = await res.json();
+
+        // If adding a business (vendor, cook, decorator), create a chat with them
+        if (selectedBiz && ['vendor', 'cook', 'decorator'].includes(type)) {
+            try {
+                // Get current user info
+                const userData = localStorage.getItem('userData');
+                const currentUserData = userData ? JSON.parse(userData) : null;
+
+                if (!currentUserData || !currentUserData.email) {
+                    console.error('Current user data not found');
+                    return;
+                }
+
+                // Create chat with the business
+                const chatRes = await fetch(`${API_BASE}/api/chat/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-Business-Id': selectedBiz.id,
+                        'X-Business-Email': selectedBiz.email
+                    },
+                    body: JSON.stringify({
+                        otherUserEmail: currentUserData.email
+                    })
+                });
+
+                if (!chatRes.ok) {
+                    const error = await chatRes.json();
+                    console.error('Failed to create chat with business:', error);
+                } else {
+                    console.log('Chat created successfully with business');
+                }
+            } catch (error) {
+                console.error('Error creating chat:', error);
+            }
+        }
+
         renderAll();
         showSuccess('Added successfully!');
     }
@@ -183,8 +236,8 @@ function setupRoleAutocomplete(inputId, role) {
                     Phone: ${selectedBiz.phone || ''}<br>
                     Role: ${selectedBiz.role || ''}`;
                 input.parentNode.insertBefore(detailsDiv, input.nextSibling);
-                // Store in DB for this booking
-                await addItem(role, selectedBiz.companyName || selectedBiz.name);
+                // Store in DB for this booking and create chat
+                await addItem(role, selectedBiz.companyName || selectedBiz.name, selectedBiz);
             });
         }, 250);
     });
@@ -235,6 +288,41 @@ async function fetchBusinessesByRole(role, query) {
         return [];
     } catch {
         return [];
+    }
+}
+
+async function showBusinessDetails(businessName, role, listItem) {
+    const detailsContainer = listItem.querySelector('.business-details-container');
+    
+    // Toggle visibility if details are already loaded
+    if (detailsContainer.innerHTML !== '') {
+        detailsContainer.style.display = detailsContainer.style.display === 'none' ? 'block' : 'none';
+        return;
+    }
+
+    try {
+        // Search for the business
+        const results = await fetchBusinessesByRole(role, businessName, true);
+        const business = results.find(b => (b.companyName || b.name) === businessName);
+        
+        if (business) {
+            detailsContainer.innerHTML = `
+                <div class="business-details">
+                    <p><strong>Company:</strong> ${business.companyName || business.name}</p>
+                    <p><strong>Email:</strong> ${business.email || 'N/A'}</p>
+                    <p><strong>Phone:</strong> ${business.phone || 'N/A'}</p>
+                    <p><strong>Role:</strong> ${business.role || role}</p>
+                    ${business.description ? `<p><strong>Description:</strong> ${business.description}</p>` : ''}
+                </div>
+            `;
+            detailsContainer.style.display = 'block';
+        } else {
+            detailsContainer.innerHTML = '<p class="error">Business details not found</p>';
+            detailsContainer.style.display = 'block';
+        }
+    } catch (error) {
+        detailsContainer.innerHTML = '<p class="error">Error loading business details</p>';
+        detailsContainer.style.display = 'block';
     }
 }
 

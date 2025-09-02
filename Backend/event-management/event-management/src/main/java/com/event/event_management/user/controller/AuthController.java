@@ -12,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -126,10 +128,15 @@ public class AuthController {
     @GetMapping("/users/search")
     public ResponseEntity<?> searchUsers(@RequestParam String query, Authentication authentication) {
         try {
-            String currentEmail = authentication.getName();
-            
+            String currentEmail = null;
+            if (authentication != null) {
+                currentEmail = authentication.getName();
+            } else {
+                // For business users, get email from header if present
+                currentEmail = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                    .getRequest().getHeader("X-Business-Email");
+            }
             List<User> users = userService.searchUsersByNameOrEmail(query, currentEmail);
-            
             List<Map<String, Object>> userList = users.stream()
                 .map(user -> {
                     Map<String, Object> userInfo = new HashMap<>();
@@ -139,7 +146,6 @@ public class AuthController {
                     return userInfo;
                 })
                 .collect(Collectors.toList());
-            
             return ResponseEntity.ok(userList);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();

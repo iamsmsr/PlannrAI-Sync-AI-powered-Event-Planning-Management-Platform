@@ -31,6 +31,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/auth/users/search").permitAll() // Allow user search for business users
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/venues/**").permitAll()
                 .requestMatchers("/api/admin/**").permitAll()

@@ -19,7 +19,7 @@ let selectedParticipants = new Map(); // For group creation
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Initializing real-time chat...');
     
-    await initializeAuth();
+    await initializeAuthOrBusiness();
     await connectWebSocket();
     await loadChats();
     
@@ -48,88 +48,84 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Initialize authentication
-async function initializeAuth() {
+async function initializeAuthOrBusiness() {
     try {
         const token = localStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = 'index.html';
-            return;
-        }
-        
-        // Decode JWT to get user info
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        currentUserEmail = payload.sub;
-        console.log('🔑 Current user email from JWT:', currentUserEmail);
-        
-        // Try to get user ID from the search endpoint (more reliable)
-        try {
-            const searchResponse = await fetch(`${API_BASE}/api/auth/users/search?query=${encodeURIComponent(currentUserEmail)}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (searchResponse.ok) {
-                const users = await searchResponse.json();
-                const user = users.find(u => u.email === currentUserEmail);
-                if (user) {
-                    currentUserId = user.id;
-                    console.log('✅ Current user found via search:', user.name, user.id);
-                    
-                    // Update UI with user name
-                    updateUserNameInHeader(user.name, user.email);
-                    return;
+        if (token) {
+            // Normal user flow
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            currentUserEmail = payload.sub;
+            console.log('🔑 Current user email from JWT:', currentUserEmail);
+            // Try to get user ID from the search endpoint (more reliable)
+            try {
+                const searchResponse = await fetch(`${API_BASE}/api/auth/users/search?query=${encodeURIComponent(currentUserEmail)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (searchResponse.ok) {
+                    const users = await searchResponse.json();
+                    const user = users.find(u => u.email === currentUserEmail);
+                    if (user) {
+                        currentUserId = user.id;
+                        console.log('✅ Current user found via search:', user.name, user.id);
+                        updateUserNameInHeader(user.name, user.email);
+                        return;
+                    }
                 }
+            } catch (error) {
+                console.warn('Search method failed, trying alternative...');
             }
-        } catch (error) {
-            console.warn('Search method failed, trying alternative...');
-        }
-        
-        // Fallback: Try to get user ID from existing chat participants
-        try {
-            const chatsResponse = await fetch(`${API_BASE}/api/chat/my`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (chatsResponse.ok) {
-                const chats = await chatsResponse.json();
-                if (chats.length > 0) {
-                    // Try to find our user ID by process of elimination
-                    for (const chat of chats) {
-                        for (const userId of chat.userIds) {
-                            try {
-                                const userResponse = await fetch(`${API_BASE}/api/auth/users/${userId}`, {
-                                    headers: { 'Authorization': `Bearer ${token}` }
-                                });
-                                if (userResponse.ok) {
-                                    const user = await userResponse.json();
-                                    if (user.email === currentUserEmail) {
-                                        currentUserId = user.id;
-                                        console.log('✅ Current user found via chat participants:', user.name, user.id);
-                                        
-                                        // Update UI with user name
-                                        updateUserNameInHeader(user.name, user.email);
-                                        return;
+            // Fallback: Try to get user ID from existing chat participants
+            try {
+                const chatsResponse = await fetch(`${API_BASE}/api/chat/my`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (chatsResponse.ok) {
+                    const chats = await chatsResponse.json();
+                    if (chats.length > 0) {
+                        for (const chat of chats) {
+                            for (const userId of chat.userIds) {
+                                try {
+                                    const userResponse = await fetch(`${API_BASE}/api/auth/users/${userId}`, {
+                                        headers: { 'Authorization': `Bearer ${token}` }
+                                    });
+                                    if (userResponse.ok) {
+                                        const user = await userResponse.json();
+                                        if (user.email === currentUserEmail) {
+                                            currentUserId = user.id;
+                                            console.log('✅ Current user found via chat participants:', user.name, user.id);
+                                            updateUserNameInHeader(user.name, user.email);
+                                            return;
+                                        }
                                     }
-                                }
-                            } catch (e) {
-                                // Continue to next user
+                                } catch (e) {}
                             }
                         }
                     }
                 }
+            } catch (error) {
+                console.warn('Chat participants method failed');
             }
-        } catch (error) {
-            console.warn('Chat participants method failed');
+            // If all else fails, create a temporary ID (this shouldn't happen in production)
+            console.error('❌ Could not determine current user ID, using email as fallback');
+            currentUserId = currentUserEmail;
+            updateUserNameInHeader(null, currentUserEmail);
+        } else {
+            // Business user flow (no login required)
+            const business = JSON.parse(localStorage.getItem('businessInfo'));
+            if (business && business.id && business.email) {
+                currentUserId = business.id;
+                currentUserEmail = business.email;
+                window.isBusinessUser = true;
+                updateUserNameInHeader(business.companyName || business.email, business.email);
+                console.log('🏢 Business user detected:', business);
+            } else {
+                // No auth, no business info: redirect to home
+                console.error('❌ No auth or business info found. Redirecting.');
+                window.location.href = 'index.html';
+            }
         }
-        
-        // If all else fails, create a temporary ID (this shouldn't happen in production)
-        console.error('❌ Could not determine current user ID, using email as fallback');
-        currentUserId = currentUserEmail;
-        
-        // Update UI with email as fallback
-        updateUserNameInHeader(null, currentUserEmail);
-        
     } catch (error) {
-        console.error('❌ Auth error:', error);
+        console.error('❌ Auth/Business error:', error);
         window.location.href = 'index.html';
     }
 }
@@ -217,30 +213,38 @@ async function loadChats() {
 
 // Load individual chats
 async function loadIndividualChats() {
-    try {
+    let headers = {};
+    if (window.isBusinessUser) {
+        const business = JSON.parse(localStorage.getItem('businessInfo'));
+        headers['X-Business-Id'] = business.id;
+        headers['X-Business-Email'] = business.email;
+    } else {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${API_BASE}/api/chat/my`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (response.ok) {
-            const chats = await response.json();
-            window.individualChats = chats;
-            console.log('📋 Loaded individual chats:', chats.length);
-        }
-    } catch (error) {
-        console.error('❌ Error loading individual chats:', error);
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${API_BASE}/api/chat/my`, { headers });
+    if (response.ok) {
+        const chats = await response.json();
+        window.individualChats = chats;
+        console.log('📋 Loaded individual chats:', chats.length);
+    } else {
+        window.individualChats = [];
     }
 }
 
 // Load group chats
 async function loadGroupChats() {
     try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`${API_BASE}/api/groupchat/my`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
+        let headers = {};
+        if (window.isBusinessUser) {
+            const business = JSON.parse(localStorage.getItem('businessInfo'));
+            headers['X-Business-Id'] = business.id;
+            headers['X-Business-Email'] = business.email;
+        } else {
+            const token = localStorage.getItem('authToken');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
+        const response = await fetch(`${API_BASE}/api/groupchat/my`, { headers });
         if (response.ok) {
             const groupChats = await response.json();
             window.groupChats = groupChats;
@@ -317,55 +321,39 @@ async function getUserInfo(userId) {
         return userInfoCache.get(userId);
     }
     
-    const token = localStorage.getItem('authToken');
-    
+    let headers = {};
+    if (window.isBusinessUser) {
+        const business = JSON.parse(localStorage.getItem('businessInfo'));
+        headers['X-Business-Id'] = business.id;
+        headers['X-Business-Email'] = business.email;
+    } else {
+        const token = localStorage.getItem('authToken');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
     try {
-        const response = await fetch(`${API_BASE}/api/auth/users/${userId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
+        const response = await fetch(`${API_BASE}/api/auth/users/${userId}`, { headers });
         if (response.ok) {
             const userInfo = await response.json();
-            // Cache the user info
             userInfoCache.set(userId, userInfo);
             console.log('✅ Fetched and cached user info:', userInfo.name);
             return userInfo;
         }
-        
-        // If user not found by ID, try to get from search
         console.log('User not found by ID, trying search fallback...');
-        const searchResponse = await fetch(`${API_BASE}/api/auth/users/search?query=${userId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
+        const searchResponse = await fetch(`${API_BASE}/api/auth/users/search?query=${userId}`, { headers });
         if (searchResponse.ok) {
             const users = await searchResponse.json();
             const user = users.find(u => u.id === userId);
             if (user) {
-                // Cache the user info
                 userInfoCache.set(userId, user);
                 return user;
             }
         }
-        
-        // Return fallback
-        const fallbackUser = { 
-            id: userId, 
-            name: `User-${userId.slice(-4)}`, 
-            email: 'unknown@email.com' 
-        };
-        // Cache the fallback too
+        const fallbackUser = { id: userId, name: `User-${userId.slice(-4)}`, email: 'unknown@email.com' };
         userInfoCache.set(userId, fallbackUser);
         return fallbackUser;
-        
     } catch (error) {
         console.error('❌ Error fetching user info:', error);
-        const fallbackUser = { 
-            id: userId, 
-            name: `User-${userId.slice(-4)}`, 
-            email: 'unknown@email.com' 
-        };
-        // Cache the fallback too
+        const fallbackUser = { id: userId, name: `User-${userId.slice(-4)}`, email: 'unknown@email.com' };
         userInfoCache.set(userId, fallbackUser);
         return fallbackUser;
     }
@@ -437,26 +425,25 @@ async function openChat(chatId, chatName, chatType = 'INDIVIDUAL') {
 // Load existing messages
 async function loadMessages(chatId, chatType = 'INDIVIDUAL') {
     try {
-        const token = localStorage.getItem('authToken');
-        
-        // Choose endpoint based on chat type
+        let headers = {};
+        if (window.isBusinessUser) {
+            const business = JSON.parse(localStorage.getItem('businessInfo'));
+            headers['X-Business-Id'] = business.id;
+            headers['X-Business-Email'] = business.email;
+        } else {
+            const token = localStorage.getItem('authToken');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
         const endpoint = chatType === 'GROUP' 
             ? `${API_BASE}/api/groupchat/${chatId}/messages`
             : `${API_BASE}/api/chat/${chatId}/messages`;
-            
-        const response = await fetch(endpoint, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
+        const response = await fetch(endpoint, { headers });
         if (response.ok) {
             const messages = await response.json();
             const messagesContainer = document.getElementById('messages');
             messagesContainer.innerHTML = '';
-            
-            // Process messages with sender names
             for (const message of messages) {
                 let senderName = 'Unknown';
-                
                 if (message.senderId === currentUserId) {
                     senderName = 'You';
                 } else {
@@ -468,7 +455,6 @@ async function loadMessages(chatId, chatType = 'INDIVIDUAL') {
                         senderName = 'Unknown';
                     }
                 }
-                
                 displayMessage({
                     id: message.id,
                     chatId: message.chatId,
@@ -479,8 +465,6 @@ async function loadMessages(chatId, chatType = 'INDIVIDUAL') {
                     timestamp: message.timestamp
                 });
             }
-            
-            // Scroll to bottom
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     } catch (error) {
@@ -591,18 +575,22 @@ function handleUserSearchInput(e) {
 
 // Search users by name or email
 async function searchUsers(query) {
-    const token = localStorage.getItem('authToken');
+    let headers = {};
     const resultsContainer = document.getElementById('userSearchResults');
-    if (!token || !resultsContainer) return;
-
+    if (!resultsContainer) return;
+    if (window.isBusinessUser) {
+        const business = JSON.parse(localStorage.getItem('businessInfo'));
+        headers['X-Business-Id'] = business.id;
+        headers['X-Business-Email'] = business.email;
+    } else {
+        const token = localStorage.getItem('authToken');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
     resultsContainer.innerHTML = '<div style="padding: 12px; color: #666;">Searching...</div>';
     resultsContainer.style.display = 'block';
-
     try {
         const url = `${API_BASE}/api/auth/users/search?query=${encodeURIComponent(query)}`;
-        const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetch(url, { headers });
         if (response.ok) {
             const users = await response.json();
             showUserSearchResults(users);
@@ -642,50 +630,40 @@ function showUserSearchResults(users) {
 
 // Create chat with selected user
 async function createChatWithUser(user) {
-    const token = localStorage.getItem('authToken');
-    if (!token || !user || !user.email) return;
-    
+    let headers = { 'Content-Type': 'application/json' };
+    if (window.isBusinessUser) {
+        const business = JSON.parse(localStorage.getItem('businessInfo'));
+        headers['X-Business-Id'] = business.id;
+        headers['X-Business-Email'] = business.email;
+    } else {
+        const token = localStorage.getItem('authToken');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+    if (!user || !user.email) return;
     const resultsContainer = document.getElementById('userSearchResults');
     if (resultsContainer) {
         resultsContainer.style.display = 'none';
         resultsContainer.innerHTML = '';
     }
-    
-    // Clear search input
     const searchInput = document.getElementById('userSearchInput');
     if (searchInput) {
         searchInput.value = '';
     }
-    
     try {
         console.log('🚀 Creating chat with user:', user.name, user.email);
-        
-        // Pre-cache the user info to ensure consistency
         userInfoCache.set(user.id, user);
-        
         const response = await fetch(`${API_BASE}/api/chat/create`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                otherUserEmail: user.email
-            })
+            headers,
+            body: JSON.stringify({ otherUserEmail: user.email })
         });
-
         if (response.ok) {
             const chat = await response.json();
             console.log('✅ Chat created/found:', chat.id);
-            
-            // Reload chats to show the new/existing chat
             await loadChats();
-            
-            // Add a small delay to ensure the chat list is properly updated
             setTimeout(() => {
                 openChat(chat.id, user.name || user.email);
             }, 100);
-            
         } else {
             console.error('❌ Failed to create chat:', response.status);
         }
@@ -958,11 +936,16 @@ function handleParticipantSearch(e) {
 // Search for participants
 async function searchParticipants(query) {
     try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(`${API_BASE}/api/auth/users/search?query=${encodeURIComponent(query)}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
+        let headers = {};
+        if (window.isBusinessUser) {
+            const business = JSON.parse(localStorage.getItem('businessInfo'));
+            headers['X-Business-Id'] = business.id;
+            headers['X-Business-Email'] = business.email;
+        } else {
+            const token = localStorage.getItem('authToken');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
+        const response = await fetch(`${API_BASE}/api/auth/users/search?query=${encodeURIComponent(query)}`, { headers });
         if (response.ok) {
             const users = await response.json();
             displayParticipantSearchResults(users);
@@ -1072,39 +1055,35 @@ async function handleGroupChatCreation(e) {
     }
     
     try {
-        const token = localStorage.getItem('authToken');
+        let headers = { 'Content-Type': 'application/json' };
+        if (window.isBusinessUser) {
+            const business = JSON.parse(localStorage.getItem('businessInfo'));
+            headers['X-Business-Id'] = business.id;
+            headers['X-Business-Email'] = business.email;
+        } else {
+            const token = localStorage.getItem('authToken');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
         const participantEmails = Array.from(selectedParticipants.values()).map(user => user.email);
-        
         const response = await fetch(`${API_BASE}/api/groupchat/create`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers,
             body: JSON.stringify({
                 name: groupName,
                 description: groupDescription,
                 participantEmails: participantEmails
             })
         });
-        
         if (response.ok) {
             const groupChat = await response.json();
             console.log('✅ Group chat created:', groupChat);
-            
-            // Close modal
             closeGroupChatModal();
-            
-            // Reload chats and switch to group tab
             await loadGroupChats();
             currentTab = 'group';
             document.getElementById('groupTab').classList.add('active');
             document.getElementById('individualTab').classList.remove('active');
             showGroupChats();
-            
-            // Open the new group chat
             openChat(groupChat.id, groupChat.name, 'GROUP');
-            
         } else {
             const error = await response.json();
             alert('Error creating group chat: ' + (error.message || 'Unknown error'));
