@@ -21,6 +21,41 @@ public class BusinessController {
     private BusinessService businessService;
 
     /**
+     * Add a service to a business
+     */
+    @PostMapping("/service")
+    public ResponseEntity<?> addServiceToBusiness(@RequestBody ServiceRequest request) {
+        try {
+            Business updated = businessService.addServiceToBusiness(
+                request.getBusinessId(),
+                request.getEventType(),
+                request.getPriceRange(),
+                request.getVenueIds()
+            );
+            return ResponseEntity.ok(Map.of("message", "Service added successfully", "business", updated));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
+
+    // DTO for service request
+    public static class ServiceRequest {
+        private String businessId;
+        private String eventType;
+        private String priceRange;
+        private List<String> venueIds;
+
+        public String getBusinessId() { return businessId; }
+        public void setBusinessId(String businessId) { this.businessId = businessId; }
+        public String getEventType() { return eventType; }
+        public void setEventType(String eventType) { this.eventType = eventType; }
+        public String getPriceRange() { return priceRange; }
+        public void setPriceRange(String priceRange) { this.priceRange = priceRange; }
+        public List<String> getVenueIds() { return venueIds; }
+        public void setVenueIds(List<String> venueIds) { this.venueIds = venueIds; }
+    }
+
+    /**
      * Search for businesses by role with optional query parameter
      * Example: /api/business/search?role=cook&q=italian
      */
@@ -87,18 +122,19 @@ public class BusinessController {
     @GetMapping("/{businessId}")
     public ResponseEntity<?> getBusinessById(@PathVariable String businessId) {
         try {
-            return businessService.findById(businessId)
-                .map(business -> {
-                    Map<String, Object> businessInfo = new HashMap<>();
-                    businessInfo.put("id", business.getId());
-                    businessInfo.put("name", business.getName());
-                    businessInfo.put("email", business.getEmail());
-                    businessInfo.put("companyName", business.getCompanyName());
-                    businessInfo.put("phone", business.getPhone());
-                    businessInfo.put("role", business.getRole());
-                    return ResponseEntity.ok(businessInfo);
-                })
-                .orElse(ResponseEntity.notFound().build());
+                return businessService.findById(businessId)
+                    .map(business -> {
+                        Map<String, Object> businessInfo = new HashMap<>();
+                        businessInfo.put("id", business.getId());
+                        businessInfo.put("name", business.getName());
+                        businessInfo.put("email", business.getEmail());
+                        businessInfo.put("companyName", business.getCompanyName());
+                        businessInfo.put("phone", business.getPhone());
+                        businessInfo.put("role", business.getRole());
+                        businessInfo.put("services", business.getServices());
+                        return ResponseEntity.ok(businessInfo);
+                    })
+                    .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "Error fetching business: " + e.getMessage());

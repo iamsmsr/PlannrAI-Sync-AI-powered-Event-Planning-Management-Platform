@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDateTime;
 
+import java.util.List;
+import java.util.ArrayList;
+
 @Document(collection = "Business")
 public class Business {
     @Id
@@ -16,6 +19,9 @@ public class Business {
     private String phone;
     private String role;
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    // List of services offered by the business
+    private List<BusinessServiceInfo> services = new ArrayList<>();
 
     // Getters and Setters
     public String getName() {
@@ -58,5 +64,42 @@ public class Business {
     }
     public String getRole() {
         return role;
+    }
+
+    public List<BusinessServiceInfo> getServices() {
+        return services;
+    }
+
+    public void setServices(List<BusinessServiceInfo> services) {
+        this.services = services;
+    }
+
+    public void addService(BusinessServiceInfo service) {
+        if (this.services == null) this.services = new ArrayList<>();
+        this.services.add(service);
+    }
+
+    // Inner class for business service info
+    public static class BusinessServiceInfo {
+        private String eventType;
+        private String priceRange;
+        private List<String> venueIds;
+
+        public BusinessServiceInfo() {}
+
+        public BusinessServiceInfo(String eventType, String priceRange, List<String> venueIds) {
+            this.eventType = eventType;
+            this.priceRange = priceRange;
+            this.venueIds = venueIds;
+        }
+
+        public String getEventType() { return eventType; }
+        public void setEventType(String eventType) { this.eventType = eventType; }
+
+        public String getPriceRange() { return priceRange; }
+        public void setPriceRange(String priceRange) { this.priceRange = priceRange; }
+
+        public List<String> getVenueIds() { return venueIds; }
+        public void setVenueIds(List<String> venueIds) { this.venueIds = venueIds; }
     }
 }

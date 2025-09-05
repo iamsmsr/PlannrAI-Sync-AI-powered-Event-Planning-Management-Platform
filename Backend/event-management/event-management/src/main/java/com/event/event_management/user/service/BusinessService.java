@@ -73,4 +73,15 @@ public class BusinessService {
     public java.util.Optional<Business> findById(String id) {
         return businessRepository.findById(id);
     }
+
+    /**
+     * Add a service to a business
+     */
+    public Business addServiceToBusiness(String businessId, String eventType, String priceRange, List<String> venueIds) {
+        Business business = businessRepository.findById(businessId)
+            .orElseThrow(() -> new RuntimeException("Business not found"));
+        Business.BusinessServiceInfo serviceInfo = new Business.BusinessServiceInfo(eventType, priceRange, venueIds);
+        business.addService(serviceInfo);
+        return businessRepository.save(business);
+    }
 }

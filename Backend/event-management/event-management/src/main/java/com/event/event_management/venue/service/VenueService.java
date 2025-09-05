@@ -241,8 +241,15 @@ public class VenueService {
         return bookingRepository.save(booking);
     }
     public List<Venue> searchVenuesByLocation(String location) {
-        List<Venue> venues = venueRepository.findByLocationIgnoreCase(location);
-        return venues;
+        return venueRepository.findByLocationIgnoreCase(location);
+    }
+    
+    public List<Venue> searchVenuesByEventType(String eventType) {
+        return venueRepository.findByEventTypeContainingIgnoreCase(eventType);
+    }
+    
+    public List<Venue> searchVenuesByLocationAndEventType(String location, String eventType) {
+        return venueRepository.findByLocationIgnoreCaseAndEventTypeContainingIgnoreCase(location, eventType);
     }
     
     public List<Venue> getAllVenues() {

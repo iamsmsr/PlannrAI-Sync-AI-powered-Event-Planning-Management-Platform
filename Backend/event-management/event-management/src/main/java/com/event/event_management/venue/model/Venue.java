@@ -20,6 +20,7 @@ public class Venue {
     private Map<String, List<Integer>> currentBookings;
     private Map<String, List<Integer>> pastEvents;
     private Map<String, Object> tempEvent;
+    private List<String> eventType;
     
     // Default constructor
     public Venue() {
@@ -30,7 +31,8 @@ public class Venue {
                  Double ratings, String details, List<String> pictures, 
                  Map<String, List<Integer>> currentBookings, 
                  Map<String, List<Integer>> pastEvents, 
-                 Map<String, Object> tempEvent) {
+                 Map<String, Object> tempEvent,
+                 List<String> eventType) {
         this.venueName = venueName;
         this.address = address;
         this.location = location;
@@ -41,6 +43,7 @@ public class Venue {
         this.currentBookings = currentBookings;
         this.pastEvents = pastEvents;
         this.tempEvent = tempEvent;
+        this.eventType = eventType;
     }
     
     // Getters and Setters
@@ -130,6 +133,14 @@ public class Venue {
     
     public void setTempEvent(Map<String, Object> tempEvent) {
         this.tempEvent = tempEvent;
+    }
+    
+    public List<String> getEventType() {
+        return eventType;
+    }
+    
+    public void setEventType(List<String> eventType) {
+        this.eventType = eventType;
     }
     
     // Inner class for Review

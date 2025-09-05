@@ -1,58 +1,169 @@
    .collab-container {
-            max-width: 700px;
+            max-width: 800px;
             margin: 40px auto;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 32px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 40px 32px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .collab-section { margin-bottom: 32px; }
-        .collab-section h2 { margin-bottom: 12px; }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                        url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        .collab-section { 
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .collab-section h2 { 
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+            display: inline-block;
+        }
         .collab-list { margin: 0 0 12px 0; padding: 0; list-style: none; }
         .collab-list li { margin-bottom: 6px; }
-        .collab-invite-form, .collab-add-form { display: flex; gap: 8px; margin-bottom: 12px; }
-        .collab-invite-form input, .collab-add-form input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
-        .collab-invite-form button, .collab-add-form button { padding: 8px 16px; border-radius: 6px; border: none; background: #007bff; color: #fff; cursor: pointer; }
-        .collab-invite-form button:hover, .collab-add-form button:hover { background: #0056b3; }
+        .collab-invite-form, .collab-add-form { 
+            display: flex; 
+            gap: 12px; 
+            margin-bottom: 16px; 
+        }
+        .collab-invite-form input, .collab-add-form input { 
+            flex: 1; 
+            padding: 12px 16px;
+            border-radius: 8px; 
+            border: 2px solid rgba(0, 123, 255, 0.2);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .collab-invite-form input:focus, .collab-add-form input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+        .collab-invite-form button, .collab-add-form button { 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            border: none; 
+            background: #007bff; 
+            color: #fff; 
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .collab-invite-form button:hover, .collab-add-form button:hover { 
+            background: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 86, 179, 0.2);
+        }
         .collab-role-label { font-weight: 500; margin-right: 8px; }
         .collab-collaborators-list { margin-top: 8px; }
         .collab-collaborators-list li { display: flex; align-items: center; gap: 8px; }
         .collab-remove-btn { background: #ff6b6b; color: #fff; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 12px; }
         .collab-remove-btn:hover { background: #c0392b; }
-        .collab-info { color: #666; font-size: 15px; margin-bottom: 18px; }
-        .collab-error { color: #c0392b; margin-bottom: 10px; }
-        .collab-success { color: #059669; margin-bottom: 10px; }
+        .collab-info { 
+            color: #fff; 
+            font-size: 1.1rem; 
+            margin-bottom: 24px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .collab-error { 
+            color: #fff; 
+            margin-bottom: 16px;
+            background: rgba(231, 76, 60, 0.9);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+        }
+        .collab-success { 
+            color: #fff; 
+            margin-bottom: 16px;
+            background: rgba(46, 204, 113, 0.9);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+        }
         .collab-autocomplete-dropdown {
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(4px);
         }
         .collab-autocomplete-dropdown li:hover {
             background: #f0f4ff;
         }
 /* Business Details Styles */
 .business-details-container {
-    margin-top: 8px;
-    margin-left: 20px;
-    padding: 10px;
-    border-left: 2px solid #ddd;
+    margin-top: 12px;
+    margin-left: 24px;
+    padding: 16px;
+    border-left: 3px solid #007bff;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .business-details {
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 0.9em;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 123, 255, 0.2);
 }
 
 .business-details p {
-    margin: 5px 0;
+    margin: 8px 0;
+    line-height: 1.5;
+    color: #2c3e50;
+}
+
+.business-details strong {
+    color: #1a1a1a;
+    font-weight: 600;
 }
 
 .business-details .error {
-    color: #e74c3c;
+    color: #fff;
+    background: rgba(231, 76, 60, 0.9);
+    padding: 8px 16px;
+    border-radius: 6px;
     font-style: italic;
+    margin: 8px 0;
 }
 
 /* Make business names look clickable */

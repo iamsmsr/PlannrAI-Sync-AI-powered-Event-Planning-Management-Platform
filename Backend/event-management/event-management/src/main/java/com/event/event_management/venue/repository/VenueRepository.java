@@ -10,4 +10,6 @@ public interface VenueRepository extends MongoRepository<Venue, String> {
     
     List<Venue> findByLocation(String location);
     List<Venue> findByLocationIgnoreCase(String location);
+    List<Venue> findByEventTypeContainingIgnoreCase(String eventType);
+    List<Venue> findByLocationIgnoreCaseAndEventTypeContainingIgnoreCase(String location, String eventType);
 }

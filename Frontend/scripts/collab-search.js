@@ -214,6 +214,7 @@ function setupRoleAutocomplete(inputId, role) {
     const input = document.getElementById(inputId);
     let timeout = null;
     let dropdown = null;
+    let selectedBiz = null;
 
     input.addEventListener('input', function() {
         const query = input.value.trim();
@@ -222,22 +223,39 @@ function setupRoleAutocomplete(inputId, role) {
         if (!query) return;
         timeout = setTimeout(async () => {
             const results = await fetchBusinessesByRole(role, query, true); // get objects
-            showDropdown(input, results, async (selectedBiz) => {
+            showDropdown(input, results, function(biz) {
+                selectedBiz = biz;
+                input.value = biz.companyName || biz.name || '';
                 if (dropdown) dropdown.remove();
-                // Hide input and add button
-                input.style.display = 'none';
-                const addBtn = input.parentNode.querySelector('button[type="submit"]');
-                if (addBtn) addBtn.style.display = 'none';
                 // Show details
-                const detailsDiv = document.createElement('div');
-                detailsDiv.className = 'collab-business-details';
-                detailsDiv.innerHTML = `<strong>${selectedBiz.companyName || selectedBiz.name}</strong><br>
-                    Email: ${selectedBiz.email || ''}<br>
-                    Phone: ${selectedBiz.phone || ''}<br>
-                    Role: ${selectedBiz.role || ''}`;
-                input.parentNode.insertBefore(detailsDiv, input.nextSibling);
-                // Store in DB for this booking and create chat
-                await addItem(role, selectedBiz.companyName || selectedBiz.name, selectedBiz);
+                let detailsDiv = input.parentNode.querySelector('.collab-business-details');
+                if (!detailsDiv) {
+                    detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'collab-business-details';
+                    input.parentNode.insertBefore(detailsDiv, input.nextSibling);
+                }
+                detailsDiv.innerHTML = `<strong>${biz.companyName || biz.name}</strong><br>
+                    Email: ${biz.email || ''}<br>
+                    Phone: ${biz.phone || ''}<br>
+                    Role: ${biz.role || ''}`;
+                // Add button to confirm adding
+                let addBtn = detailsDiv.querySelector('.collab-add-biz-btn');
+                if (!addBtn) {
+                    addBtn = document.createElement('button');
+                    addBtn.textContent = 'Add & Create Chat';
+                    addBtn.className = 'collab-add-biz-btn';
+                    addBtn.style.marginTop = '8px';
+                    addBtn.onclick = async function(e) {
+                        e.preventDefault();
+                        input.style.display = 'none';
+                        this.style.display = 'none';
+                        // Save to DB and create chat
+                        await addItem(role, biz.companyName || biz.name, biz);
+                    };
+                    detailsDiv.appendChild(addBtn);
+                } else {
+                    addBtn.style.display = 'inline-block';
+                }
             });
         }, 250);
     });
@@ -293,19 +311,46 @@ async function fetchBusinessesByRole(role, query) {
 
 async function showBusinessDetails(businessName, role, listItem) {
     const detailsContainer = listItem.querySelector('.business-details-container');
-    
     // Toggle visibility if details are already loaded
     if (detailsContainer.innerHTML !== '') {
         detailsContainer.style.display = detailsContainer.style.display === 'none' ? 'block' : 'none';
         return;
     }
-
     try {
         // Search for the business
         const results = await fetchBusinessesByRole(role, businessName, true);
         const business = results.find(b => (b.companyName || b.name) === businessName);
-        
         if (business) {
+            let servicesHtml = '';
+            if (business.id) {
+                // Fetch latest business info to get services
+                try {
+                    const resp = await fetch(`${API_BASE}/api/business/${business.id}`);
+                    if (resp.ok) {
+                        const fullBiz = await resp.json();
+                        const services = fullBiz.services || [];
+                        if (services.length) {
+                            // Fetch all venues for mapping IDs to names
+                            let venueMap = {};
+                            try {
+                                const venueResp = await fetch(`${API_BASE}/api/venues/all`);
+                                if (venueResp.ok) {
+                                    const venues = await venueResp.json();
+                                    venues.forEach(v => venueMap[v.id] = v.venueName);
+                                }
+                            } catch {}
+                            servicesHtml = `<div style='margin-top:10px;'><strong>Services:</strong><ul style='padding-left:18px;'>` +
+                                services.map(s => {
+                                    let venueNames = (s.venueIds||[]).map(id => venueMap[id] || id).join(', ');
+                                    return `<li>Event: ${s.eventType}, Price: ${s.priceRange}, Venues: ${venueNames || 'None'}</li>`;
+                                }).join('') +
+                                '</ul></div>';
+                        } else {
+                            servicesHtml = `<div style='margin-top:10px;color:#6b7280;'>No services listed.</div>`;
+                        }
+                    }
+                } catch {}
+            }
             detailsContainer.innerHTML = `
                 <div class="business-details">
                     <p><strong>Company:</strong> ${business.companyName || business.name}</p>
@@ -313,6 +358,7 @@ async function showBusinessDetails(businessName, role, listItem) {
                     <p><strong>Phone:</strong> ${business.phone || 'N/A'}</p>
                     <p><strong>Role:</strong> ${business.role || role}</p>
                     ${business.description ? `<p><strong>Description:</strong> ${business.description}</p>` : ''}
+                    ${servicesHtml}
                 </div>
             `;
             detailsContainer.style.display = 'block';

@@ -26,9 +26,18 @@ public class VenueController {
     @GetMapping("/search")
     public ResponseEntity<List<Venue>> searchVenues(
             @RequestParam(name = "location", required = false, defaultValue = "Dhaka") String location,
-            @RequestParam(name = "activity", required = false) String activity) {
+            @RequestParam(name = "eventType", required = false) String eventType) {
         
-        List<Venue> venues = venueService.searchVenuesByLocation(location);
+        List<Venue> venues;
+        if (eventType != null && !eventType.trim().isEmpty()) {
+            if (location != null && !location.trim().isEmpty()) {
+                venues = venueService.searchVenuesByLocationAndEventType(location, eventType);
+            } else {
+                venues = venueService.searchVenuesByEventType(eventType);
+            }
+        } else {
+            venues = venueService.searchVenuesByLocation(location);
+        }
         return ResponseEntity.ok(venues);
     }
     
