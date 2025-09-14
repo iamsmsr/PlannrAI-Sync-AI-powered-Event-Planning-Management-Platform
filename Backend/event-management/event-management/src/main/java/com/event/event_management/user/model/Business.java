@@ -19,6 +19,8 @@ public class Business {
     private String phone;
     private String role;
     private LocalDateTime createdAt = LocalDateTime.now();
+    @org.springframework.data.mongodb.core.mapping.Field(value = "ratings")
+    private Double rating = 0.0;
 
     // List of services offered by the business
     private List<BusinessServiceInfo> services = new ArrayList<>();
@@ -64,6 +66,14 @@ public class Business {
     }
     public String getRole() {
         return role;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
     public List<BusinessServiceInfo> getServices() {

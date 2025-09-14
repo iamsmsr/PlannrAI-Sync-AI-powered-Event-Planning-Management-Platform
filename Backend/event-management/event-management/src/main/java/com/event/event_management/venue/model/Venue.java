@@ -22,6 +22,11 @@ public class Venue {
     private Map<String, Object> tempEvent;
     private List<String> eventType;
     
+    // Service provider lists for bookings
+    private List<String> vendors;
+    private List<String> cooks;
+    private List<String> decorators;
+    
     // Default constructor
     public Venue() {
     }
@@ -143,6 +148,30 @@ public class Venue {
         this.eventType = eventType;
     }
     
+    public List<String> getVendors() {
+        return vendors;
+    }
+    
+    public void setVendors(List<String> vendors) {
+        this.vendors = vendors;
+    }
+    
+    public List<String> getCooks() {
+        return cooks;
+    }
+    
+    public void setCooks(List<String> cooks) {
+        this.cooks = cooks;
+    }
+    
+    public List<String> getDecorators() {
+        return decorators;
+    }
+    
+    public void setDecorators(List<String> decorators) {
+        this.decorators = decorators;
+    }
+
     // Inner class for Review
     public static class Review {
         private String user;

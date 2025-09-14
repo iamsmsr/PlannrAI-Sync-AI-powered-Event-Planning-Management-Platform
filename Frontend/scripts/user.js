@@ -215,15 +215,15 @@ async function handleCorporateSubmit(event) {
     };
     
  
-    console.log('Corporate data:2', corporateData);
+        console.log('Corporate data:2', corporateData);
 
+    // Add initial rating of 0
+    corporateData.rating = 0.0;
     
     // Show loading state
     const submitBtn = event.target.querySelector('button[type="submit"]');
     if (submitBtn) {
-            console.log('Corporate data: 3', corporateData);
-
-        submitBtn.disabled = true;
+            console.log('Corporate data: 3', corporateData);        submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
     }
     
@@ -1370,6 +1370,175 @@ function isUpcomingBooking(selectedDates) {
 // API base URL - can be changed for different environments
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// Rating and Review Functions
+function showRatingModal(bookingId) {
+    const modal = document.createElement('div');
+    modal.className = 'rating-modal';
+    modal.innerHTML = `
+        <div class="rating-modal-content">
+            <h2>Rate & Review</h2>
+            <button class="close-btn" onclick="closeRatingModal()">×</button>
+            
+            <div class="rating-sections">
+                <div class="rating-section">
+                    <h3>Venue Rating</h3>
+                    <div class="star-rating" data-type="venue">
+                        ${generateStarRating('venue')}
+                    </div>
+                    <textarea id="venueReview" placeholder="Write your review about the venue..." rows="4"></textarea>
+                </div>
+                
+                <div class="rating-section">
+                    <h3>Service Providers</h3>
+                    <div class="service-ratings">
+                        <div class="service-rating">
+                            <label>Vendor</label>
+                            <div class="star-rating" data-type="vendor">
+                                ${generateStarRating('vendor')}
+                            </div>
+                        </div>
+                        <div class="service-rating">
+                            <label>Cook</label>
+                            <div class="star-rating" data-type="cook">
+                                ${generateStarRating('cook')}
+                            </div>
+                        </div>
+                        <div class="service-rating">
+                            <label>Decorator</label>
+                            <div class="star-rating" data-type="decorator">
+                                ${generateStarRating('decorator')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit-rating-btn" onclick="submitRatings('${bookingId}')">Submit Ratings</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add event listeners for star ratings
+    document.querySelectorAll('.star-rating').forEach(container => {
+        container.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', () => handleStarClick(star));
+            star.addEventListener('mouseover', () => handleStarHover(star));
+            star.addEventListener('mouseout', () => handleStarOut(star));
+        });
+    });
+}
+
+function generateStarRating(type) {
+    return Array(5).fill(0).map((_, i) => `
+        <span class="star" data-rating="${i + 1}" data-type="${type}">★</span>
+    `).join('');
+}
+
+function handleStarClick(star) {
+    const container = star.closest('.star-rating');
+    const rating = star.dataset.rating;
+    container.dataset.value = rating;
+    updateStars(container, rating);
+}
+
+function handleStarHover(star) {
+    const container = star.closest('.star-rating');
+    const rating = star.dataset.rating;
+    updateStars(container, rating);
+}
+
+function handleStarOut(star) {
+    const container = star.closest('.star-rating');
+    const rating = container.dataset.value || 0;
+    updateStars(container, rating);
+}
+
+function updateStars(container, rating) {
+    container.querySelectorAll('.star').forEach(s => {
+        s.classList.toggle('active', s.dataset.rating <= rating);
+    });
+}
+
+function closeRatingModal() {
+    const modal = document.querySelector('.rating-modal');
+    if (modal) modal.remove();
+}
+
+async function submitRatings(bookingId) {
+    const venueRating = document.querySelector('[data-type="venue"]').dataset.value;
+    const vendorRating = document.querySelector('[data-type="vendor"]').dataset.value;
+    const cookRating = document.querySelector('[data-type="cook"]').dataset.value;
+    const decoratorRating = document.querySelector('[data-type="decorator"]').dataset.value;
+    const venueReview = document.getElementById('venueReview').value;
+
+    console.log('Submitting ratings for booking:', bookingId);
+    console.log('Ratings:', { venueRating, vendorRating, cookRating, decoratorRating });
+
+    try {
+        // Submit ratings for service providers
+        const serviceRatings = [
+            { type: 'vendor', rating: parseFloat(vendorRating || 0) },
+            { type: 'cook', rating: parseFloat(cookRating || 0) },
+            { type: 'decorator', rating: parseFloat(decoratorRating || 0) }
+        ];
+
+        // Update service provider ratings
+        for (const service of serviceRatings) {
+            if (service.rating > 0) {
+                console.log(`Submitting ${service.type} rating:`, service.rating, 'for booking:', bookingId);
+                const response = await fetch(`http://localhost:8080/api/business/rating`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        bookingId,
+                        serviceType: service.type,
+                        rating: service.rating
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Failed to submit ${service.type} rating:`, response.status, errorText);
+                    throw new Error(`Failed to submit ${service.type} rating: ${response.status}`);
+                }
+                console.log(`${service.type} rating submitted successfully`);
+            }
+        }
+
+        // Submit venue rating and review
+        if (venueRating) {
+            console.log('Submitting venue rating:', venueRating, 'for booking:', bookingId);
+            const venueResponse = await fetch(`http://localhost:8080/api/venues/rating`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+
+                },
+                body: JSON.stringify({
+                    bookingId,
+                    rating: parseFloat(venueRating),
+                    review: venueReview
+                })
+            });
+
+            if (!venueResponse.ok) {
+                const errorText = await venueResponse.text();
+                console.error('Failed to submit venue rating:', venueResponse.status, errorText);
+                throw new Error(`Failed to submit venue rating: ${venueResponse.status}`);
+            }
+        }
+
+        showToast('Ratings submitted successfully!', 'success');
+        closeRatingModal();
+    } catch (error) {
+        console.error('Error submitting ratings:', error);
+        showToast('Failed to submit ratings. Please try again.', 'error');
+    }
+}
+
 // Function to show route on map
 function showRouteOnMap(userCoords, venueCoords) {
     // Open map.html with coordinates as parameters
@@ -1568,6 +1737,9 @@ function createBookingStatusCard(booking) {
                 ` : ''}
                 ${booking.status === 'REJECTED' ? `
                     <button class="action-btn danger" disabled>✗ Rejected</button>
+                ` : ''}
+                ${!isUpcomingBooking(booking.selectedDates) && booking.status === 'ACTIVE' ? `
+                    <button class="action-btn primary" onclick="showRatingModal('${booking.id}')">⭐ Rate & Review</button>
                 ` : ''}
             </div>
         </div>

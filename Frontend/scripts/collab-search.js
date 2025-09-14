@@ -237,7 +237,8 @@ function setupRoleAutocomplete(inputId, role) {
                 detailsDiv.innerHTML = `<strong>${biz.companyName || biz.name}</strong><br>
                     Email: ${biz.email || ''}<br>
                     Phone: ${biz.phone || ''}<br>
-                    Role: ${biz.role || ''}`;
+                    Role: ${biz.role || ''}<br>
+                    Rating: <span class="business-rating">${biz.rating !== undefined ? biz.rating.toFixed(1) : 'N/A'} ⭐</span>`;
                 // Add button to confirm adding
                 let addBtn = detailsDiv.querySelector('.collab-add-biz-btn');
                 if (!addBtn) {
@@ -357,6 +358,7 @@ async function showBusinessDetails(businessName, role, listItem) {
                     <p><strong>Email:</strong> ${business.email || 'N/A'}</p>
                     <p><strong>Phone:</strong> ${business.phone || 'N/A'}</p>
                     <p><strong>Role:</strong> ${business.role || role}</p>
+                    <p><strong>Rating:</strong> <span class="business-rating">${business.rating !== undefined ? business.rating.toFixed(1) : 'N/A'} ⭐</span></p>
                     ${business.description ? `<p><strong>Description:</strong> ${business.description}</p>` : ''}
                     ${servicesHtml}
                 </div>

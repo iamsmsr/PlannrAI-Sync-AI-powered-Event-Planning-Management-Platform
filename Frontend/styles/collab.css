@@ -157,6 +157,11 @@
     font-weight: 600;
 }
 
+.business-rating {
+    color: #f59e0b;  /* Amber color for the rating */
+    font-weight: 600;
+}
+
 .business-details .error {
     color: #fff;
     background: rgba(231, 76, 60, 0.9);

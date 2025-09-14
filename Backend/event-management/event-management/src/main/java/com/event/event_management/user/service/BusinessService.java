@@ -24,6 +24,8 @@ public class BusinessService {
         business.setCompanyName(companyName);
         business.setPhone(phone);
         business.setRole(Role);
+        business.setRating(0.0);  // Initialize rating to 0
+        business.setRating(0.0);  // Initialize with 0 rating
 
         return businessRepository.save(business);
     }

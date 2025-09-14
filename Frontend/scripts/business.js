@@ -13,6 +13,7 @@ function renderBusinessInfo() {
         <div class="info-row"><span class="info-label">Company Name:</span> <span class="info-value">${business.companyName || '-'}</span></div>
         <div class="info-row"><span class="info-label">Phone:</span> <span class="info-value">${business.phone || '-'}</span></div>
         <div class="info-row"><span class="info-label">Role:</span> <span class="info-value">${business.role || '-'}</span></div>
+        <div class="info-row"><span class="info-label">Rating:</span> <span class="info-value rating-value">${business.rating !== undefined ? business.rating.toFixed(1) : '-'} ⭐</span></div>
     `;
     renderBusinessServices(business.id);
     fetchBusinessEvents();
@@ -33,6 +34,7 @@ async function renderBusinessServices(businessId) {
             <div class="info-row"><span class="info-label">Company Name:</span> <span class="info-value">${business.companyName || '-'}</span></div>
             <div class="info-row"><span class="info-label">Phone:</span> <span class="info-value">${business.phone || '-'}</span></div>
             <div class="info-row"><span class="info-label">Role:</span> <span class="info-value">${business.role || '-'}</span></div>
+            <div class="info-row"><span class="info-label">Rating:</span> <span class="info-value rating-value">${business.rating !== undefined ? business.rating.toFixed(1) : '-'} ⭐</span></div>
         `;
 
         const services = business.services || [];

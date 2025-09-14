@@ -62,6 +62,16 @@ body {
     font-weight: 500;
 }
 
+.rating-value {
+    font-weight: 600;
+    color: #f59e0b;  /* Amber color for the rating */
+}
+
+.rating-value::after {
+    content: '⭐';
+    margin-left: 4px;
+}
+
 .events-list {
     margin-top: 24px;
 }

@@ -77,7 +77,8 @@ public class BusinessController {
             "companyName", inquiry.getCompanyName(),
             "email", inquiry.getEmail(),
             "phone", inquiry.getPhone(),
-            "role",  inquiry.getRole()
+            "role",  inquiry.getRole(),
+            "rating", inquiry.getRating()
         ));
 
         return ResponseEntity.ok(response);
@@ -131,6 +132,7 @@ public class BusinessController {
                         businessInfo.put("companyName", business.getCompanyName());
                         businessInfo.put("phone", business.getPhone());
                         businessInfo.put("role", business.getRole());
+                        businessInfo.put("rating", business.getRating());
                         businessInfo.put("services", business.getServices());
                         return ResponseEntity.ok(businessInfo);
                     })
