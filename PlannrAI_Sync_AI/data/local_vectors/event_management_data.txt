@@ -1,0 +1,602 @@
+PlannrAI Sync: AI-powered Event Planning & Management Platform - Complete Venue and Vendor Directory
+
+=== INTRODUCTION ===
+
+PlannrAI Sync is an AI-powered event management system designed to simplify and enhance the process of planning, organizing, and executing events. The platform allows customers to search for venues and vendors using an interactive map, make bookings, collaborate with others in real time, and receive AI-driven recommendations for decorations, budgeting, and planning. Vendors can list and manage their services, interact with customers through live chat, and respond to booking requests. The system integrates key features such as real-time weather updates, vendor reviews, and an AI assistant available in both Bengali and English.
+
+=== PLATFORM FEATURES ===
+
+Core Features:
+- Interactive map-based venue and vendor search
+- Real-time collaborative event planning
+- AI-powered recommendations in Bengali and English
+- End-to-end booking system
+- Live chat between customers and vendors
+- Vendor rating and review system
+- Real-time weather and traffic updates
+- Collaborative planning tools with task sharing
+- Budget management and planning assistance
+- Multi-language support (Bengali and English)
+
+User Roles:
+1. Customers: Search venues, book services, collaborate on planning, rate vendors
+2. Vendors: List services, manage bookings, chat with customers, receive reviews
+3. Administrators: System management, vendor approval, platform maintenance
+
+=== VENUE DIRECTORY - DHAKA ===
+
+VENUE 1: Grand Convention Hall
+Address: 123 Main Street, Gulshan, Dhaka
+Location Coordinates: 23.780573, 90.414353
+Capacity: 500-800 guests
+Price Range: ৳15,000 - ৳25,000 per day (Basic Package)
+Facilities: Air conditioning, sound system, parking for 100 cars, catering kitchen
+Specialties: Corporate events, weddings, conferences
+Rating: 4.25/5
+Reviews:
+- Alice: "Spacious and clean facility with excellent service." (4.5/5)
+- Bob: "Great service and professional staff." (4/5)
+Amenities: Projector, stage, bridal room, photography area
+Contact: +880-1700-000001
+
+VENUE 2: Royal Banquet Complex
+Address: 45 Dhanmondi Road, Dhanmondi, Dhaka
+Location Coordinates: 23.746466, 90.376015
+Capacity: 300-600 guests
+Price Range: ৳12,000 - ৳20,000 per day (Basic Package)
+Facilities: Multiple halls, garden area, valet parking
+Specialties: Weddings, social gatherings, birthday parties
+Rating: 4.4/5
+Reviews:
+- Sarah: "Beautiful garden setting perfect for outdoor ceremonies." (4.5/5)
+- Ahmed: "Excellent food quality and decoration." (4.3/5)
+Amenities: Outdoor garden, fountain, multiple changing rooms
+Contact: +880-1700-000002
+
+VENUE 3: Elite Conference Center
+Address: 78 Motijheel Commercial Area, Motijheel, Dhaka
+Location Coordinates: 23.730631, 90.417236
+Capacity: 200-400 guests
+Price Range: ৳10,000 - ৳18,000 per day (Basic Package)
+Facilities: Modern AV equipment, business center, Wi-Fi
+Specialties: Corporate meetings, seminars, product launches
+Rating: 4.6/5
+Reviews:
+- Corporate Client A: "State-of-the-art facilities for business events." (5/5)
+- Rashid: "Professional environment with excellent technical support." (4.2/5)
+Amenities: High-speed internet, video conferencing, business lounge
+Contact: +880-1700-000003
+
+VENUE 4: Heritage Palace
+Address: 156 Old Dhaka, Lalbagh, Dhaka
+Location Coordinates: 23.717331, 90.386040
+Capacity: 400-700 guests
+Price Range: ৳18,000 - ৳30,000 per day (Basic Package)
+Facilities: Traditional architecture, cultural ambiance, heritage decor
+Specialties: Traditional weddings, cultural events, heritage celebrations
+Rating: 4.3/5
+Reviews:
+- Fatima: "Authentic Bangladeshi architecture and atmosphere." (4.5/5)
+- Karim: "Perfect for traditional ceremonies." (4.1/5)
+Amenities: Traditional decor, cultural artifacts, heritage dining
+Contact: +880-1700-000004
+
+VENUE 5: Skyline Rooftop Venue
+Address: 92 Gulshan Avenue, Gulshan-2, Dhaka
+Location Coordinates: 23.792395, 90.414141
+Capacity: 150-300 guests
+Price Range: ৳20,000 - ৳35,000 per day (Basic Package)
+Facilities: Open-air rooftop, city skyline view, modern lighting
+Specialties: Cocktail parties, evening receptions, corporate events
+Rating: 4.7/5
+Reviews:
+- Marina: "Stunning city views and modern amenities." (5/5)
+- Ravi: "Perfect for evening events with beautiful lighting." (4.4/5)
+Amenities: LED lighting, bar area, panoramic city view
+Contact: +880-1700-000005
+
+VENUE 6: Garden Paradise Resort
+Address: 234 Uttara Sector 7, Uttara, Dhaka
+Location Coordinates: 23.875751, 90.389816
+Capacity: 600-1000 guests
+Price Range: ৳25,000 - ৳40,000 per day (Basic Package)
+Facilities: Large gardens, swimming pool, multiple pavilions
+Specialties: Destination weddings, large celebrations, outdoor events
+Rating: 4.5/5
+Reviews:
+- Wedding Planner Suzy: "Excellent for large outdoor weddings." (4.8/5)
+- Nasir: "Beautiful natural setting with great facilities." (4.2/5)
+Amenities: Swimming pool, gazebo, multiple dining areas
+Contact: +880-1700-000006
+
+VENUE 7: Metropolitan Hall
+Address: 67 Wari Road, Wari, Dhaka
+Location Coordinates: 23.719999, 90.418842
+Capacity: 250-500 guests
+Price Range: ৳11,000 - ৳19,000 per day (Basic Package)
+Facilities: Classic interior, marble floors, crystal chandeliers
+Specialties: Formal events, award ceremonies, galas
+Rating: 4.2/5
+Reviews:
+- Event Coordinator Lisa: "Elegant venue for formal occasions." (4.3/5)
+- Mahmud: "Classic ambiance with professional service." (4.1/5)
+Amenities: Grand entrance, marble decor, premium lighting
+Contact: +880-1700-000007
+
+VENUE 8: Riverside Convention Center
+Address: 189 Sadarghat Road, Old Dhaka, Dhaka
+Location Coordinates: 23.705849, 90.406250
+Capacity: 300-600 guests
+Price Range: ৳14,000 - ৳24,000 per day (Basic Package)
+Facilities: River view, boat access, waterfront dining
+Specialties: Waterfront weddings, cultural events, river cruises
+Rating: 4.4/5
+Reviews:
+- Bride Rashida: "Unique river setting for our wedding." (4.6/5)
+- Cultural Event Organizer: "Perfect for traditional programs." (4.2/5)
+Amenities: River access, boat jetty, waterfront terrace
+Contact: +880-1700-000008
+
+VENUE 9: Crystal Palace Ballroom
+Address: 445 Elephant Road, Dhanmondi, Dhaka
+Location Coordinates: 23.738800, 90.385040
+Capacity: 400-800 guests
+Price Range: ৳16,000 - ৳28,000 per day (Basic Package)
+Facilities: Grand ballroom, VIP areas, premium sound system
+Specialties: Luxury weddings, corporate galas, high-end events
+Rating: 4.6/5
+Reviews:
+- Luxury Event Planner: "Premium facilities for upscale events." (4.8/5)
+- Corporate Client B: "Impressive venue for company celebrations." (4.4/5)
+Amenities: Crystal chandeliers, VIP suites, premium catering
+Contact: +880-1700-000009
+
+VENUE 10: Community Center Plus
+Address: 78 Mirpur-1, Mirpur, Dhaka
+Location Coordinates: 23.796875, 90.353226
+Capacity: 200-400 guests
+Price Range: ৳8,000 - ৳15,000 per day (Basic Package)
+Facilities: Community-friendly, affordable pricing, basic amenities
+Specialties: Community events, family gatherings, local celebrations
+Rating: 4.0/5
+Reviews:
+- Local Family: "Affordable and suitable for family events." (4.1/5)
+- Community Leader: "Great value for community programs." (3.9/5)
+Amenities: Basic sound system, community kitchen, parking
+Contact: +880-1700-000010
+
+VENUE 11: Tech Innovation Hub
+Address: 123 Tejgaon Industrial Area, Tejgaon, Dhaka
+Location Coordinates: 23.759094, 90.395508
+Capacity: 100-300 guests
+Price Range: ৳12,000 - ৳22,000 per day (Basic Package)
+Facilities: High-tech equipment, startup-friendly environment
+Specialties: Tech conferences, startup events, innovation showcases
+Rating: 4.5/5
+Reviews:
+- Startup Founder: "Perfect for tech events and networking." (4.7/5)
+- Innovation Manager: "Modern facilities for forward-thinking events." (4.3/5)
+Amenities: Smart boards, high-speed internet, tech demo areas
+Contact: +880-1700-000011
+
+VENUE 12: Green Valley Resort
+Address: 567 Savar Road, Savar, Dhaka
+Location Coordinates: 23.854126, 90.266113
+Capacity: 500-900 guests
+Price Range: ৳22,000 - ৳38,000 per day (Basic Package)
+Facilities: Natural setting, eco-friendly, multiple outdoor spaces
+Specialties: Eco-weddings, nature retreats, outdoor celebrations
+Rating: 4.3/5
+Reviews:
+- Environmental Activist: "Beautiful natural venue with eco-consciousness." (4.5/5)
+- Nature Lover: "Perfect blend of nature and modern facilities." (4.1/5)
+Amenities: Nature trails, organic gardens, eco-friendly facilities
+Contact: +880-1700-000012
+
+VENUE 13: Art Gallery Venue
+Address: 234 Dhanmondi 27, Dhanmondi, Dhaka
+Location Coordinates: 23.745051, 90.376831
+Capacity: 150-250 guests
+Price Range: ৳15,000 - ৳25,000 per day (Basic Package)
+Facilities: Artistic ambiance, gallery walls, creative spaces
+Specialties: Art exhibitions, creative events, cultural showcases
+Rating: 4.4/5
+Reviews:
+- Artist Community: "Inspiring space for creative events." (4.6/5)
+- Cultural Enthusiast: "Perfect atmosphere for art-focused gatherings." (4.2/5)
+Amenities: Exhibition walls, artistic lighting, creative zones
+Contact: +880-1700-000013
+
+VENUE 14: Sports Club Complex
+Address: 789 Gulshan-1, Gulshan, Dhaka
+Location Coordinates: 23.781250, 90.417969
+Capacity: 300-600 guests
+Price Range: ৳14,000 - ৳26,000 per day (Basic Package)
+Facilities: Sports facilities, recreational areas, club amenities
+Specialties: Sports events, team celebrations, recreational gatherings
+Rating: 4.2/5
+Reviews:
+- Sports Team Captain: "Great facilities for sports celebrations." (4.4/5)
+- Recreation Coordinator: "Excellent for team-building events." (4.0/5)
+Amenities: Sports courts, recreational areas, club facilities
+Contact: +880-1700-000014
+
+VENUE 15: Lakeside Pavilion
+Address: 456 Ramna Park Area, Ramna, Dhaka
+Location Coordinates: 23.738281, 90.403320
+Capacity: 250-450 guests
+Price Range: ৳13,000 - ৳23,000 per day (Basic Package)
+Facilities: Lake view, natural lighting, peaceful environment
+Specialties: Outdoor weddings, peaceful gatherings, nature events
+Rating: 4.3/5
+Reviews:
+- Peace Seeker: "Serene environment perfect for intimate gatherings." (4.5/5)
+- Nature Event Planner: "Beautiful natural setting with modern amenities." (4.1/5)
+Amenities: Lake access, nature walks, peaceful surroundings
+Contact: +880-1700-000015
+
+=== VENDOR DIRECTORY ===
+
+CATERING SERVICES:
+
+VENDOR 1: Royal Feast Catering
+Services: Full-service catering, Bengali cuisine, international dishes
+Specialties: Traditional Bengali wedding menu, corporate lunch
+Price Range: ৳300 - ৳800 per person
+Location: Operates across Dhaka
+Rating: 4.5/5
+Experience: 15 years in catering industry
+Contact: +880-1800-000001
+Portfolio: Traditional rice dishes, fish preparations, vegetarian options
+Menu Options: Breakfast, lunch, dinner, snacks, beverages
+Reviews:
+- Wedding Client: "Authentic Bengali flavors and excellent presentation." (4.7/5)
+- Corporate Client: "Professional service for our company events." (4.3/5)
+
+VENDOR 2: Gourmet Kitchen
+Services: Premium catering, fusion cuisine, custom menus
+Specialties: International fusion, gourmet presentations
+Price Range: ৳500 - ৳1200 per person
+Location: Premium service across Dhaka
+Rating: 4.7/5
+Experience: 12 years specializing in high-end events
+Contact: +880-1800-000002
+Portfolio: Continental, Asian fusion, molecular gastronomy
+Menu Options: Themed menus, dietary accommodations, live cooking
+Reviews:
+- Luxury Event Client: "Exceptional quality and creative presentations." (4.9/5)
+- Food Critic: "Innovative cuisine with excellent execution." (4.5/5)
+
+VENDOR 3: Traditional Taste Catering
+Services: Authentic Bengali cuisine, home-style cooking
+Specialties: Traditional home recipes, regional specialties
+Price Range: ৳200 - ৳500 per person
+Location: Dhaka and surrounding areas
+Rating: 4.3/5
+Experience: 20 years preserving traditional flavors
+Contact: +880-1800-000003
+Portfolio: Regional Bengali dishes, festival foods, comfort meals
+Menu Options: Traditional thali, seasonal menus, festival specials
+Reviews:
+- Family Event: "Tastes just like grandmother's cooking." (4.5/5)
+- Cultural Program: "Authentic flavors for our heritage event." (4.1/5)
+
+PHOTOGRAPHY SERVICES:
+
+VENDOR 4: Moments Photography Studio
+Services: Wedding photography, event coverage, portrait sessions
+Specialties: Candid photography, drone shots, cinematic videos
+Price Range: ৳15,000 - ৳50,000 per event
+Location: Dhaka-based, travels nationwide
+Rating: 4.6/5
+Experience: 10 years capturing precious moments
+Contact: +880-1900-000001
+Equipment: Professional cameras, drones, lighting equipment
+Packages: Basic coverage, premium packages, destination shoots
+Reviews:
+- Bride Testimonial: "Captured our special day beautifully." (4.8/5)
+- Corporate Event: "Professional coverage of our conference." (4.4/5)
+
+VENDOR 5: Creative Lens Photography
+Services: Artistic photography, event documentation, commercial shoots
+Specialties: Creative compositions, artistic editing, storytelling
+Price Range: ৳20,000 - ৳60,000 per event
+Location: Premium service in Dhaka metro
+Rating: 4.8/5
+Experience: 8 years in creative photography
+Contact: +880-1900-000002
+Equipment: High-end cameras, artistic lighting, editing suites
+Packages: Artistic packages, commercial shoots, lifestyle photography
+Reviews:
+- Art Gallery: "Stunning artistic vision and execution." (4.9/5)
+- Fashion Event: "Creative approach that exceeded expectations." (4.7/5)
+
+VENDOR 6: Documentary Style Photography
+Services: Documentary photography, photojournalism, event stories
+Specialties: Authentic moments, natural lighting, storytelling
+Price Range: ৳12,000 - ৳40,000 per event
+Location: Dhaka and greater metropolitan area
+Rating: 4.4/5
+Experience: 12 years in documentary photography
+Contact: +880-1900-000003
+Equipment: Professional documentary gear, natural lighting setups
+Packages: Documentary coverage, photo books, digital galleries
+Reviews:
+- NGO Event: "Powerful documentation of our cause." (4.6/5)
+- Community Event: "Authentic capture of community spirit." (4.2/5)
+
+DECORATION SERVICES:
+
+VENDOR 7: Dream Decorations
+Services: Complete event decoration, theme design, floral arrangements
+Specialties: Wedding decorations, corporate branding, themed events
+Price Range: ৳25,000 - ৳200,000 per event
+Location: Dhaka and surrounding districts
+Rating: 4.5/5
+Experience: 18 years creating magical environments
+Contact: +880-2000-000001
+Services Include: Floral design, lighting, fabric draping, stage setup
+Themes: Traditional Bengali, modern contemporary, international themes
+Reviews:
+- Wedding Client: "Transformed our venue into a fairy tale." (4.7/5)
+- Corporate Event: "Professional branding integration." (4.3/5)
+
+VENDOR 8: Elegant Events Decor
+Services: Luxury decoration, premium materials, custom designs
+Specialties: High-end weddings, corporate galas, luxury events
+Price Range: ৳50,000 - ৳300,000 per event
+Location: Premium service across Bangladesh
+Rating: 4.8/5
+Experience: 15 years in luxury event decoration
+Contact: +880-2000-000002
+Services Include: Crystal decorations, premium fabrics, imported flowers
+Themes: Luxury modern, classic elegance, international luxury
+Reviews:
+- Luxury Wedding: "Breathtaking elegance and attention to detail." (4.9/5)
+- High-End Corporate: "Sophisticated and impressive setup." (4.7/5)
+
+VENDOR 9: Cultural Craft Decorations
+Services: Traditional decorations, cultural themes, handmade crafts
+Specialties: Bengali cultural themes, traditional crafts, heritage designs
+Price Range: ৳15,000 - ৳80,000 per event
+Location: Dhaka with cultural expertise nationwide
+Rating: 4.3/5
+Experience: 25 years preserving traditional decoration arts
+Contact: +880-2000-000003
+Services Include: Traditional crafts, cultural artifacts, heritage themes
+Themes: Pohela Boishakh, traditional weddings, cultural festivals
+Reviews:
+- Cultural Festival: "Authentic representation of our heritage." (4.5/5)
+- Traditional Wedding: "Beautiful traditional Bengali setup." (4.1/5)
+
+SOUND & LIGHTING:
+
+VENDOR 10: Sound Symphony
+Services: Professional sound systems, lighting design, AV equipment
+Specialties: Concert sound, wedding audio, corporate presentations
+Price Range: ৳10,000 - ৳75,000 per event
+Location: Dhaka metro area with equipment rental
+Rating: 4.4/5
+Experience: 14 years in professional audio-visual services
+Contact: +880-2100-000001
+Equipment: Professional speakers, mixing boards, LED lighting
+Services: Sound engineering, lighting design, technical support
+Reviews:
+- Concert Organizer: "Crystal clear sound for our music event." (4.6/5)
+- Wedding Planner: "Perfect audio for outdoor ceremony." (4.2/5)
+
+VENDOR 11: Tech Audio Visual
+Services: High-tech AV solutions, interactive displays, modern lighting
+Specialties: Corporate presentations, tech conferences, modern events
+Price Range: ৳15,000 - ৳100,000 per event
+Location: Dhaka with high-tech equipment
+Rating: 4.6/5
+Experience: 10 years in cutting-edge AV technology
+Contact: +880-2100-000002
+Equipment: LED walls, interactive displays, smart lighting systems
+Services: Technical consultation, live streaming, digital integration
+Reviews:
+- Tech Conference: "State-of-the-art equipment and support." (4.8/5)
+- Modern Wedding: "Impressive technology integration." (4.4/5)
+
+TRANSPORTATION:
+
+VENDOR 12: Royal Transport Services
+Services: Wedding cars, guest transportation, luxury vehicles
+Specialties: Decorated wedding cars, VIP transport, group transportation
+Price Range: ৳5,000 - ৳25,000 per day
+Location: Dhaka and greater area
+Rating: 4.3/5
+Experience: 12 years in event transportation
+Contact: +880-2200-000001
+Fleet: Luxury cars, decorated vehicles, buses for groups
+Services: Bridal car decoration, guest shuttles, VIP transport
+Reviews:
+- Wedding Client: "Beautiful car decoration and professional service." (4.5/5)
+- Corporate Event: "Reliable transportation for our guests." (4.1/5)
+
+ENTERTAINMENT:
+
+VENDOR 13: Cultural Performers Group
+Services: Traditional music, folk dance, cultural programs
+Specialties: Bengali folk performances, traditional music, cultural shows
+Price Range: ৳20,000 - ৳80,000 per performance
+Location: Dhaka-based, performs nationwide
+Rating: 4.4/5
+Experience: 20 years preserving cultural arts
+Contact: +880-2300-000001
+Performances: Folk songs, traditional dances, cultural storytelling
+Programs: Wedding entertainment, cultural festivals, heritage shows
+Reviews:
+- Cultural Event: "Authentic and engaging cultural performance." (4.6/5)
+- Wedding Celebration: "Beautiful traditional music for our ceremony." (4.2/5)
+
+VENDOR 14: Modern Entertainment Solutions
+Services: DJ services, live bands, modern music, interactive entertainment
+Specialties: Wedding DJs, corporate entertainment, party music
+Price Range: ৳15,000 - ৳60,000 per event
+Location: Dhaka metro area
+Rating: 4.5/5
+Experience: 8 years in modern entertainment
+Contact: +880-2300-000002
+Services: Professional DJs, live music, interactive games, modern shows
+Equipment: Professional sound systems, lighting, entertainment technology
+Reviews:
+- Modern Wedding: "Perfect music and entertainment for our celebration." (4.7/5)
+- Corporate Party: "Engaging entertainment that energized our event." (4.3/5)
+
+=== PLATFORM USAGE GUIDE ===
+
+How to Use PlannrAI Sync:
+
+For Customers:
+1. Register on the platform with basic information
+2. Use the interactive map to search for venues by location, capacity, and budget
+3. Filter venues by date availability and specific requirements
+4. Browse vendor services with ratings and portfolios
+5. Initiate live chat with venues and vendors for discussions
+6. Create collaborative event plans and invite team members
+7. Book venues and services through the integrated booking system
+8. Track event planning progress with collaborative tools
+9. Rate and review venues and vendors after events
+10. Access AI assistance for planning recommendations in Bengali or English
+
+For Vendors:
+1. Register and create detailed service profiles
+2. Upload portfolios, pricing, and availability calendars
+3. Respond to customer inquiries through live chat
+4. Manage booking requests and confirmations
+5. Update service offerings and pricing
+6. Build reputation through customer reviews
+7. Access analytics on profile performance
+8. Collaborate with customers on event planning
+9. Receive notifications for new opportunities
+10. Maintain professional communication standards
+
+For Event Planning:
+1. Define event requirements (date, guest count, budget, style)
+2. Use AI recommendations for venue and vendor selection
+3. Create collaborative planning boards with team members
+4. Assign tasks and deadlines to team members
+5. Track budget allocation across different services
+6. Monitor real-time weather updates for outdoor events
+7. Coordinate with multiple vendors through unified communication
+8. Access planning templates for different event types
+9. Generate reports and summaries for stakeholders
+10. Ensure all elements align with event timeline
+
+=== PRICING STRUCTURE ===
+
+Venue Pricing Guidelines:
+- Basic Package: ৳8,000 - ৳40,000 per day (includes basic facilities)
+- Premium Package: Additional ৳5,000 - ৳15,000 (enhanced services)
+- Luxury Package: Additional ৳10,000 - ৳25,000 (premium amenities)
+
+Vendor Service Ranges:
+- Catering: ৳200 - ৳1,200 per person depending on menu complexity
+- Photography: ৳12,000 - ৳60,000 per event based on coverage and quality
+- Decoration: ৳15,000 - ৳300,000 depending on scale and materials
+- Sound & Lighting: ৳10,000 - ৳100,000 based on equipment and technical needs
+- Transportation: ৳5,000 - ৳25,000 per day for vehicle services
+- Entertainment: ৳15,000 - ৳80,000 per performance or event
+
+Platform Features:
+- Basic User Account: Free registration and basic search
+- Premium Planning Tools: ৳500 monthly subscription for advanced features
+- Vendor Listing: ৳2,000 monthly for basic vendor profile
+- Premium Vendor Profile: ৳5,000 monthly for enhanced visibility and features
+
+=== FREQUENTLY ASKED QUESTIONS ===
+
+Q1: How do I search for venues on PlannrAI Sync?
+A: Use our interactive map feature to search by location, date, capacity, and budget. You can filter results based on your specific requirements and view detailed venue information, photos, and reviews.
+
+Q2: Can I book multiple vendors through the platform?
+A: Yes, PlannrAI Sync allows you to book and coordinate with multiple vendors for your event. You can manage all communications and bookings through our unified platform.
+
+Q3: Is the AI assistant available in Bengali?
+A: Yes, our AI assistant supports both Bengali and English languages. You can switch between languages and receive planning recommendations, budget advice, and vendor suggestions in your preferred language.
+
+Q4: How does the collaborative planning feature work?
+A: You can invite team members, family, or friends to collaborate on your event planning. Everyone can contribute to planning boards, assign tasks, share ideas, and communicate in real-time through our collaborative tools.
+
+Q5: What payment methods are accepted?
+A: We accept various payment methods including mobile banking (bKash, Nagad, Rocket), bank transfers, and credit/debit cards for both platform subscriptions and vendor bookings.
+
+Q6: How are vendor reviews verified?
+A: Reviews can only be submitted by customers who have completed bookings through our platform. We verify the authenticity of reviews to maintain trust and reliability in our rating system.
+
+Q7: Can I get weather updates for my outdoor event?
+A: Yes, PlannrAI Sync provides real-time weather updates and forecasts to help you make informed decisions about outdoor events and backup planning.
+
+Q8: Is there a mobile app available?
+A: Currently, PlannrAI Sync operates through our web platform optimized for mobile devices. A dedicated mobile app is planned for future release.
+
+Q9: How do I become a verified vendor on the platform?
+A: Register as a vendor, complete your profile with portfolio examples, provide business documentation, and undergo our verification process. Verified vendors receive enhanced visibility and trust badges.
+
+Q10: What support is available if I encounter issues?
+A: Our customer support team is available through live chat, email, and phone during business hours. We also provide comprehensive help documentation and video tutorials for platform usage.
+
+=== EVENT PLANNING BEST PRACTICES ===
+
+Timeline Planning:
+- 6-12 months before: Book venue and major vendors
+- 3-6 months before: Finalize decorations, catering menu, entertainment
+- 1-3 months before: Confirm all details, send invitations, coordinate logistics
+- 1 week before: Final confirmations, weather check, emergency planning
+- Event day: Execute timeline with vendor coordination
+
+Budget Management:
+- Venue: 30-40% of total budget
+- Catering: 25-35% of total budget
+- Photography: 10-15% of total budget
+- Decoration: 15-20% of total budget
+- Entertainment: 5-10% of total budget
+- Miscellaneous: 5-10% contingency
+
+Weather Considerations:
+- Monitor forecasts 1 week before outdoor events
+- Have backup indoor options available
+- Consider seasonal weather patterns in Dhaka
+- Plan for monsoon season alternatives (June-September)
+- Prepare weather-appropriate arrangements
+
+Communication Protocol:
+- Establish clear communication channels with all vendors
+- Set regular check-in schedules
+- Document all agreements and changes
+- Maintain emergency contact lists
+- Use platform messaging for organized communication
+
+Quality Assurance:
+- Read vendor reviews and ratings carefully
+- Request portfolio examples and references
+- Conduct site visits for venues
+- Taste catering samples before final selection
+- Confirm vendor availability and backup plans
+
+=== PLATFORM TERMS OF SERVICE ===
+
+User Responsibilities:
+- Provide accurate information during registration
+- Respect other users and maintain professional communication
+- Honor booking commitments and payment obligations
+- Leave honest and constructive reviews
+- Report any issues or violations promptly
+
+Vendor Obligations:
+- Maintain accurate service descriptions and pricing
+- Respond to customer inquiries promptly
+- Deliver services as promised and confirmed
+- Maintain professional standards and quality
+- Keep availability calendars updated
+
+Platform Policies:
+- Zero tolerance for fraudulent activities
+- Respectful communication is mandatory
+- Booking cancellations subject to vendor policies
+- Dispute resolution through platform mediation
+- Privacy protection for all user data
+
+This comprehensive directory provides complete information about venues and vendors available through PlannrAI Sync for event management in Dhaka, Bangladesh. The platform facilitates seamless connections between customers and service providers while offering AI-powered assistance for optimal event planning experiences.

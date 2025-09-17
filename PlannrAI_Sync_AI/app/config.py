@@ -1,0 +1,19 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    NOMIC_INFERENCE_MODE: str = 'local'  # set to 'remote' to use the API or 'local'
+    GROQ_API_KEY: str
+    GROQ_MODEL: str = 'meta-llama/llama-4-scout-17b-16e-instruct'  # https://console.groq.com/docs/models
+
+    model_config = SettingsConfigDict(env_file='.env')
+
+settings = Settings()
+
+
+
+#llama-3.1-8b-instant
+#llama3-70b-8192
+#deepseek-r1-distill-llama-70b
+#openai/gpt-oss-120b
+#llama-3.3-70b-versatile
+#meta-llama/llama-4-scout-17b-16e-instruct

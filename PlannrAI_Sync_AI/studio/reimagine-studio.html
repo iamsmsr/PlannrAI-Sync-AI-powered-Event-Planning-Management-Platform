@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reimagine Studio - PlannrAI</title>
+    <link rel="stylesheet" href="master-tool.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="back-button">
+                <a href="index.html">← Back to Studio</a>
+            </div>
+            <h1>🎨 Reimagine Studio</h1>
+            <p>Upload an image and create stunning variations with AI</p>
+        </header>
+
+        <div class="main-content">
+            <div class="tool-form">
+                <form id="reimagineForm">
+                    <div class="form-group">
+                        <label for="imageUpload">Upload Your Image</label>
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <input type="file" id="imageUpload" accept="image/*" required style="display: none;">
+                            <div class="upload-content">
+                                <div class="upload-icon">📷</div>
+                                <p>Click to upload or drag and drop</p>
+                                <span class="upload-hint">PNG, JPG, WebP (max 1024x1024px)</span>
+                            </div>
+                        </div>
+                        <div class="uploaded-image" id="uploadedImage" style="display: none;">
+                            <img id="previewImage" alt="Uploaded image">
+                            <button type="button" class="change-image-btn" onclick="changeImage()">Change Image</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="generate-btn" id="reimagineBtn">
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-text">Reimagine Image</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>🎭 Reimagined Variations</h3>
+                    <button class="clear-chat" onclick="clearChat()">Clear All</button>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message welcome-message">
+                        <div class="message-header">
+                            <strong>Welcome to Reimagine Studio!</strong>
+                        </div>
+                        <p>Upload an image to create beautiful AI-powered variations. Perfect for:</p>
+                        <ul>
+                            <li>🎨 Creating multiple design options</li>
+                            <li>🖼️ Generating artistic interpretations</li>
+                            <li>💡 Exploring creative possibilities</li>
+                            <li>🎪 Event imagery variations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ReimagineStudioTool {
+            constructor() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.currentFile = null;
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                // Form submission
+                document.getElementById('reimagineForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.reimagineImage();
+                });
+
+                // File upload area
+                const fileUploadArea = document.getElementById('fileUploadArea');
+                const fileInput = document.getElementById('imageUpload');
+
+                fileUploadArea.addEventListener('click', () => {
+                    fileInput.click();
+                });
+
+                fileUploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.classList.add('drag-over');
+                });
+
+                fileUploadArea.addEventListener('dragleave', () => {
+                    fileUploadArea.classList.remove('drag-over');
+                });
+
+                fileUploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUploadArea.classList.remove('drag-over');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleFileUpload(files[0]);
+                    }
+                });
+
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.handleFileUpload(e.target.files[0]);
+                    }
+                });
+            }
+
+            handleFileUpload(file) {
+                if (!file.type.startsWith('image/')) {
+                    this.showToast('Please upload an image file', 'error');
+                    return;
+                }
+
+                // Check file size (rough estimate for 1024x1024)
+                if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                    this.showToast('Image file is too large. Please upload a smaller image.', 'error');
+                    return;
+                }
+
+                this.currentFile = file;
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('fileUploadArea').style.display = 'none';
+                    document.getElementById('uploadedImage').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            async reimagineImage() {
+                if (!this.currentFile) {
+                    this.showToast('Please upload an image first', 'error');
+                    return;
+                }
+
+                const reimagineBtn = document.getElementById('reimagineBtn');
+                const originalText = reimagineBtn.querySelector('.btn-text').textContent;
+                
+                reimagineBtn.querySelector('.btn-text').textContent = 'Reimagining...';
+                reimagineBtn.disabled = true;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('image_file', this.currentFile);
+
+                    const response = await fetch('/reimagine-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        // Response is an image blob
+                        const imageBlob = await response.blob();
+                        const imageUrl = URL.createObjectURL(imageBlob);
+                        
+                        this.displayReimagineResult(this.currentFile.name, imageUrl);
+                        this.showToast('Image reimagined successfully!', 'success');
+                        
+                        // Log credits info if available
+                        const remainingCredits = response.headers.get('x-remaining-credits');
+                        const creditsConsumed = response.headers.get('x-credits-consumed');
+                        if (remainingCredits) {
+                            console.log(`Credits remaining: ${remainingCredits}, consumed: ${creditsConsumed}`);
+                        }
+                    } else {
+                        // Try to parse error message
+                        let errorMessage = 'Failed to reimagine image';
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.detail || errorMessage;
+                        } catch (e) {
+                            errorMessage = `Server error: ${response.status}`;
+                        }
+                        throw new Error(errorMessage);
+                    }
+                } catch (error) {
+                    console.error('Error reimagining image:', error);
+                    this.showToast(error.message || 'Failed to reimagine image. Please try again.', 'error');
+                } finally {
+                    reimagineBtn.querySelector('.btn-text').textContent = originalText;
+                    reimagineBtn.disabled = false;
+                }
+            }
+
+            displayReimagineResult(originalName, imageUrl) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message assistant-message';
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <strong>Reimagined Variation</strong>
+                        <span class="timestamp">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <div class="original-info">
+                        <strong>Original:</strong> ${originalName}
+                    </div>
+                    <div class="generated-image">
+                        <img src="${imageUrl}" alt="Reimagined image" style="max-width: 100%; border-radius: 8px; margin-top: 10px;">
+                    </div>
+                    <div class="image-actions">
+                        <button onclick="downloadImage('${imageUrl}', 'reimagined-${originalName}')" class="download-btn">📥 Download</button>
+                        <button onclick="reimagineAgain()" class="regenerate-btn">🔄 Reimagine Again</button>
+                    </div>
+                `;
+                
+                // Remove welcome message if it exists
+                const welcomeMessage = this.chatMessages.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.remove();
+                }
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 1001;
+                    font-weight: 500;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    transform: translateX(100%);
+                    transition: transform 0.3s ease;
+                `;
+                
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                // Animate in
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Global functions for button actions
+        window.downloadImage = function(imageUrl, filename) {
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = `${filename}-${Date.now()}.jpg`;
+            link.click();
+        };
+
+        window.reimagineAgain = function() {
+            document.getElementById('reimagineBtn').click();
+        };
+
+        window.changeImage = function() {
+            document.getElementById('fileUploadArea').style.display = 'block';
+            document.getElementById('uploadedImage').style.display = 'none';
+            document.getElementById('imageUpload').value = '';
+            reimagineStudio.currentFile = null;
+        };
+
+        window.clearChat = function() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+                <div class="message welcome-message">
+                    <div class="message-header">
+                        <strong>Welcome to Reimagine Studio!</strong>
+                    </div>
+                    <p>Upload an image to create beautiful AI-powered variations. Perfect for:</p>
+                    <ul>
+                        <li>🎨 Creating multiple design options</li>
+                        <li>🖼️ Generating artistic interpretations</li>
+                        <li>💡 Exploring creative possibilities</li>
+                        <li>🎪 Event imagery variations</li>
+                    </ul>
+                </div>
+            `;
+        };
+
+        // Initialize the tool when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.reimagineStudio = new ReimagineStudioTool();
+        });
+    </script>
+</body>
+</html>

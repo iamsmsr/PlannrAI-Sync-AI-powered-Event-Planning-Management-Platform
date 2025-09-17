@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Name Generator - PlannrAI Studio</title>
+    <link rel="stylesheet" href="../master-tool.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="tool-header">
+            <div class="header-content">
+                <a href="../index.html" class="back-btn">← Back to Studio</a>
+                <div class="tool-info">
+                    <h1>🎪 Event Name Generator</h1>
+                    <p>Generate creative and catchy names for your event</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>🎯 Event Details</h2>
+                    <p>Provide event information to generate creative name suggestions</p>
+                </div>
+
+                <form class="event-name-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventType">Event Type *</label>
+                            <select id="eventType" required>
+                                <option value="">Select event type...</option>
+                                <option value="conference">Conference</option>
+                                <option value="workshop">Workshop</option>
+                                <option value="seminar">Seminar</option>
+                                <option value="webinar">Webinar</option>
+                                <option value="wedding">Wedding</option>
+                                <option value="birthday">Birthday Party</option>
+                                <option value="anniversary">Anniversary</option>
+                                <option value="corporate">Corporate Event</option>
+                                <option value="product-launch">Product Launch</option>
+                                <option value="networking">Networking Event</option>
+                                <option value="charity">Charity Event</option>
+                                <option value="exhibition">Exhibition</option>
+                                <option value="festival">Festival</option>
+                                <option value="concert">Concert</option>
+                                <option value="sports">Sports Event</option>
+                                <option value="educational">Educational Event</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="industry">Industry/Field</label>
+                            <input type="text" id="industry" placeholder="e.g., Technology, Healthcare, Education">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="targetAudience">Target Audience *</label>
+                            <input type="text" id="targetAudience" placeholder="e.g., Young professionals, Students, Entrepreneurs" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventTone">Event Tone/Style *</label>
+                            <select id="eventTone" required>
+                                <option value="">Select tone...</option>
+                                <option value="professional">Professional & Formal</option>
+                                <option value="creative">Creative & Artistic</option>
+                                <option value="fun">Fun & Energetic</option>
+                                <option value="elegant">Elegant & Sophisticated</option>
+                                <option value="modern">Modern & Tech-savvy</option>
+                                <option value="traditional">Traditional & Cultural</option>
+                                <option value="inspiring">Inspiring & Motivational</option>
+                                <option value="casual">Casual & Friendly</option>
+                                <option value="premium">Premium & Exclusive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventTheme">Event Theme/Purpose</label>
+                            <input type="text" id="eventTheme" placeholder="e.g., Innovation, Sustainability, Digital Future">
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location/Culture</label>
+                            <select id="location">
+                                <option value="">Select location...</option>
+                                <option value="dhaka">Dhaka, Bangladesh</option>
+                                <option value="chittagong">Chittagong, Bangladesh</option>
+                                <option value="sylhet">Sylhet, Bangladesh</option>
+                                <option value="bangladesh">Bangladesh (General)</option>
+                                <option value="south-asia">South Asia</option>
+                                <option value="international">International</option>
+                                <option value="virtual">Virtual/Online</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="keyWords">Keywords to Include</label>
+                            <input type="text" id="keyWords" placeholder="e.g., innovation, connect, summit, expo">
+                        </div>
+                        <div class="form-group">
+                            <label for="avoidWords">Words to Avoid</label>
+                            <input type="text" id="avoidWords" placeholder="e.g., boring, old, simple">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nameLength">Preferred Name Length</label>
+                            <select id="nameLength">
+                                <option value="">Any length</option>
+                                <option value="short">Short (1-2 words)</option>
+                                <option value="medium">Medium (2-3 words)</option>
+                                <option value="long">Long (3-4 words)</option>
+                                <option value="descriptive">Descriptive (4+ words)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="nameCount">Number of Names</label>
+                            <select id="nameCount">
+                                <option value="10">10 names</option>
+                                <option value="15">15 names</option>
+                                <option value="20">20 names</option>
+                                <option value="25">25 names</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="additionalInfo">Additional Information</label>
+                        <textarea id="additionalInfo" rows="3" placeholder="Any specific requirements, cultural considerations, or creative direction you'd like to include..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="generateBtn" class="primary-btn">
+                            🎪 Generate Event Names
+                        </button>
+                        <button type="button" id="clearBtn" class="secondary-btn">
+                            🗑️ Clear Form
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Chat Section -->
+            <section class="chat-section">
+                <div class="section-header">
+                    <h2>💬 AI Naming Assistant</h2>
+                    <p>Get creative name suggestions and chat with AI to refine them</p>
+                </div>
+
+                <div class="chat-container" id="chatContainer">
+                    <div class="welcome-message">
+                        <div class="bot-message">
+                            <span class="message-icon">🤖</span>
+                            <div class="message-content">
+                                <p>👋 Welcome! Fill out the event details above and click "Generate Event Names" to get creative name suggestions. Then you can chat with me to refine or generate more options!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <form id="chatForm" class="chat-form">
+                        <input 
+                            type="text" 
+                            id="chatInput" 
+                            placeholder="Generate names first..." 
+                            disabled
+                        >
+                        <button type="submit" id="chatSendBtn" disabled>
+                            <span>Send</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="copyBtn" class="action-btn" disabled title="Copy names to clipboard">
+                        📋 Copy Names
+                    </button>
+                    <button id="downloadBtn" class="action-btn" disabled title="Download as text file">
+                        💾 Download
+                    </button>
+                    <button id="exportBtn" class="action-btn" disabled title="Export with details">
+                        📤 Export List
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="event-name.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlannrAI Sync - Event Planning Assistant</title>
+    <link rel="stylesheet" href="/frontend/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>PlannrAI Sync - Event Planning Assistant</h2>
+        
+        <!-- Language Toggle -->
+        <div class="language-toggle">
+            <button id="lang-en" class="lang-btn active">English</button>
+            <button id="lang-bn" class="lang-btn">বাংলা</button>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div id="faq-section" class="faq-section">
+            <h3 data-en="Frequently Asked Questions" data-bn="প্রায়শই জিজ্ঞাসিত প্রশ্নাবলী">Frequently Asked Questions</h3>
+            
+            <!-- Category Selection -->
+            <div id="category-selection" class="category-selection">
+                <p data-en="Select a category to see relevant questions:" data-bn="প্রাসঙ্গিক প্রশ্ন দেখতে একটি বিভাগ বেছে নিন:">Select a category to see relevant questions:</p>
+                <div class="category-buttons">
+                    <button class="category-btn" data-category="venue" data-en="🏢 Venues" data-bn="🏢 ভেন্যু">🏢 Venues</button>
+                    <button class="category-btn" data-category="vendor" data-en="🛍️ Vendors" data-bn="🛍️ ভেন্ডর">🛍️ Vendors</button>
+                    <button class="category-btn" data-category="platform" data-en="💻 Platform" data-bn="💻 প্ল্যাটফর্ম">💻 Platform</button>
+                    <button class="category-btn" data-category="booking" data-en="💳 Booking" data-bn="💳 বুকিং">💳 Booking</button>
+                    <button class="category-btn" data-category="support" data-en="🆘 Support" data-bn="🆘 সাপোর্ট">🆘 Support</button>
+                </div>
+            </div>
+
+            <!-- Questions Container -->
+            <div id="questions-container" class="questions-container" style="display: none;">
+                <div class="back-button-container">
+                    <button id="back-to-categories" class="back-btn" data-en="← Back to Categories" data-bn="← বিভাগে ফিরে যান">← Back to Categories</button>
+                </div>
+                <h4 id="category-title" class="category-title"></h4>
+                <div id="questions-list" class="questions-list"></div>
+            </div>
+        </div>
+
+        <div id="chat"></div>
+        <form id="chat-form">
+            <input type="text" id="question" placeholder="Ask about venues, vendors, bookings (English or বাংলা)..." required />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script src="/frontend/script_new.js"></script>
+</body>
+</html>

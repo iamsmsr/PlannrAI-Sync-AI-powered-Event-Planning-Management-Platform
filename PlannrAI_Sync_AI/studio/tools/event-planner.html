@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Planner & Timeline - PlannrAI Studio</title>
+    <link rel="stylesheet" href="../master-tool.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="tool-header">
+            <div class="header-content">
+                <a href="../index.html" class="back-btn">← Back to Studio</a>
+                <div class="tool-info">
+                    <h1>📅 Event Planner & Timeline</h1>
+                    <p>Create comprehensive event planning timelines with AI assistance</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>📋 Event Details</h2>
+                    <p>Fill in your event information to generate a detailed planning timeline</p>
+                </div>
+
+                <form class="event-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventType">Event Type *</label>
+                            <select id="eventType" required>
+                                <option value="">Select event type...</option>
+                                <option value="wedding">Wedding</option>
+                                <option value="corporate">Corporate Event</option>
+                                <option value="birthday">Birthday Party</option>
+                                <option value="anniversary">Anniversary</option>
+                                <option value="graduation">Graduation</option>
+                                <option value="conference">Conference</option>
+                                <option value="workshop">Workshop</option>
+                                <option value="launch">Product Launch</option>
+                                <option value="charity">Charity Event</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDate">Event Date *</label>
+                            <input type="date" id="eventDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventTime">Event Time</label>
+                            <input type="time" id="eventTime">
+                        </div>
+                        <div class="form-group">
+                            <label for="guestCount">Number of Guests *</label>
+                            <input type="number" id="guestCount" min="1" placeholder="e.g., 50" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="budgetRange">Budget Range</label>
+                            <select id="budgetRange">
+                                <option value="">Select budget range...</option>
+                                <option value="under-25k">Under ৳25,000</option>
+                                <option value="25k-50k">৳25,000 - ৳50,000</option>
+                                <option value="50k-100k">৳50,000 - ৳1,00,000</option>
+                                <option value="100k-250k">৳1,00,000 - ৳2,50,000</option>
+                                <option value="250k-500k">৳2,50,000 - ৳5,00,000</option>
+                                <option value="500k-1m">৳5,00,000 - ৳10,00,000</option>
+                                <option value="above-1m">Above ৳10,00,000</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="venueType">Venue Preference</label>
+                            <select id="venueType">
+                                <option value="">Select venue type...</option>
+                                <option value="hotel">Hotel/Resort</option>
+                                <option value="banquet">Banquet Hall</option>
+                                <option value="outdoor">Outdoor Venue</option>
+                                <option value="community">Community Center</option>
+                                <option value="restaurant">Restaurant</option>
+                                <option value="office">Office Space</option>
+                                <option value="home">Home/Private Residence</option>
+                                <option value="cultural">Cultural Center</option>
+                                <option value="rooftop">Rooftop Venue</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="planningTime">Planning Timeline</label>
+                            <select id="planningTime">
+                                <option value="">How much time do you have?</option>
+                                <option value="1-week">1 Week (Rush Planning)</option>
+                                <option value="2-weeks">2 Weeks</option>
+                                <option value="1-month">1 Month</option>
+                                <option value="2-months">2 Months</option>
+                                <option value="3-months">3 Months</option>
+                                <option value="6-months">6 Months</option>
+                                <option value="1-year">1 Year or More</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location/Area</label>
+                            <input type="text" id="location" placeholder="e.g., Dhaka, Gulshan">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="priorities">Key Requirements & Priorities</label>
+                        <textarea id="priorities" rows="3" placeholder="e.g., Photography is very important, need halal catering, prefer morning event, need parking space..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="specialRequests">Special Requests or Themes</label>
+                        <textarea id="specialRequests" rows="3" placeholder="e.g., Traditional Bengali theme, eco-friendly options, live music, specific dietary requirements..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="generateBtn" class="primary-btn">
+                            🤖 Generate Planning Timeline
+                        </button>
+                        <button type="button" id="clearBtn" class="secondary-btn">
+                            🗑️ Clear Form
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Chat Section -->
+            <section class="chat-section">
+                <div class="section-header">
+                    <h2>💬 AI Planning Assistant</h2>
+                    <p>Get your timeline and chat with AI to refine your event plan</p>
+                </div>
+
+                <div class="chat-container" id="chatContainer">
+                    <div class="welcome-message">
+                        <div class="bot-message">
+                            <span class="message-icon">🤖</span>
+                            <div class="message-content">
+                                <p>👋 Welcome! Fill out the event details above and click "Generate Planning Timeline" to create your comprehensive event plan. Then you can chat with me to refine it!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <form id="chatForm" class="chat-form">
+                        <input 
+                            type="text" 
+                            id="chatInput" 
+                            placeholder="Generate a timeline first..." 
+                            disabled
+                        >
+                        <button type="submit" id="chatSendBtn" disabled>
+                            <span>Send</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="copyBtn" class="action-btn" disabled title="Copy timeline to clipboard">
+                        📋 Copy
+                    </button>
+                    <button id="downloadBtn" class="action-btn" disabled title="Download as text file">
+                        💾 Download
+                    </button>
+                    <button id="exportBtn" class="action-btn" disabled title="Export detailed plan">
+                        📤 Export Plan
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="event-planner.js"></script>
+</body>
+</html>

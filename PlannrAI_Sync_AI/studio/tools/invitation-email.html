@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation Email Generator - PlannrAI Studio</title>
+    <link rel="stylesheet" href="../master-tool.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="tool-header">
+            <div class="header-content">
+                <a href="../index.html" class="back-btn">← Back to Studio</a>
+                <div class="tool-info">
+                    <h1>📧 Invitation Email Generator</h1>
+                    <p>Create compelling invitation emails with AI assistance</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>📧 Email Details</h2>
+                    <p>Fill in your event information to generate invitation email content</p>
+                </div>
+
+                <form class="invitation-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventName">Event Name *</label>
+                            <input type="text" id="eventName" placeholder="e.g., AI Conference 2024" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDate">Event Date</label>
+                            <input type="text" id="eventDate" placeholder="e.g., September 15, 2024">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="eventDetails">Event Details *</label>
+                        <textarea id="eventDetails" rows="4" placeholder="Brief description of your event, key highlights, what attendees will gain..." required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tone">Tone of Voice</label>
+                            <select id="tone">
+                                <option value="professional">Professional</option>
+                                <option value="friendly">Friendly</option>
+                                <option value="exciting">Exciting</option>
+                                <option value="formal">Formal</option>
+                                <option value="casual">Casual</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="language">Language</label>
+                            <select id="language">
+                                <option value="english">English</option>
+                                <option value="bengali">Bengali</option>
+                                <option value="mixed">English + Bengali</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="customInstructions">Additional Instructions</label>
+                        <textarea id="customInstructions" rows="3" placeholder="Any specific requirements, RSVP details, dress code, etc..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="generateBtn" class="primary-btn">
+                            📧 Generate Email
+                        </button>
+                        <button type="button" id="clearBtn" class="secondary-btn">
+                            🗑️ Clear Form
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Chat Section -->
+            <section class="chat-section">
+                <div class="section-header">
+                    <h2>💬 AI Email Assistant</h2>
+                    <p>Get your invitation email and chat with AI to refine it</p>
+                </div>
+
+                <div class="chat-container" id="chatContainer">
+                    <div class="welcome-message">
+                        <div class="bot-message">
+                            <span class="message-icon">🤖</span>
+                            <div class="message-content">
+                                <p>👋 Welcome! Fill out the event details above and click "Generate Email" to create your invitation. Then you can chat with me to refine it!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <form id="chatForm" class="chat-form">
+                        <input 
+                            type="text" 
+                            id="chatInput" 
+                            placeholder="Generate email first..." 
+                            disabled
+                        >
+                        <button type="submit" id="chatSendBtn" disabled>
+                            <span>Send</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="copyBtn" class="action-btn" disabled title="Copy email to clipboard">
+                        � Copy
+                    </button>
+                    <button id="downloadBtn" class="action-btn" disabled title="Download as text file">
+                        💾 Download
+                    </button>
+                    <button id="exportBtn" class="action-btn" disabled title="Export email template">
+                        📤 Export
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="invitation-email.js"></script>
+</body>
+</html>
