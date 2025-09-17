@@ -93,14 +93,14 @@ public class Business {
     public static class BusinessServiceInfo {
         private String eventType;
         private String priceRange;
-        private List<String> venueIds;
+        private List<String> venueNames;
 
         public BusinessServiceInfo() {}
 
-        public BusinessServiceInfo(String eventType, String priceRange, List<String> venueIds) {
+        public BusinessServiceInfo(String eventType, String priceRange, List<String> venueNames) {
             this.eventType = eventType;
             this.priceRange = priceRange;
-            this.venueIds = venueIds;
+            this.venueNames = venueNames;
         }
 
         public String getEventType() { return eventType; }
@@ -109,7 +109,7 @@ public class Business {
         public String getPriceRange() { return priceRange; }
         public void setPriceRange(String priceRange) { this.priceRange = priceRange; }
 
-        public List<String> getVenueIds() { return venueIds; }
-        public void setVenueIds(List<String> venueIds) { this.venueIds = venueIds; }
+        public List<String> getVenueNames() { return venueNames; }
+        public void setVenueNames(List<String> venueNames) { this.venueNames = venueNames; }
     }
 }

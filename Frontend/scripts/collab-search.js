@@ -3,7 +3,7 @@
 
 
 // --- Access Control & Data ---
-    const API_BASE = 'http://localhost:8080';
+    const API_BASE = window.API_BASE || 'http://localhost:8080';
     const bookingId = new URLSearchParams(window.location.search).get('bookingId');
     const authToken = localStorage.getItem('authToken');
 
@@ -14,7 +14,7 @@
     async function fetchBooking() {
         if (!bookingId || !authToken) return null;
         // Replace with your backend endpoint
-        const res = await fetch(`http://localhost:8080/api/venues/bookings/${bookingId}`, {
+    const res = await fetch(`${API_BASE}/api/venues/bookings/${bookingId}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (!res.ok) return null;

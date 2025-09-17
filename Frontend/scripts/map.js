@@ -7,7 +7,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Fetch all venues from backend
-fetch('http://localhost:8080/api/venues/all')
+const API_BASE = window.API_BASE || 'http://localhost:8080';
+fetch(`${API_BASE}/api/venues/all`)
     .then(response => response.json())
     .then(venues => {
         venues.forEach(venue => {
@@ -71,36 +72,52 @@ const showRoute = urlParams.get('showRoute');
 const fromCoords = urlParams.get('from');
 const toCoords = urlParams.get('to');
 
-if (showRoute && fromCoords && toCoords) {
-    const [fromLng, fromLat] = fromCoords.split(',');
-    const [toLng, toLat] = toCoords.split(',');
-    
-    // Add markers for start and end points
-    const startMarker = L.marker([fromLat, fromLng]).addTo(map)
-        .bindPopup('Start Location').openPopup();
-    const endMarker = L.marker([toLat, toLng]).addTo(map)
-        .bindPopup('Destination').openPopup();
+async function fetchAndDrawRoute(from, to) {
+    try {
+        const [fromLng, fromLat] = from.split(',');
+        const [toLng, toLat] = to.split(',');
 
-    // Fetch route from OSRM
-    fetch(`http://router.project-osrm.org/route/v1/driving/${fromCoords};${toCoords}?overview=full&geometries=geojson`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.routes && data.routes[0]) {
-                // Add the route to the map
-                const route = L.geoJSON(data.routes[0].geometry, {
-                    style: {
-                        color: '#059669',
-                        weight: 6,
-                        opacity: 0.7
-                    }
-                }).addTo(map);
+        // Add markers for start and end points
+        L.marker([fromLat, fromLng]).addTo(map).bindPopup('Start Location');
+        L.marker([toLat, toLng]).addTo(map).bindPopup('Destination');
 
-                // Fit the map to show the entire route
-                const bounds = route.getBounds();
-                map.fitBounds(bounds, { padding: [50, 50] });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching route:', error);
+        // Fetch route from OSRM (use HTTPS)
+        const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${from};${to}?overview=full&geometries=geojson`);
+        const data = await res.json();
+        if (data.routes && data.routes[0]) {
+            const route = L.geoJSON(data.routes[0].geometry, {
+                style: { color: '#059669', weight: 6, opacity: 0.7 }
+            }).addTo(map);
+            const bounds = route.getBounds();
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+    } catch (error) {
+        console.error('Error fetching route:', error);
+    }
+}
+
+if (showRoute && toCoords) {
+    // If 'from' is provided, use it. Otherwise try to obtain user's location via browser geolocation.
+    if (fromCoords) {
+        fetchAndDrawRoute(fromCoords, toCoords);
+    } else {
+        // Try to get the user's location via the map's locate feature
+        map.once('locationfound', function(e) {
+            const fcoords = `${e.latlng.lng},${e.latlng.lat}`;
+            fetchAndDrawRoute(fcoords, toCoords);
+            L.marker([e.latlng.lat, e.latlng.lng]).addTo(map).bindPopup('Start Location').openPopup();
         });
+
+        map.once('locationerror', function(err) {
+            console.warn('Could not determine user location for routing:', err);
+            // As a fallback, just show the destination marker so user can manually navigate
+            const parts = toCoords.split(',');
+            const tlat = parts[1];
+            const tlng = parts[0];
+            L.marker([tlat, tlng]).addTo(map).bindPopup('Destination').openPopup();
+        });
+
+        // Trigger locate if not already started
+        map.locate({ setView: false, maxZoom: 16 });
+    }
 }

@@ -79,10 +79,10 @@ public class BusinessService {
     /**
      * Add a service to a business
      */
-    public Business addServiceToBusiness(String businessId, String eventType, String priceRange, List<String> venueIds) {
+    public Business addServiceToBusiness(String businessId, String eventType, String priceRange, List<String> venueNames) {
         Business business = businessRepository.findById(businessId)
             .orElseThrow(() -> new RuntimeException("Business not found"));
-        Business.BusinessServiceInfo serviceInfo = new Business.BusinessServiceInfo(eventType, priceRange, venueIds);
+        Business.BusinessServiceInfo serviceInfo = new Business.BusinessServiceInfo(eventType, priceRange, venueNames);
         business.addService(serviceInfo);
         return businessRepository.save(business);
     }

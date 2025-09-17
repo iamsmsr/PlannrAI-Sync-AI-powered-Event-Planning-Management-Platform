@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (viewDatesId && typeof viewDates === 'function') {
         // Fetch all venues and assign to the actual global variable
-        fetch('http://localhost:8080/api/venues/all')
+        const API_BASE = window.API_BASE || 'http://localhost:8080';
+        fetch(`${API_BASE}/api/venues/all`)
             .then(response => response.json())
             .then(venues => {
                 currentSearchResults = venues;
@@ -127,7 +128,8 @@ async function checkAndRedirectAdmin() {
         
         // If no cached info, fetch user details
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const response = await fetch(`http://localhost:8080/api/auth/users/search?query=${encodeURIComponent(payload.sub)}`, {
+        const API_BASE = window.API_BASE || 'http://localhost:8080';
+        const response = await fetch(`${API_BASE}/api/auth/users/search?query=${encodeURIComponent(payload.sub)}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -562,3 +564,83 @@ function hideLoading() {
     // Can be implemented later for loading indicators
     console.log('Loading complete.');
 }
+
+// PlannrAI Assistant: open/close and visibility for non-registered users
+function openPlannrAI() {
+    const modal = document.getElementById('plannrai-assistant-modal');
+    if (!modal) return;
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closePlannrAI() {
+    const modal = document.getElementById('plannrai-assistant-modal');
+    if (!modal) return;
+    modal.setAttribute('aria-hidden', 'true');
+    try {
+        localStorage.removeItem('plannrai_chat_history');
+    } catch (e) {
+        console.warn('Failed to remove plannrai_chat_history from localStorage', e);
+    }
+    // If the assistant is loaded inside an iframe (cross-origin), request it to clear its own storage.
+    try {
+        const iframe = document.getElementById('plannrai-iframe');
+        if (iframe && iframe.contentWindow) {
+            // Determine a safe targetOrigin from the iframe src if possible
+            let targetOrigin = '*';
+            try {
+                const src = iframe.getAttribute('src');
+                if (src) {
+                    const url = new URL(src, window.location.href);
+                    targetOrigin = url.origin;
+                }
+            } catch (err) {
+                // fallback to wildcard
+            }
+            // Send a message the iframe can listen for and clear its own localStorage
+            iframe.contentWindow.postMessage({ type: 'plannrai_clear_history' }, targetOrigin);
+        }
+    } catch (err) {
+        console.warn('Failed to postMessage to plannrai iframe to clear history', err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Wire up the floating button
+    const btn = document.getElementById('plannrai-assistant-btn');
+    const modal = document.getElementById('plannrai-assistant-modal');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            openPlannrAI();
+            // example analytics placeholder
+            try { if (window.dataLayer) window.dataLayer.push({ event: 'open_plannrai_assistant' }); } catch(e){}
+        });
+    }
+
+    // Close when clicking backdrop or close control
+    if (modal) {
+        modal.querySelector('.plannrai-modal-backdrop')?.addEventListener('click', closePlannrAI);
+        modal.querySelector('.plannrai-close')?.addEventListener('click', closePlannrAI);
+    }
+
+    // Only show assistant to non-logged-in users
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+        // Hide button for logged-in users
+        if (btn) btn.style.display = 'none';
+    } else {
+        // show for guests
+        if (btn) {
+            btn.style.display = 'flex';
+            // Add pulse to draw attention
+            btn.classList.add('pulse');
+        }
+
+        // Welcome message for first-time visitors only
+        const welcomeShown = localStorage.getItem('plannrai_welcome_shown');
+        // Add a listener to stop the pulse after first user interaction
+        if (btn) {
+            const stopPulse = () => { btn.classList.remove('pulse'); btn.removeEventListener('click', stopPulse); };
+            btn.addEventListener('click', stopPulse);
+        }
+    }
+});

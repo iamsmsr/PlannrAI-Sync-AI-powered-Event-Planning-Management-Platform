@@ -5,7 +5,8 @@ let currentSearchResults = [];
 
 // Search venues function
 function searchVenues(location, activity) {
-    const url = `http://localhost:8080/api/venues/search?location=${location}&activity=${activity}`;
+    const API_BASE = window.API_BASE || 'http://localhost:8080';
+    const url = `${API_BASE}/api/venues/search?location=${location}&activity=${activity}`;
     
     console.log('Searching with URL:', url);
     

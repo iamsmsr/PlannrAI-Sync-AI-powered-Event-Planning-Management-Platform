@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8080';
+const API_BASE = window.API_BASE || 'http://localhost:8080';
 
 function renderBusinessInfo() {
     const infoDiv = document.getElementById('businessInfoContent');
@@ -48,7 +48,7 @@ async function renderBusinessServices(businessId) {
                 <div class="service-item">
                     <div class="service-detail"><strong>Event Type:</strong> ${service.eventType}</div>
                     <div class="service-detail"><strong>Price Range:</strong> ${service.priceRange}</div>
-                    <div class="service-detail"><strong>Experience with Venues:</strong> ${service.venueIds && service.venueIds.length ? service.venueIds.join(', ') : 'None'}</div>
+                    <div class="service-detail"><strong>Experience with Venues:</strong> ${(service.venueNames && service.venueNames.length) ? service.venueNames.join(', ') : ((service.venueIds && service.venueIds.length) ? service.venueIds.join(', ') : 'None')}</div>
                 </div>
             `).join('');
     } catch (err) {
@@ -150,7 +150,7 @@ async function loadVenueList() {
 
         venueListDiv.innerHTML = venues.map(venue => `
             <label class="venue-item">
-                <input type="checkbox" name="venueExperience" value="${venue.id}" />
+                <input type="checkbox" name="venueExperience" value="${venue.venueName}" />
                 ${venue.venueName}
             </label>
         `).join('');
@@ -170,7 +170,7 @@ async function handleServiceFormSubmit(e) {
     const eventType = document.getElementById('eventType').value;
     const priceRange = document.getElementById('priceRange').value.trim();
     const venueCheckboxes = document.querySelectorAll('input[name="venueExperience"]:checked');
-    const venueIds = Array.from(venueCheckboxes).map(cb => cb.value);
+    const venueNames = Array.from(venueCheckboxes).map(cb => cb.value);
 
     if (!eventType || !priceRange) {
         showAddServiceError('Please fill all required fields.');
@@ -182,7 +182,7 @@ async function handleServiceFormSubmit(e) {
             businessId: business.id,
             eventType,
             priceRange,
-            venueIds
+            venueNames
         };
 
         const resp = await fetch(`${API_BASE}/api/business/service`, {

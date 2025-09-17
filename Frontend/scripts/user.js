@@ -52,8 +52,9 @@ async function handleBusinessIdLogin(e) {
         errorDiv.style.display = 'block';
         return;
     }
-    try {
-        const res = await fetch(`http://localhost:8080/api/business/${id}`);
+        try {
+        const API_BASE = window.API_BASE || 'http://localhost:8080';
+            const res = await fetch(`${API_BASE}/api/business/${id}`);
         if (!res.ok) {
             errorDiv.textContent = 'Business not found or not approved yet.';
             errorDiv.style.display = 'block';
@@ -235,7 +236,7 @@ async function handleCorporateSubmit(event) {
         if (authToken) {
             headers['Authorization'] = `Bearer ${authToken}`;
         }
-        const response = await fetch('http://localhost:8080/api/business/inquiry', {
+    const response = await fetch(`${API_BASE}/api/business/inquiry`, {
             method: 'POST',
             headers,
             body: JSON.stringify(corporateData)
@@ -299,7 +300,7 @@ async function handleSignup(event) {
     
     try {
         // TODO: Replace with actual backend URL
-        const response = await fetch('http://localhost:8080/api/auth/signup', {
+    const response = await fetch(`${API_BASE}/api/auth/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -357,7 +358,7 @@ async function handleSignin(event) {
     
     try {
         // TODO: Replace with actual backend URL
-        const response = await fetch('http://localhost:8080/api/auth/signin', {
+    const response = await fetch(`${API_BASE}/api/auth/signin`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -669,7 +670,14 @@ function showDashboard() {
     }
     
     // Update navigation
-    updateNavigation(true);
+    // By default show public navbar when rendering the dashboard (per request)
+    // This will make the navbar appear like the logged-out view even while on the dashboard.
+    try {
+        updateNavigation(false);
+    } catch (e) {
+        // Fallback to logged-in navigation if updateNavigation fails
+        updateNavigation(true);
+    }
     
     // Save current state
     setTimeout(() => {
@@ -911,7 +919,7 @@ async function loadUserBookings() {
         let collaboratorBookings = [];
         try {
             // Fetch bookings where user is owner
-            const response = await fetch(`http://localhost:8080/api/venues/bookings/user/${userData.id}`, {
+            const response = await fetch(`${API_BASE}/api/venues/bookings/user/${userData.id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -926,7 +934,7 @@ async function loadUserBookings() {
             }
 
             // Fetch bookings where user is a collaborator (by email)
-            const collabRes = await fetch(`http://localhost:8080/api/venues/bookings/collaborator/${encodeURIComponent(userData.email)}`, {
+            const collabRes = await fetch(`${API_BASE}/api/venues/bookings/collaborator/${encodeURIComponent(userData.email)}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -994,18 +1002,25 @@ async function loadUserBookings() {
                             );
                         });
 
-                        if (userCoords && venue.address) {
-                            // Get venue coordinates and swap lat/long order for OSRM
-                            let venueCoords = extractCoordinates(venue.address);
-                            // Split coordinates and reverse order
-                            venueCoords = venueCoords.split(',').reverse().join(',');
-                            
-                            // Get route information using OSRM
+                        // Compute venue coordinates from venue.address if available
+                        if (venue.address && venue.address.includes('|')) {
                             try {
-                                console.log('Fetching route from', userCoords, 'to', venueCoords);
-                                const routeResponse = await fetch(`http://router.project-osrm.org/route/v1/driving/${userCoords};${venueCoords}?overview=false`);
+                                let venueCoords = extractCoordinates(venue.address); // expected 'lat,lng'
+                                // Reverse to 'lng,lat' for OSRM consistency
+                                venueCoords = venueCoords.split(',').reverse().join(',');
+                                booking.venueCoords = venueCoords;
+                            } catch (err) {
+                                console.warn('Failed to parse venue coordinates for booking', booking.id, err);
+                            }
+                        }
+
+                        // If we have user's coords as well, try fetching driving distance/duration
+                        if (userCoords && booking.venueCoords) {
+                            try {
+                                console.log('Fetching route from', userCoords, 'to', booking.venueCoords);
+                                const routeResponse = await fetch(`https://router.project-osrm.org/route/v1/driving/${userCoords};${booking.venueCoords}?overview=false`);
                                 const routeData = await routeResponse.json();
-                                
+
                                 if (routeData.routes && routeData.routes[0]) {
                                     venue.distanceInfo = {
                                         distance: (routeData.routes[0].distance / 1000).toFixed(2), // Convert to km
@@ -1014,7 +1029,6 @@ async function loadUserBookings() {
                                     // Also add the distance info and coordinates to the booking
                                     booking.distanceInfo = venue.distanceInfo;
                                     booking.userCoords = userCoords;
-                                    booking.venueCoords = venueCoords;
                                 }
                             } catch (error) {
                                 console.error('Error fetching route information:', error);
@@ -1368,7 +1382,7 @@ function isUpcomingBooking(selectedDates) {
 }
 
 // API base URL - can be changed for different environments
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = (window.API_BASE || 'http://localhost:8080') + '/api';
 
 // Rating and Review Functions
 function showRatingModal(bookingId) {
@@ -1486,7 +1500,7 @@ async function submitRatings(bookingId) {
         for (const service of serviceRatings) {
             if (service.rating > 0) {
                 console.log(`Submitting ${service.type} rating:`, service.rating, 'for booking:', bookingId);
-                const response = await fetch(`http://localhost:8080/api/business/rating`, {
+                const response = await fetch(`${API_BASE}/api/business/rating`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1510,7 +1524,7 @@ async function submitRatings(bookingId) {
         // Submit venue rating and review
         if (venueRating) {
             console.log('Submitting venue rating:', venueRating, 'for booking:', bookingId);
-            const venueResponse = await fetch(`http://localhost:8080/api/venues/rating`, {
+            const venueResponse = await fetch(`${API_BASE}/api/venues/rating`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1542,7 +1556,8 @@ async function submitRatings(bookingId) {
 // Function to show route on map
 function showRouteOnMap(userCoords, venueCoords) {
     // Open map.html with coordinates as parameters
-    const url = `map.html?showRoute=true&from=${userCoords}&to=${venueCoords}`;
+    // If userCoords is not available, omit the 'from' parameter and let map.js try browser geolocation
+    const url = userCoords ? `map.html?showRoute=true&from=${encodeURIComponent(userCoords)}&to=${encodeURIComponent(venueCoords)}` : `map.html?showRoute=true&to=${encodeURIComponent(venueCoords)}`;
     window.open(url, '_blank');
 }
 
@@ -1687,12 +1702,12 @@ function createBookingStatusCard(booking) {
                     <p><strong>Selected Dates:</strong> ${formattedDates}</p>
                     <p><strong>Booking Date:</strong> ${bookingDate}</p>
                     ${weatherHTML}
-                    ${booking.distanceInfo ? `
+                    ${booking.venueCoords ? `
                         <div class="distance-info" style="margin-top: 10px; padding: 8px; background: #f3f4f6; border-radius: 6px;">
                             <h5 style="margin: 0 0 8px 0; color: #374151;">🚗 Travel Information</h5>
-                            <p style="margin: 4px 0;"><strong>Distance:</strong> ${booking.distanceInfo.distance} km</p>
-                            <p style="margin: 4px 0;"><strong>Estimated time:</strong> ${booking.distanceInfo.duration} minutes</p>
-                            <button onclick="showRouteOnMap('${booking.userCoords}', '${booking.venueCoords}')" 
+                            ${booking.distanceInfo ? `<p style="margin: 4px 0;"><strong>Distance:</strong> ${booking.distanceInfo.distance} km</p>
+                            <p style="margin: 4px 0;"><strong>Estimated time:</strong> ${booking.distanceInfo.duration} minutes</p>` : `<p style="margin:4px 0;color:#6b7280;">Distance not calculated. Click below to view route.</p>`}
+                            <button onclick="showRouteOnMap('${booking.userCoords || ''}', '${booking.venueCoords}')" 
                                     style="background: #059669; color: white; border: none; border-radius: 4px; 
                                            padding: 6px 12px; margin-top: 8px; cursor: pointer; width: 100%;">
                                 🗺️ Show Route
@@ -1884,7 +1899,7 @@ async function confirmBooking(bookingId) {
         console.log('Sending booking data to backend:', bookingData);
         
         // Send to backend
-        const response = await fetch('http://localhost:8080/api/venues/bookings', {
+    const response = await fetch(`${API_BASE}/api/venues/bookings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

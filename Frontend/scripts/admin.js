@@ -1,7 +1,8 @@
 // Admin Dashboard JavaScript
 
 // Configuration
-const API_BASE_URL = 'http://localhost:8080'; // Update this when deploying
+const API_BASE = window.API_BASE || 'http://localhost:8080'; // Page-level API base
+const API_BASE_URL = API_BASE; // Backwards-compatible name
 
 // Global variables
 let currentAdminUser = null;

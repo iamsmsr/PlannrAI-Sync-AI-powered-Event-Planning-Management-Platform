@@ -1,7 +1,7 @@
 // Simple Chat for chat.html
 console.log('Chat script loaded');
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = window.API_BASE || 'http://localhost:8080';
 let currentUserId = null;
 let currentUserEmail = null;
 

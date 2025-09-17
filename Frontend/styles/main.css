@@ -257,3 +257,133 @@ body {
         font-size: 2.5rem;
     }
 }
+
+/* PlannrAI Assistant Floating Button & Modal */
+#plannrai-assistant-btn {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    background: linear-gradient(135deg,#0066ff,#00c2a8);
+    color: white;
+    border: none;
+    padding: 14px 18px; /* slightly smaller */
+    border-radius: 999px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.16);
+    font-weight: 800;
+    font-size: 1rem; /* slightly reduced */
+    cursor: pointer;
+    z-index: 2000;
+    display: flex;
+    gap: 10px; /* slightly reduced */
+    align-items: center;
+}
+
+#plannrai-assistant-btn:hover {
+    transform: translateY(-3px);
+}
+
+/* subtle attention animation (gentle scale + fade) */
+@keyframes plannrai-subtle {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-3px) scale(1.03); opacity: 0.98; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+#plannrai-assistant-btn.pulse {
+    animation: plannrai-subtle 2.5s ease-in-out infinite;
+}
+
+.plannrai-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 2100;
+}
+
+.plannrai-modal[aria-hidden="false"] {
+    display: block;
+}
+
+.plannrai-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+}
+
+.plannrai-modal-panel {
+    position: absolute;
+    right: 12px; /* moved closer to the right edge */
+    bottom: 90px;
+    width: 560px; /* slightly wider for a larger iframe */
+    max-width: calc(100% - 24px);
+    height: 720px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.plannrai-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(90deg,#0066ff,#00c2a8);
+    color: white;
+}
+
+.plannrai-modal-header h3 { margin: 0; font-size: 1rem; }
+.plannrai-close {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.plannrai-modal-body { flex: 1; background: #f7fafc; }
+.plannrai-modal-body {
+    flex: 1;
+    background: #f7fafc;
+    padding-bottom: 10px; /* ensure space for embedded controls */
+}
+.plannrai-modal-body iframe {
+    width: 100%;
+    height: calc(100% - 10px); /* leave small room so send button isn't clipped */
+    border: 0;
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .plannrai-modal-panel { width: 100%; height: 70vh; right: 0; bottom: 0; border-radius: 12px 12px 0 0; }
+    #plannrai-assistant-btn { right: 16px; bottom: 16px; padding: 12px 14px; }
+}
+
+/* Assistant Portal Button */
+.assistant-portal-btn {
+    display: inline-block;
+    margin-top: 12px;
+    background: linear-gradient(90deg,#0a6bff 0%, #0066ff 45%, #00c2a8 100%);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 999px; /* pill */
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.2px;
+    box-shadow: 0 10px 30px rgba(10,107,255,0.18), 0 4px 10px rgba(0,0,0,0.08);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    position: relative;
+}
+.assistant-portal-btn::before {
+    content: '✨';
+    display: inline-block;
+    margin-right: 10px;
+    transform: translateY(-1px);
+}
+.assistant-portal-btn:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 18px 44px rgba(10,107,255,0.22), 0 6px 16px rgba(0,0,0,0.12);
+}

@@ -30,7 +30,7 @@ public class BusinessController {
                 request.getBusinessId(),
                 request.getEventType(),
                 request.getPriceRange(),
-                request.getVenueIds()
+                request.getVenueNames()
             );
             return ResponseEntity.ok(Map.of("message", "Service added successfully", "business", updated));
         } catch (Exception e) {
@@ -43,51 +43,23 @@ public class BusinessController {
         private String businessId;
         private String eventType;
         private String priceRange;
-        private List<String> venueIds;
-
+        private List<String> venueNames;
         public String getBusinessId() { return businessId; }
         public void setBusinessId(String businessId) { this.businessId = businessId; }
         public String getEventType() { return eventType; }
         public void setEventType(String eventType) { this.eventType = eventType; }
         public String getPriceRange() { return priceRange; }
         public void setPriceRange(String priceRange) { this.priceRange = priceRange; }
-        public List<String> getVenueIds() { return venueIds; }
-        public void setVenueIds(List<String> venueIds) { this.venueIds = venueIds; }
+        public List<String> getVenueNames() { return venueNames; }
+        public void setVenueNames(List<String> venueNames) { this.venueNames = venueNames; }
+
     }
 
     /**
      * Search for businesses by role with optional query parameter
      * Example: /api/business/search?role=cook&q=italian
      */
-    @PostMapping("/inquiry")
-    public ResponseEntity<?> submitInquiry(@RequestBody Business inquiryDTO) {
-    try {
-        Business inquiry = businessService.saveInquiry(
-            inquiryDTO.getName(),
-            inquiryDTO.getEmail(),
-            inquiryDTO.getCompanyName(),
-            inquiryDTO.getPhone(),
-            inquiryDTO.getRole()
-        );
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Here is your id: " + inquiry.getId() + ". you'll be able to use it once approved");
-        response.put("inquiry", Map.of(
-            "id", inquiry.getId(),
-            "companyName", inquiry.getCompanyName(),
-            "email", inquiry.getEmail(),
-            "phone", inquiry.getPhone(),
-            "role",  inquiry.getRole(),
-            "rating", inquiry.getRating()
-        ));
-
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        Map<String, String> error = new HashMap<>();
-        error.put("message", "Error submitting inquiry: " + e.getMessage());
-        return ResponseEntity.badRequest().body(error);
-    }
-    }
+    // (submitInquiry removed)
     @GetMapping("/search")
     public ResponseEntity<?> searchBusinesses(
             @RequestParam("role") String role,
