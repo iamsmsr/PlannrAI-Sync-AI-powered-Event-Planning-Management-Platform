@@ -16,7 +16,6 @@ PlannrAI Sync is an intelligent RESTful event management platform or web applica
 
 ⭐ Ratings & Reviews – Build trust through feedback and vendor ratings.
 
-📊 Vendor Management – Vendors list services, handle bookings, and manage availability.
 
 **Tech Stack**
 
