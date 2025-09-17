@@ -5,8 +5,11 @@
 
 (function(){
     if (!window.API_BASE) {
-        window.API_BASE = 'http://localhost:8080';
+        window.API_BASE = 'https://plannraisyncb.onrender.com';
     }
     // Provide a convenience constant available in modules/scripts that don't read window
     try { window.API_BASE_STRING = window.API_BASE; } catch(e) { /* ignore */ }
 })();
+
+//https://plannraisyncb.onrender.com
+//http://localhost:8080
