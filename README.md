@@ -10,7 +10,7 @@ PlannrAI Sync is an intelligent RESTful event management platform or web applica
 
 🤖 AI Assistance (Bengali & English) – Get suggestions for decorations, budgeting, and planning from RAG ChatBot.
 
-🖼️ — AI Image Studio: text-to-photo, photo-to-photo, background remover.
+🖼️ AI Image Studio: text-to-photo, photo-to-photo, background remover.
 
 🌦 Live Weather Updates – Plan better with real-time weather insights.
 
