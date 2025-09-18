@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,7 +32,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/health", "/health/**").permitAll()
+                // Root endpoints - completely public - NO AUTHENTICATION REQUIRED
+                .requestMatchers("/", "/ping", "/status", "/health").permitAll()
+                .requestMatchers("/health/**").permitAll() 
+                .requestMatchers("/error").permitAll()
+                .requestMatchers("/actuator/**").permitAll() // Spring Boot Actuator endpoints
                 .requestMatchers("/api/auth/users/search").permitAll() // Allow user search for business users
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/venues/**").permitAll()
@@ -39,8 +44,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/chat/**").permitAll()  // Allow chat endpoints
                 .requestMatchers("/ws/**").permitAll()  // Allow WebSocket connections
                 .requestMatchers("/api/business/**").permitAll() // Allow business inquiry public access
+                //.anyRequest().permitAll()
                 .anyRequest().authenticated()
             )
+            // Do NOT add JWT filter for health check endpoints
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

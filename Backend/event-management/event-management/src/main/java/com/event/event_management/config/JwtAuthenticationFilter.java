@@ -21,6 +21,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+            
+        // Bypass security completely for health endpoints
+        String requestPath = request.getRequestURI();
+        if (requestPath.equals("/health") || 
+            requestPath.equals("/ping") || 
+            requestPath.equals("/status") || 
+            requestPath.equals("/") ||
+            requestPath.equals("/api/venues/health") ||
+            requestPath.startsWith("/actuator/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+            
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);

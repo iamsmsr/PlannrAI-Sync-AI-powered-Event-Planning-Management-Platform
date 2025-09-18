@@ -41,7 +41,7 @@ function initializeApp() {
     setupActivityButtons();
     setupSearchButton();
     setupChatButton(); // Add chat button setup
-    setupHealthIndicator();
+    // Health indicator moved to index1.html
     
     // Initially hide results section
     document.querySelector('.results-section').style.display = 'none';
@@ -59,61 +59,7 @@ function initializeApp() {
     }, 100);
 }
 
-// Health indicator: fetch backend /health and update navbar
-function setupHealthIndicator() {
-    const nav = document.querySelector('.nav-links');
-    if (!nav) return;
-
-    // (removed navbar health badge - overlay handles user feedback)
-
-    const API_BASE = window.API_BASE || 'http://localhost:8080';
-
-    const overlay = document.getElementById('renderLoadingOverlay');
-    const overlaySub = document.getElementById('renderLoadingSub');
-    const retryBtn = document.getElementById('renderRetryBtn');
-
-    function showOverlay(msg) {
-        if (!overlay) return;
-        overlay.style.display = 'flex';
-        if (overlaySub) overlaySub.textContent = msg;
-    }
-
-    function hideOverlay() {
-        if (!overlay) return;
-        overlay.style.display = 'none';
-    }
-
-    function doHealthPing(attempt = 1) {
-        if (overlay) showOverlay(['Waking up Render — brewing espresso', 'Gentle nudges being sent to the backend', 'Asking nicely: please wake up!'][attempt % 3]);
-
-        fetch(`${API_BASE}/health`, { cache: 'no-store' })
-            .then(resp => {
-                if (resp.ok) return resp.text();
-                throw new Error('Not OK');
-            })
-            .then(text => {
-                // backend is ready — hide overlay
-                hideOverlay();
-            })
-            .catch(err => {
-                console.warn('Health check failed', err);
-                // keep overlay shown with a friendly message
-                // Keep overlay shown with a humorous message and allow retry
-                if (overlaySub) overlaySub.textContent = 'Render is still waking up. You can try again or wait a few seconds.';
-                // Auto-retry a few times with backoff
-                if (attempt < 4) {
-                    setTimeout(() => doHealthPing(attempt + 1), 2500 * attempt);
-                }
-            });
-    }
-
-    retryBtn?.addEventListener('click', function() {
-        doHealthPing(1);
-    });
-
-    // Start initial ping
-    doHealthPing(1);
-}
+// Health indicator removed (handled by index1.html)
 
 // State Management Functions
 function initializeStateManagement() {

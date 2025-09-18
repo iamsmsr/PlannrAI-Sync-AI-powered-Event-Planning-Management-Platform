@@ -5,17 +5,24 @@ import com.event.event_management.user.service.BusinessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
+import java.net.URL;
+import java.net.HttpURLConnection;
 
 @RestController
 @RequestMapping("/api/business")
 @CrossOrigin(origins = "*")
 
 public class BusinessController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BusinessController.class);
 
     @Autowired
     private BusinessService businessService;
@@ -32,7 +39,38 @@ public class BusinessController {
                 request.getPriceRange(),
                 request.getVenueNames()
             );
-            return ResponseEntity.ok(Map.of("message", "Service added successfully", "business", updated));
+            // // Fire-and-forget: schedule a single asynchronous POST to the AI server and do not block
+            // logger.info("⏱ Scheduling vector store update for businessId={}", request.getBusinessId());
+            // CompletableFuture.runAsync(() -> {
+            //     logger.info("🏃 Vector update async started for businessId={}", request.getBusinessId());
+            //     HttpURLConnection conn = null;
+            //     try {
+            //         URL url = new URL("https://plannrai-sync-chatbot.onrender.com/update-vector-store");
+            //         conn = (HttpURLConnection) url.openConnection();
+            //         conn.setRequestMethod("POST");
+            //         conn.setConnectTimeout(3000);
+            //         conn.setReadTimeout(5000);
+            //         conn.setDoOutput(true);
+            //         conn.connect();
+
+            //         int status = conn.getResponseCode();
+            //         logger.info("Triggered vector update (fire-and-forget) status={}", status);
+            //     } catch (Exception ex) {
+            //         // Swallow errors so the main flow is never affected
+            //         logger.error("Failed to trigger vector update (ignored): {}", ex.getMessage());
+            //     } finally {
+            //         if (conn != null) conn.disconnect();
+            //     }
+            // });
+
+            // Trigger is currently commented out in the source; record that it was NOT scheduled
+            logger.info("Vector update trigger is disabled in BusinessController; no async call scheduled for businessId={}", request.getBusinessId());
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Service added successfully");
+            response.put("business", updated);
+            response.put("vectorUpdateScheduled", false);
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", "Error: " + e.getMessage()));
         }

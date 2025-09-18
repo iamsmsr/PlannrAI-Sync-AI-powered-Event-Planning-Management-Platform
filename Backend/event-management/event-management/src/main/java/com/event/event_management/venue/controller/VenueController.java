@@ -23,6 +23,12 @@ public class VenueController {
     @Autowired
     private VenueService venueService;
     
+    // Health check endpoint moved to working controller
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("OK");
+    }
+    
     @GetMapping("/search")
     public ResponseEntity<List<Venue>> searchVenues(
             @RequestParam(name = "location", required = false, defaultValue = "Dhaka") String location,

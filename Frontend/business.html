@@ -28,15 +28,41 @@
             <button id="addServiceBtn" class="action-button">Add Service</button>
         </div>
     </div>
-        <!-- Add Service Modal -->
-        <div id="addServiceModal">
-            <div class="modal-content">
-                <button onclick="closeAddServiceModal()" class="modal-close">&times;</button>
-                <h2>Add Service</h2>
-                <form id="addServiceForm">
-                    <div class="form-group">
-                        <label class="form-label" for="eventType">Event Type:</label>
-                        <script src="scripts/business.js"></script>
-                    
+
+    <!-- Add Service Modal -->
+    <div id="addServiceModal" class="modal">
+        <div class="modal-content">
+            <button onclick="closeAddServiceModal()" class="modal-close">&times;</button>
+            <h2>Add Service</h2>
+            <form id="addServiceForm">
+                <div class="form-group">
+                    <label class="form-label" for="eventType">Event Type:</label>
+                    <input id="eventType" name="eventType" class="form-input" placeholder="e.g. Wedding, Conference" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="priceRange">Price Range:</label>
+                    <input id="priceRange" name="priceRange" class="form-input" placeholder="e.g. $500 - $2000" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Experience with Venues:</label>
+                    <div id="venueList" class="venue-list">
+                        <!-- venue checkboxes populated dynamically -->
+                    </div>
+                </div>
+
+                <div id="addServiceError" class="error-message" style="display:none"></div>
+                <div id="addServiceSuccess" class="success-message" style="display:none"></div>
+
+                <div class="form-actions">
+                    <button type="submit" class="action-button">Save Service</button>
+                    <button type="button" onclick="closeAddServiceModal()" class="secondary-button">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/business.js"></script>
 </body>
 </html>

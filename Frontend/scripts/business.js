@@ -137,6 +137,10 @@ function closeAddServiceModal() {
 
 async function loadVenueList() {
     const venueListDiv = document.getElementById('venueList');
+    if (!venueListDiv) {
+        console.warn('venueList element not found in DOM; skipping venue load');
+        return;
+    }
     venueListDiv.innerHTML = '<div class="loading">Loading venues...</div>';
     try {
         const response = await fetch(`${API_BASE}/api/venues/all`);
