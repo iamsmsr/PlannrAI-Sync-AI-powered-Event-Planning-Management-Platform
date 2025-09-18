@@ -120,7 +120,7 @@ async function checkAndRedirectAdmin() {
                                (currentUser.roles && currentUser.roles.includes('ADMIN'));
                 
                 if (isAdmin) {
-                    console.log('🔧 Admin user detected on index.html, redirecting to admin.html');
+                    console.log('🔧 Admin user detected on index1.html, redirecting to admin.html');
                     window.location.href = 'admin.html';
                     return;
                 }
@@ -148,7 +148,7 @@ async function checkAndRedirectAdmin() {
                                (currentUser.roles && currentUser.roles.includes('ADMIN'));
                 
                 if (isAdmin) {
-                    console.log('🔧 Admin user detected on index.html, redirecting to admin.html');
+                    console.log('🔧 Admin user detected on index1.html, redirecting to admin.html');
                     window.location.href = 'admin.html';
                     return;
                 }

@@ -121,12 +121,12 @@ async function initializeAuthOrBusiness() {
             } else {
                 // No auth, no business info: redirect to home
                 console.error('❌ No auth or business info found. Redirecting.');
-                window.location.href = 'index.html';
+                window.location.href = 'index1.html';
             }
         }
     } catch (error) {
         console.error('❌ Auth/Business error:', error);
-        window.location.href = 'index.html';
+        window.location.href = 'index1.html';
     }
 }
 
@@ -683,7 +683,7 @@ function setupNavigationButtons() {
         dashboardBtn.addEventListener('click', function(e) {
             e.preventDefault();
             console.log('🔧 Basic dashboard button clicked!');
-            window.location.href = 'index.html';
+            window.location.href = 'index1.html';
         });
     } else {
         console.error('❌ Dashboard button not found in DOM!');
@@ -805,7 +805,7 @@ function setupDashboardButtonForUser(currentUser) {
         newBtn.addEventListener('click', function(e) {
             e.preventDefault();
             console.log('🔧 User dashboard button clicked!');
-            window.location.href = 'index.html';
+            window.location.href = 'index1.html';
         });
         
         console.log('👤 Regular user - dashboard button redirects to user dashboard');
@@ -828,7 +828,7 @@ function setupFallbackDashboardButton() {
         newBtn.addEventListener('click', function(e) {
             e.preventDefault();
             console.log('🔧 Fallback dashboard button clicked!');
-            window.location.href = 'index.html';
+            window.location.href = 'index1.html';
         });
     }
 }

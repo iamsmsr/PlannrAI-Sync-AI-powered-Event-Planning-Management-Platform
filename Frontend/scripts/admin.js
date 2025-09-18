@@ -209,11 +209,11 @@ function adminLogout() {
 
 // Redirect functions
 function redirectToLogin() {
-    window.location.href = 'index.html';
+    window.location.href = 'index1.html';
 }
 
 function redirectToUserDashboard() {
-    window.location.href = 'index.html#dashboard';
+    window.location.href = 'index1.html#dashboard';
 }
 
 // Utility function to make authenticated API calls

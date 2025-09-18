@@ -32,7 +32,7 @@ fetch(`${API_BASE}/api/venues/all`)
                         <div style="font-size:0.9rem;color:#666;margin-bottom:6px;">
                             <span style='color:#f59e42;font-size:1.1em;'>★</span> ${venue.ratings ? venue.ratings : 'N/A'}
                         </div>
-                        <button style='background:#059669;color:#fff;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:0.95rem;margin-top:4px;' onclick='window.location.href="index.html?viewDates=${venue.id}&venueName=${encodeURIComponent(venue.venueName)}&autoBook=true"'>View Dates</button>
+                        <button style='background:#059669;color:#fff;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-size:0.95rem;margin-top:4px;' onclick='window.location.href="index1.html?viewDates=${venue.id}&venueName=${encodeURIComponent(venue.venueName)}&autoBook=true"'>View Dates</button>
                     </div>
                 `;
                 L.marker([lat, lng]).addTo(map)
@@ -52,9 +52,9 @@ const autoBook = urlParams.get('autoBook');
 
 if (venueId && venueName && autoBook) {
     console.log('🔄 Map: Auto-booking requested for venue:', venueName);
-    // Redirect to index.html with booking intent
+    // Redirect to index1.html with booking intent
     setTimeout(() => {
-        window.location.href = `index.html?viewDates=${venueId}&venueName=${encodeURIComponent(venueName)}&autoBook=true`;
+        window.location.href = `index1.html?viewDates=${venueId}&venueName=${encodeURIComponent(venueName)}&autoBook=true`;
     }, 1000); // Small delay to let map load first
 }
 

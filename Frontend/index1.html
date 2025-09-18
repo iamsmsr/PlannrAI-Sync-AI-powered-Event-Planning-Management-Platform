@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlannrAI Sync</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/results.css">
+    <link rel="stylesheet" href="styles/calendar.css">
+    <link rel="stylesheet" href="styles/user.css">
+    <link rel="stylesheet" href="styles/chat.css">
+    <link rel="stylesheet" href="styles/rating.css">
+    <!-- Leaflet CSS for map support -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="scripts/config.js"></script>
+</head>
+<body class="loading">
+    <!-- Loading overlay removed: readiness is handled by index1.html now -->
+    <!-- Hero Section -->
+    <div class="hero">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="logo" style="position: relative;">
+                PlannrAI Sync
+                <span style="display: block; font-size: 0.75rem; color: #fff; font-weight: 500; margin-top: 2px;">AI-powered Event Planning &amp; Management</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" id="browseSpacesBtn" class="nav-link">Browse Spaces ▼</a>
+                <a href="#" class="nav-link" onclick="showCorporateModal()">Corporate Plans</a>
+                <a href="#" id="listSpaceBtn" class="nav-link">List Your Space</a>
+                <a href="#" class="nav-link dashboard-link" onclick="showDashboard()" style="display: none;">Dashboard</a>
+                <a href="realtimechat.html" class="nav-link realtime-chat-link" style="display: none; background: linear-gradient(45deg, #007bff, #0056b3); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; position: relative; margin-right: 10px;">
+                    🚀 Chat
+                    <span style="position: absolute; top: -2px; right: -2px; background: #ff6b6b; color: white; border-radius: 50%; width: 10px; height: 10px; font-size: 6px; display: flex; align-items: center; justify-content: center;">●</span>
+                </a>
+                <a href="#" class="nav-link" onclick="showAuthModal('signin')">Log In</a>
+                <button class="signup-btn" onclick="showAuthModal('signup')">Sign Up</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-section">
+                <label class="search-label">What are you planning?</label>
+                <div class="activity-buttons">
+                    <button class="activity-btn" data-activity="wedding">Wedding</button>
+                    <button class="activity-btn" data-activity="party">Party</button>
+                    <button class="activity-btn" data-activity="meeting">Meeting</button>
+                </div>
+            </div>
+            <div class="search-section">
+                <label class="search-label">Where?</label>
+                <input type="text" class="location-input" value="Dhaka" placeholder="Enter a city">
+            </div>
+            <button class="search-button">Search →</button>
+            <a href="map.html" class="search-button" style="margin-left: 10px; text-decoration: none; display: inline-block; background: #059669; color: #fff; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer;">Venues Near Me</a>
+        </div>
+
+        <!-- Hero Title -->
+        <div class="hero-title">
+            <h1>Find a space...</h1>
+            <h1>Fulfill your vison...</h1>
+        </div>
+    </div>
+    
+    <!-- Awards Section -->
+    <section class="awards-section">
+        <div class="awards-container">
+            <div class="awards-images">
+                <img src="https://media.istockphoto.com/id/1173488492/photo/making-a-grand-entrance-into-marriage.webp?a=1&b=1&s=612x612&w=0&k=20&c=W5M53I59wNj0G0dS6AT-Xa-VV-GX7IqiEDKkpt_bHV0=" alt="Venue 3">
+                <img src="https://plus.unsplash.com/premium_photo-1661386039533-c638967d8e21?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZXZlbnQlMjBoYWxsfGVufDB8fDB8fHww" alt="Venue 3">
+                <img src="https://media.istockphoto.com/id/869080440/photo/b-day-party.webp?a=1&b=1&s=612x612&w=0&k=20&c=VnQiVt894rZQbOCaVsQI3_BVSTkX6xcyj6tdEaRMfHs=" alt="Venue 3">
+                <img src="https://images.unsplash.com/photo-1560439514-07abbb294a86?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGJpZyUyMGNvcnBvcmF0ZSUyMGV2ZW50fGVufDB8fDB8fHww" alt="Venue 3">
+
+            
+            </div>
+            <div class="awards-text">
+                <p>Announcing the 2025</p>
+                <h2>OPEN DOOR AWARDS</h2>
+                <p>Discover the best in space for your Events</p>
+                <a href="#" class="awards-link">→</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <div class="results-header">
+            <div class="search-info">Found 0 venues</div>
+            <button class="back-btn" onclick="backToSearch()">← Back to Search</button>
+            <button class="show-map-btn" id="showMapBtn" style="margin-left:10px; background:#059669; color:#fff; border:none; border-radius:5px; padding:8px 18px; cursor:pointer; font-size:1rem;">Show Map</button>
+        </div>
+        <div class="venues-map-flex" style="display:flex; gap:24px; align-items:flex-start;">
+            <div class="venues-container" style="flex:1 1 0;">
+                <!-- Venue cards will be inserted here -->
+            </div>
+            <div id="sideMapContainer" style="flex:1 1 0; min-width:350px; max-width:600px; display:none;">
+                <div id="sideMap" style="height:70vh; width:100%; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,0.08);"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Small inline scripts for homepage interactions -->
+    <!-- Reusable centered modal for messages -->
+    <div id="homepageMsgModal" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; z-index:100000;">
+        <div style="position:absolute; inset:0; background:rgba(0,0,0,0.45);"></div>
+        <div style="position:relative; background:#fff; padding:22px; border-radius:10px; width:min(560px,92%); box-shadow: 0 10px 40px rgba(2,6,23,0.2);">
+            <div style="display:flex; justify-content:flex-end;"><button id="homepageMsgClose" style="background:transparent;border:none;font-size:20px;cursor:pointer;">×</button></div>
+            <div id="homepageMsgContent" style="padding:8px 6px; color:#111827; font-size:16px; line-height:1.4;"></div>
+        </div>
+    </div>
+
+    <script>
+        const homepageModal = document.getElementById('homepageMsgModal');
+        const homepageMsgContent = document.getElementById('homepageMsgContent');
+        const homepageMsgClose = document.getElementById('homepageMsgClose');
+
+        function showHomepageMessage(htmlContent) {
+            homepageMsgContent.innerHTML = htmlContent;
+            homepageModal.style.display = 'flex';
+        }
+
+        function closeHomepageMessage() {
+            homepageModal.style.display = 'none';
+            homepageMsgContent.innerHTML = '';
+        }
+
+        homepageMsgClose?.addEventListener('click', closeHomepageMessage);
+        // Close modal when clicking outside the dialog box
+        homepageModal?.addEventListener('click', function(e) {
+            if (e.target === homepageModal) closeHomepageMessage();
+        });
+
+        // Browse Spaces: centered message
+        document.getElementById('browseSpacesBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            showHomepageMessage('<h3 style="margin-top:0;">Coming soon</h3><p>The Browse Spaces feature is coming soon. Stay tuned for updates.</p>');
+        });
+
+        // List Your Space: centered message with contact email
+        document.getElementById('listSpaceBtn')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            showHomepageMessage('<h3 style="margin-top:0;">List Your Space</h3><p>Please email us at <strong>plannaraisync@spcae.com</strong> with your space details and our team will get back to you.</p>');
+        });
+    </script>
+
+    <!-- Calendar Modal -->
+    <div class="calendar-modal" id="calendarModal">
+        <div class="modal-overlay" onclick="closeCalendar()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="venue-title">Select Dates</h2>
+                <button class="close-btn" onclick="closeCalendar()">×</button>
+            </div>
+            <div class="month-selector">
+                <!-- Month buttons will be generated here -->
+            </div>
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="day-label">Sun</div>
+                    <div class="day-label">Mon</div>
+                    <div class="day-label">Tue</div>
+                    <div class="day-label">Wed</div>
+                    <div class="day-label">Thu</div>
+                    <div class="day-label">Fri</div>
+                    <div class="day-label">Sat</div>
+                </div>
+                <div class="calendar-grid">
+                    <!-- Calendar days will be generated here -->
+                </div>
+            </div>
+            <div class="calendar-legend">
+                <div class="legend-item">
+                    <div class="legend-color available"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color booked"></div>
+                    <span>Booked</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color temp-hold"></div>
+                    <span>Temporarily Hold</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color selected"></div>
+                    <span>Selected</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeCalendar()">Cancel</button>
+                <button class="book-dates-btn" onclick="bookDates()">Book Dates</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <section class="dashboard-section">
+        <div class="dashboard-container">
+            <!-- Duplicate of top navbar for dashboard view to ensure consistent navigation -->
+            <div class="dashboard-top-navbar" style="margin-bottom:16px;">
+                <nav class="navbar" style="position:static;padding:12px 16px;background:transparent;">
+                    <div class="logo" style="position: relative; color: #000;">
+                        PlannrAI Sync
+                        <span style="display: block; font-size: 0.75rem; color: #666; font-weight: 500; margin-top: 2px;">AI-powered Event Planning &amp; Management</span>
+                    </div>
+                </nav>
+            </div>
+            <div class="dashboard-header">
+                <h1 class="dashboard-welcome">Welcome!</h1>
+                <p class="dashboard-subtitle">Manage your bookings and account settings</p>
+                <p>Email: <span class="dashboard-email">user@example.com</span></p>
+                <button class="dashboard-logout-btn" onclick="logout()">Logout</button>
+            </div>
+            
+            <div class="dashboard-nav">
+                <button class="dashboard-nav-btn active" onclick="switchDashboardTab('overview')">Overview</button>
+                <button class="dashboard-nav-btn" onclick="switchDashboardTab('bookings')">My Bookings</button>
+                <button class="dashboard-nav-btn" onclick="switchDashboardTab('profile')">Profile</button>
+                <button class="dashboard-nav-btn" onclick="goToSearchFromDashboard()">Search Venues</button>
+                <button class="dashboard-nav-btn" id="dashboardChatBtn" onclick="window.location.href='chat.html'">Chat</button>
+                <button class="dashboard-nav-btn" id="dashboardRealtimeChatBtn" onclick="window.location.href='realtimechat.html'" style="background: linear-gradient(45deg, #007bff, #0056b3); color: white; position: relative;">
+                    🚀 Real-Time Chat
+                    <span style="position: absolute; top: -5px; right: -5px; background: #ff6b6b; color: white; border-radius: 50%; width: 12px; height: 12px; font-size: 8px; display: flex; align-items: center; justify-content: center;">●</span>
+                </button>
+            </div>
+            
+            <div class="dashboard-content">
+                <!-- Overview Section -->
+                <div class="dashboard-overview" id="overviewSection">
+                    <div class="dashboard-empty">
+                        <!-- Venue Assistant Portal Button (kept) -->
+                        <div style="margin-top: 8px;">
+                            <h3 style="color: #007bff;">Venue Assistant</h3>
+                            <p style="font-size: 14px; color: #666; margin-top: 8px;">Open the assistant studio to manage or chat with the Venue Assistant.</p>
+                            <a href="https://plannrai-sync-chatbot.onrender.com/studio/index.html" target="_blank" rel="noopener" class="assistant-portal-btn">Open PlannrAI Studio</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- My Bookings Section -->
+                <div class="dashboard-bookings" id="bookingsSection" style="display: none;">
+                    <div class="bookings-header">
+                        <h3>Booking Status Dashboard</h3>
+                        <p>Track your venue booking requests and their approval status</p>
+                    </div>
+                    <div class="bookings-container">
+                        <!-- Booking cards will be inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Chat Section -->
+                <div class="dashboard-chat" id="chatSection" style="display: none;">
+                    <div class="chat-container">
+                        <div class="chat-sidebar">
+                            <div class="chat-sidebar-header">
+                            </div>
+                            <div id="chatListContainer"></div>
+                        </div>
+                        <div class="chat-main">
+                            <h3>Messages</h3>
+                            <div id="chatMessagesContainer" class="chat-messages"></div>
+                            <div class="chat-input-container">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Profile Section -->
+                <div class="dashboard-profile" id="profileSection" style="display: none;">
+                    <div class="dashboard-empty">
+                        <h3>Profile Settings</h3>
+                        <p>Profile management features will be available here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Authentication Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <h2 class="auth-modal-title" id="authModalTitle">Welcome</h2>
+                <button class="auth-close-btn" onclick="closeAuthModal()">×</button>
+            </div>
+            
+            <!-- Sign In Form -->
+            <div id="signinFormContainer" class="auth-form-container">
+                <div class="error-message" id="signinError"></div>
+                <form id="signinForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label" for="signinEmail">Email</label>
+                        <input type="email" id="signinEmail" name="email" class="form-input" 
+                               placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signinPassword">Password</label>
+                        <input type="password" id="signinPassword" name="password" class="form-input" 
+                               placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Sign In</button>
+                </form>
+                <div class="auth-switch">
+                    <p class="auth-switch-text">Don't have an account?</p>
+                    <button class="auth-switch-btn" onclick="switchAuthMode('signup')">Sign up here</button>
+                </div>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div id="signupFormContainer" class="auth-form-container" style="display: none;">
+                <div class="error-message" id="signupError"></div>
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label" for="signupName">Full Name</label>
+                        <input type="text" id="signupName" name="name" class="form-input" 
+                               placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" name="email" class="form-input" 
+                               placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupPhone">Phone (Optional)</label>
+                        <input type="tel" id="signupPhone" name="phone" class="form-input" 
+                               placeholder="Enter your phone number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" name="password" class="form-input" 
+                               placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" name="confirmPassword" class="form-input" 
+                               placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Sign Up</button>
+                </form>
+                <div class="auth-switch">
+                    <p class="auth-switch-text">Already have an account?</p>
+                    <button class="auth-switch-btn" onclick="switchAuthMode('signin')">Sign in here</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Corporate Plans Modal -->
+    <div class="auth-modal" id="corporateModal" style="display: none;">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <h2 class="auth-modal-title">Corporate Plans</h2>
+                <button class="auth-close-btn" onclick="closeCorporateModal()">×</button>
+            </div>
+            <div class="auth-form-container">
+                <div class="error-message" id="corporateError"></div>
+                <form id="corporateForm" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label" for="corporateCompany">Company Name</label>
+                        <input type="text" id="corporateCompany" name="companyName" class="form-input" 
+                               placeholder="Enter your company name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="corporateEmail">Email</label>
+                        <input type="email" id="corporateEmail" name="email" class="form-input" 
+                               placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="corporatePhone">Phone</label>
+                        <input type="tel" id="corporatePhone" name="phone" class="form-input" 
+                               placeholder="Enter your phone number" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="corporateRole">Role</label>
+                        <input type="text" id="corporateRole" name="role" class="form-input" 
+                               placeholder="Your company's role" required>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Submit Inquiry</button>
+                </form>
+            </div>
+        </div>
+    </div>
+     <!-- Leaflet JS for map support -->
+     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+     <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+     <script type="text/javascript">
+         (function(){
+             emailjs.init({
+                publicKey: "IG37CTbx3UqbTiBe4",
+             });
+         })();
+     </script>
+     <script src="scripts/user.js"></script>
+     <script src="scripts/app.js"></script>
+     <script src="scripts/search.js"></script>
+     <script src="scripts/calendar.js"></script>
+     <script src="scripts/chat.js"></script>
+
+    <!-- PlannrAI Assistant Floating Button + Modal -->
+    <div id="plannrai-assistant-container">
+        <button id="plannrai-assistant-btn" title="Open PlannrAI Assistant">💬 PlannrAI Assistant</button>
+        <div id="plannrai-assistant-modal" class="plannrai-modal" aria-hidden="true">
+            <div class="plannrai-modal-backdrop" onclick="closePlannrAI()"></div>
+            <div class="plannrai-modal-panel">
+                <div class="plannrai-modal-header">
+                    <h3>PlannrAI Assistant</h3>
+                    <button class="plannrai-close" onclick="closePlannrAI()">×</button>
+                </div>
+                <div class="plannrai-modal-body">
+                    <iframe id="plannrai-iframe" src="https://plannrai-sync-chatbot.onrender.com/frontend/index.html" frameborder="0" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
