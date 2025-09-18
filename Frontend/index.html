@@ -15,6 +15,12 @@
     <script src="scripts/config.js"></script>
 </head>
 <body class="loading">
+    <!-- Humorous loading overlay shown while waiting for backend (Render cold start) -->
+    <div id="renderLoadingOverlay" style="position:fixed;inset:0;background:rgba(2,6,23,0.85);color:#fff;display:flex;align-items:center;justify-content:center;z-index:200000;flex-direction:column;padding:20px;gap:12px;">
+        <div style="font-size:26px;font-weight:700;">Hold tight — waking up the servers ☕️</div>
+        <div id="renderLoadingSub" style="font-size:16px;opacity:0.9;max-width:720px;text-align:center;">They take their time making good coffee. This might take a few seconds.</div>
+        <div style="margin-top:8px;"><button id="renderRetryBtn" style="padding:8px 14px;border-radius:8px;border:none;background:#10b981;color:#fff;cursor:pointer;">Try again</button></div>
+    </div>
     <!-- Hero Section -->
     <div class="hero">
         <!-- Navigation -->
