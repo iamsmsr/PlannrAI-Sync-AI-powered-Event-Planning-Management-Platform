@@ -24,8 +24,8 @@
   const msgEl = document.getElementById('msg');
   const retryBtn = document.getElementById('retry');
 
-  const API_BASE = window.API_BASE || 'http://localhost:8080';
-  
+  //const API_BASE = window.API_BASE || 'http://localhost:8080';
+  const API_BASE = 'https://plannraisyncb.onrender.com'
   let retryCount = 0;
   let maxRetries = 10;
 
@@ -63,7 +63,7 @@
       const res = await fetch(API_BASE + '/api/venues/all', { method: 'GET' });
       if (res.ok) {
         statusEl.textContent = 'Perfect! Everything is ready to party 🎉';
-        setTimeout(() => { window.location.href = 'index.html'; }, 600);
+        setTimeout(() => { window.location.href = '../index.html'; }, 600);
         return true;
       } else {
         statusEl.textContent = getRandomMessage(retryMessages) + ` (${res.status})`;
