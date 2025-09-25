@@ -2,6 +2,9 @@
 
 PlannrAI Sync is an intelligent RESTful event management platform or web application that combines interactive tools, AI recommendations, and real-time collaboration to make planning and executing events effortless. Whether you’re a customer searching for venues, a vendor offering services, or an admin managing the system, PlannrAI Sync streamlines the entire process from discovery to booking.
 
+YT DEMO: https://www.youtube.com/watch?v=e0YORYvfm_U
+
+
 **Key Features**
 
 🔍 Interactive Map Search – Find venues and vendors by location, type, and availability.
