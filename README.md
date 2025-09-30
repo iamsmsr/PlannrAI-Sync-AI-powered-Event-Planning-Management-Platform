@@ -13,6 +13,8 @@ YT DEMO: https://www.youtube.com/watch?v=e0YORYvfm_U
 
 🤖 AI Assistance (Bengali & English) – Get suggestions for decorations, budgeting, and planning from RAG ChatBot.
 
+🖼️ AI Photo Tools – Generate photos from text, transform photo-to-photo, and remove backgrounds effortlessly.
+
 🌦 Live Weather Updates – Plan better with real-time weather insights.
 
 📝 Collaborative Event Planning – Share tasks, ideas, and checklists with your team.
